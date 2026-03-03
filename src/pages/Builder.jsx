@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { PanelRight, PanelLeft, FileText } from 'lucide-react';
+import { PanelRight, PanelLeft, FileText } from 'lucide-react'; // FileText used in mobile toggle
+import ResumePreview from '../components/Preview/ResumePreview';
 
 import Navbar from '../components/Layout/Navbar';
 import Sidebar, { SECTIONS } from '../components/Layout/Sidebar';
@@ -20,35 +21,6 @@ const FORM_MAP = {
   certifications: <CertificationsForm />,
 };
 
-// ── Preview placeholder (replaced in Day 2) ─────────────────────────────────
-function PreviewPlaceholder() {
-  return (
-    <div className="flex flex-col items-center justify-center h-full bg-slate-100 text-slate-400 gap-3 p-6">
-      <div className="w-16 h-16 bg-slate-200 rounded-xl flex items-center justify-center">
-        <FileText size={28} className="text-slate-400" />
-      </div>
-      <p className="text-base font-semibold text-slate-500">Preview Coming Soon</p>
-      <p className="text-xs text-center leading-relaxed max-w-[180px]">
-        Live resume preview will appear here in Day 2 once templates are built.
-      </p>
-      {/* A4 ghost outline */}
-      <div className="mt-4 border-2 border-dashed border-slate-300 rounded-lg"
-           style={{ width: '148px', height: '209px' }}>
-        <div className="w-full h-full flex flex-col gap-2 p-3">
-          <div className="h-3 bg-slate-200 rounded w-3/4" />
-          <div className="h-2 bg-slate-200 rounded w-1/2" />
-          <div className="h-px bg-slate-300 my-1" />
-          <div className="h-2 bg-slate-200 rounded w-full" />
-          <div className="h-2 bg-slate-200 rounded w-5/6" />
-          <div className="h-2 bg-slate-200 rounded w-4/6" />
-          <div className="h-px bg-slate-300 my-1" />
-          <div className="h-2 bg-slate-200 rounded w-full" />
-          <div className="h-2 bg-slate-200 rounded w-3/4" />
-        </div>
-      </div>
-    </div>
-  );
-}
 
 // ── Mobile section tab bar ───────────────────────────────────────────────────
 function MobileTabBar({ activeSection, onSectionChange }) {
@@ -157,7 +129,7 @@ export default function Builder() {
           }`}
           style={{ width: '35%', minWidth: '280px' }}
         >
-          <PreviewPlaceholder />
+          <ResumePreview />
         </div>
       </div>
 
