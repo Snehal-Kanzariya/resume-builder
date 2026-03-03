@@ -36,7 +36,7 @@ export const sampleData = {
       current: false,
       location: 'Remote',
       bullets: [
-        'Built the company's main React SPA from scratch, scaling to 50k DAU.',
+        "Built the company's main React SPA from scratch, scaling to 50k DAU.",
         'Integrated Stripe payments and reduced checkout drop-off by 25%.',
         'Improved Lighthouse performance score from 54 to 91.',
       ],

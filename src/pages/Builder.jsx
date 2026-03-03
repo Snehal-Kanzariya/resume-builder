@@ -122,12 +122,20 @@ export default function Builder() {
           </div>
         </main>
 
-        {/* ── RIGHT: Preview panel (desktop always visible, mobile toggle) ── */}
+        {/* ── RIGHT: Preview panel — sticky by flex layout (only center scrolls) ── */}
         <div
-          className={`md:flex flex-col border-l border-slate-200 overflow-hidden ${
+          className={`md:flex flex-col border-l border-slate-200 ${
             mobileView === 'preview' ? 'flex flex-1' : 'hidden'
           }`}
-          style={{ width: '35%', minWidth: '280px' }}
+          style={{
+            width: '35%',
+            minWidth: '280px',
+            position: 'sticky',
+            top: 0,
+            alignSelf: 'flex-start',
+            height: 'calc(100vh - 56px)',   /* viewport minus navbar */
+            overflowY: 'auto',
+          }}
         >
           <ResumePreview />
         </div>
