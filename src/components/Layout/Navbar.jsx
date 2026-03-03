@@ -49,14 +49,13 @@ export default function Navbar() {
           <Eye size={15} />
           Full Preview
         </Link>
-        <button
-          disabled
-          title="PDF export — coming in Day 2"
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
+        <Link
+          to="/preview"
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
         >
           <Download size={15} />
           <span className="hidden sm:block">Download PDF</span>
-        </button>
+        </Link>
       </div>
     </header>
   );

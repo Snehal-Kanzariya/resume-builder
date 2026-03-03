@@ -1,11 +1,11 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ResumeProvider } from './context/ResumeContext';
-import Builder from './pages/Builder';
+import Builder     from './pages/Builder';
+import PreviewPage from './pages/PreviewPage';
 
-// Pages (to be built in Day 3)
-// import Home from './pages/Home';
+// To be built in Day 3
+// import Home          from './pages/Home';
 // import TemplatesPage from './pages/TemplatesPage';
-// import PreviewPage from './pages/PreviewPage';
 
 function Placeholder({ name }) {
   return (
@@ -23,7 +23,7 @@ export default function App() {
           <Route path="/"          element={<Placeholder name="Home" />} />
           <Route path="/builder"   element={<Builder />} />
           <Route path="/templates" element={<Placeholder name="Templates" />} />
-          <Route path="/preview"   element={<Placeholder name="Preview" />} />
+          <Route path="/preview"   element={<PreviewPage />} />
         </Routes>
       </ResumeProvider>
     </BrowserRouter>
