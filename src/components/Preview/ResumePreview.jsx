@@ -1,10 +1,13 @@
 import { forwardRef, useRef, useState } from 'react';
+import { useReactToPrint } from 'react-to-print';
 import {
-  LayoutTemplate, Palette, ZoomIn, ZoomOut,
+  LayoutTemplate, Palette, ZoomIn,
   Type, FlaskConical, Check,
+  Printer, Download, Loader2,
 } from 'lucide-react';
 import { useResume } from '../../context/ResumeContext';
 import { sampleData } from '../../data/sampleData';
+import { downloadPDF, buildFilename, PRINT_PAGE_STYLE } from '../../utils/pdfExport';
 import A4Container from './A4Container';
 
 import ModernTemplate       from '../Templates/ModernTemplate';
@@ -23,36 +26,76 @@ export const TEMPLATES = [
   { id: 'professional', label: 'Professional', Component: ProfessionalTemplate },
 ];
 
+export const FONT_SCALES = { small: 0.88, medium: 1.0, large: 1.11 };
+
 const ACCENT_PRESETS = [
   '#2563eb', '#7c3aed', '#059669', '#dc2626',
   '#d97706', '#0891b2', '#db2777', '#1e293b',
 ];
 
-const FONT_SCALES = { small: 0.88, medium: 1.0, large: 1.11 };
+const ZOOM_WIDTHS = { fit: '100%', '75': '75%', '100': '794px' };
 
-// zoom key → width of the A4Container wrapper inside the scroll area
-const ZOOM_WIDTHS = { fit: '100%', '75': '75%', '100': `794px` };
+// ── Small helpers ─────────────────────────────────────────────────────────────
 
-// ── Divider ───────────────────────────────────────────────────────────────────
 function Sep() {
   return <div className="w-px h-4 bg-slate-200 flex-shrink-0" />;
 }
 
+function SegmentedBtn({ options, value, onChange }) {
+  return (
+    <div className="flex rounded-md border border-slate-200 overflow-hidden">
+      {options.map(({ key, label }) => (
+        <button
+          key={key}
+          onClick={() => onChange(key)}
+          className={`px-2 py-0.5 text-[10px] font-medium transition-colors border-r last:border-r-0 border-slate-200 ${
+            value === key ? 'bg-blue-600 text-white' : 'text-slate-500 hover:bg-slate-50'
+          }`}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 // ── ResumePreview ─────────────────────────────────────────────────────────────
 
-const ResumePreview = forwardRef(function ResumePreview(_props, externalRef) {
-  const internalRef = useRef(null);
-  const printRef    = externalRef ?? internalRef;
+const ResumePreview = forwardRef(function ResumePreview(_props, _externalRef) {
+  // Hidden full-res print target (794×1123, no CSS transforms)
+  const printContentRef = useRef(null);
 
   const { resumeData, updateSettings, loadSampleData } = useResume();
   const { selectedTemplate, accentColor, fontSize } = resumeData.settings;
 
-  // Local UI state — not persisted
-  const [zoom, setZoom]           = useState('fit');
-  const [sampleLoaded, setSample] = useState(false);
+  const [zoom,        setZoom]        = useState('fit');
+  const [sampleLoaded, setSample]     = useState(false);
+  const [isDownloading, setDownloading] = useState(false);
 
   const { Component } = TEMPLATES.find(t => t.id === selectedTemplate) ?? TEMPLATES[0];
   const contentScale  = FONT_SCALES[fontSize] ?? 1.0;
+
+  // ── react-to-print (primary — selectable text, exact colours) ────────────
+  const handlePrint = useReactToPrint({
+    contentRef: printContentRef,
+    documentTitle: buildFilename(resumeData.personalInfo.fullName).replace('.pdf', ''),
+    pageStyle: PRINT_PAGE_STYLE,
+  });
+
+  // ── html2canvas + jsPDF (fallback download) ───────────────────────────────
+  async function handleDownload() {
+    setDownloading(true);
+    try {
+      await downloadPDF(
+        printContentRef.current,
+        buildFilename(resumeData.personalInfo.fullName),
+      );
+    } catch (err) {
+      console.error('PDF export failed:', err);
+    } finally {
+      setDownloading(false);
+    }
+  }
 
   function handleLoadSample() {
     loadSampleData(sampleData);
@@ -63,29 +106,27 @@ const ResumePreview = forwardRef(function ResumePreview(_props, externalRef) {
   return (
     <div className="flex flex-col h-full bg-slate-100 overflow-hidden">
 
-      {/* ── TOOLBAR ─────────────────────────────────────────────────────────── */}
+      {/* ── TOOLBAR ──────────────────────────────────────────────────────────── */}
       <div className="flex-shrink-0 bg-white border-b border-slate-200">
 
-        {/* Row 1 — template + color + sample */}
+        {/* Row 1 — template · colours · sample data */}
         <div className="flex items-center gap-2 px-3 py-2 flex-wrap">
 
           {/* Template selector */}
-          <div className="flex items-center gap-1.5 min-w-0">
+          <div className="flex items-center gap-1.5">
             <LayoutTemplate size={13} className="text-slate-400 flex-shrink-0" />
             <select
               value={selectedTemplate}
               onChange={e => updateSettings('selectedTemplate', e.target.value)}
-              className="text-xs font-medium text-slate-700 bg-transparent border-none outline-none cursor-pointer max-w-[100px]"
+              className="text-xs font-medium text-slate-700 bg-transparent border-none outline-none cursor-pointer"
             >
-              {TEMPLATES.map(t => (
-                <option key={t.id} value={t.id}>{t.label}</option>
-              ))}
+              {TEMPLATES.map(t => <option key={t.id} value={t.id}>{t.label}</option>)}
             </select>
           </div>
 
           <Sep />
 
-          {/* Accent color presets */}
+          {/* Accent presets + custom picker */}
           <div className="flex items-center gap-1.5">
             <Palette size={13} className="text-slate-400 flex-shrink-0" />
             <div className="flex gap-1 items-center">
@@ -96,13 +137,10 @@ const ResumePreview = forwardRef(function ResumePreview(_props, externalRef) {
                   title={color}
                   style={{ backgroundColor: color }}
                   className={`w-3.5 h-3.5 rounded-full flex-shrink-0 transition-transform hover:scale-125 ${
-                    accentColor === color
-                      ? 'ring-2 ring-offset-1 ring-slate-500 scale-125'
-                      : ''
+                    accentColor === color ? 'ring-2 ring-offset-1 ring-slate-500 scale-125' : ''
                   }`}
                 />
               ))}
-              {/* Custom color input */}
               <label
                 className="relative w-3.5 h-3.5 rounded-full overflow-hidden cursor-pointer border border-slate-300 flex-shrink-0"
                 title="Custom colour"
@@ -123,7 +161,7 @@ const ResumePreview = forwardRef(function ResumePreview(_props, externalRef) {
 
           <Sep />
 
-          {/* Load Sample Data */}
+          {/* Sample data */}
           <button
             onClick={handleLoadSample}
             className={`flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-md transition-all flex-shrink-0 ${
@@ -132,70 +170,75 @@ const ResumePreview = forwardRef(function ResumePreview(_props, externalRef) {
                 : 'bg-slate-50 hover:bg-slate-100 text-slate-600 hover:text-slate-800'
             }`}
           >
-            {sampleLoaded
-              ? <><Check size={12} /> Loaded!</>
-              : <><FlaskConical size={12} /> Sample Data</>
-            }
+            {sampleLoaded ? <><Check size={12} /> Loaded!</> : <><FlaskConical size={12} /> Sample Data</>}
           </button>
         </div>
 
-        {/* Row 2 — font size + zoom */}
+        {/* Row 2 — font size · zoom · print · download */}
         <div className="flex items-center gap-2 px-3 py-1.5 border-t border-slate-100 flex-wrap">
 
           {/* Font size */}
           <div className="flex items-center gap-1.5">
             <Type size={12} className="text-slate-400 flex-shrink-0" />
-            <div className="flex rounded-md border border-slate-200 overflow-hidden">
-              {(['small', 'medium', 'large']).map((size, i) => (
-                <button
-                  key={size}
-                  onClick={() => updateSettings('fontSize', size)}
-                  className={`px-2 py-0.5 text-[10px] font-medium transition-colors border-r last:border-r-0 border-slate-200 ${
-                    fontSize === size
-                      ? 'bg-blue-600 text-white'
-                      : 'text-slate-500 hover:bg-slate-50'
-                  }`}
-                >
-                  {size === 'small' ? 'S' : size === 'medium' ? 'M' : 'L'}
-                </button>
-              ))}
-            </div>
+            <SegmentedBtn
+              value={fontSize}
+              onChange={v => updateSettings('fontSize', v)}
+              options={[
+                { key: 'small',  label: 'S' },
+                { key: 'medium', label: 'M' },
+                { key: 'large',  label: 'L' },
+              ]}
+            />
           </div>
 
           <Sep />
 
-          {/* Zoom controls */}
+          {/* Zoom */}
           <div className="flex items-center gap-1.5">
             <ZoomIn size={12} className="text-slate-400 flex-shrink-0" />
-            <div className="flex rounded-md border border-slate-200 overflow-hidden">
-              {[
+            <SegmentedBtn
+              value={zoom}
+              onChange={setZoom}
+              options={[
                 { key: 'fit', label: 'Fit'  },
                 { key: '75',  label: '75%'  },
                 { key: '100', label: '100%' },
-              ].map(({ key, label }) => (
-                <button
-                  key={key}
-                  onClick={() => setZoom(key)}
-                  className={`px-2 py-0.5 text-[10px] font-medium transition-colors border-r last:border-r-0 border-slate-200 ${
-                    zoom === key
-                      ? 'bg-blue-600 text-white'
-                      : 'text-slate-500 hover:bg-slate-50'
-                  }`}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
+              ]}
+            />
           </div>
+
+          <Sep />
+
+          {/* Print (react-to-print — selectable text) */}
+          <button
+            onClick={handlePrint}
+            className="flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors flex-shrink-0"
+            title="Open browser print dialog (text selectable)"
+          >
+            <Printer size={13} />
+            Print
+          </button>
+
+          {/* Download PDF (html2canvas fallback) */}
+          <button
+            onClick={handleDownload}
+            disabled={isDownloading}
+            className="flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-md bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white transition-colors flex-shrink-0"
+            title="Download PDF via html2canvas"
+          >
+            {isDownloading
+              ? <><Loader2 size={13} className="animate-spin" /> Generating…</>
+              : <><Download size={13} /> Download PDF</>
+            }
+          </button>
         </div>
       </div>
 
-      {/* ── A4 PREVIEW SCROLL AREA ──────────────────────────────────────────── */}
+      {/* ── A4 PREVIEW (scaled to fit panel) ────────────────────────────────── */}
       <div
         className="flex-1 overflow-y-auto overflow-x-auto p-4"
         style={{ scrollbarWidth: 'thin' }}
       >
-        {/* Zoom width wrapper — changing width triggers ResizeObserver in A4Container */}
         <div
           style={{
             width: ZOOM_WIDTHS[zoom],
@@ -204,9 +247,24 @@ const ResumePreview = forwardRef(function ResumePreview(_props, externalRef) {
             transition: 'width 0.2s ease',
           }}
         >
-          <A4Container ref={printRef} contentScale={contentScale}>
+          <A4Container contentScale={contentScale}>
             <Component />
           </A4Container>
+        </div>
+      </div>
+
+      {/* ── HIDDEN FULL-RES PRINT TARGET ─────────────────────────────────────
+           794×1123 px at native scale, no CSS transforms.
+           react-to-print and html2canvas both target this element.        ── */}
+      <div
+        style={{ position: 'fixed', left: '-9999px', top: 0, width: '794px', zIndex: -1 }}
+        aria-hidden="true"
+      >
+        <div
+          ref={printContentRef}
+          style={{ width: '794px', height: '1123px', backgroundColor: '#ffffff', overflow: 'hidden' }}
+        >
+          <Component />
         </div>
       </div>
     </div>
