@@ -1,9 +1,9 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ResumeProvider } from './context/ResumeContext';
+import Builder from './pages/Builder';
 
 // Pages (to be built in Day 3)
 // import Home from './pages/Home';
-// import Builder from './pages/Builder';
 // import TemplatesPage from './pages/TemplatesPage';
 // import PreviewPage from './pages/PreviewPage';
 
@@ -20,10 +20,10 @@ export default function App() {
     <BrowserRouter>
       <ResumeProvider>
         <Routes>
-          <Route path="/" element={<Placeholder name="Home" />} />
-          <Route path="/builder" element={<Placeholder name="Builder" />} />
+          <Route path="/"          element={<Placeholder name="Home" />} />
+          <Route path="/builder"   element={<Builder />} />
           <Route path="/templates" element={<Placeholder name="Templates" />} />
-          <Route path="/preview" element={<Placeholder name="Preview" />} />
+          <Route path="/preview"   element={<Placeholder name="Preview" />} />
         </Routes>
       </ResumeProvider>
     </BrowserRouter>
