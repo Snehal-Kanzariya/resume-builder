@@ -11,7 +11,7 @@ export default function App() {
   return (
     <ThemeProvider>
       <ToastProvider>
-        <BrowserRouter>
+        <BrowserRouter basename="/resume-builder">
           <ResumeProvider>
             <Routes>
               <Route path="/"          element={<Home />} />

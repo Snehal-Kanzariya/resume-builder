@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ResumeAI — Project Documentation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:    #2563eb;
+      --violet:  #7c3aed;
+      --emerald: #059669;
+      --slate9:  #0f172a;
+      --slate8:  #1e293b;
+      --slate7:  #334155;
+      --slate5:  #64748b;
+      --slate3:  #cbd5e1;
+      --slate1:  #f8fafc;
+      --white:   #ffffff;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--slate1);
+      color: var(--slate8);
+      line-height: 1.65;
+      font-size: 15px;
+    }
+
+    /* ── Print overrides ── */
+    @media print {
+      body { background: white; font-size: 11pt; }
+      .no-print { display: none !important; }
+      .page-break { page-break-before: always; }
+      section { page-break-inside: avoid; }
+      @page { size: A4 portrait; margin: 18mm 20mm; }
+      a { color: inherit; text-decoration: none; }
+      .hero { background: #0f172a !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+
+    /* ── Layout ── */
+    .container { max-width: 860px; margin: 0 auto; padding: 0 24px; }
+
+    /* ── Print button ── */
+    .print-bar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: white;
+      border-bottom: 1px solid var(--slate3);
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .print-bar-label { font-size: 13px; color: var(--slate5); }
+    .btn-print {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 18px;
+      background: var(--blue);
+      color: white;
+      font-size: 13px;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+    .btn-print:hover { background: #1d4ed8; }
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      background: transparent;
+      color: var(--slate5);
+      font-size: 13px;
+      font-weight: 500;
+      border: 1px solid var(--slate3);
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+    .btn-back:hover { background: var(--slate1); color: var(--slate8); }
+
+    /* ── Hero ── */
+    .hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+      padding: 60px 24px 56px;
+      text-align: center;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 100px;
+      padding: 5px 14px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 20px;
+    }
+    .hero h1 {
+      font-size: clamp(28px, 5vw, 44px);
+      font-weight: 800;
+      color: white;
+      line-height: 1.2;
+      margin-bottom: 12px;
+    }
+    .hero h1 span {
+      background: linear-gradient(90deg, #60a5fa, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero p {
+      color: rgba(255,255,255,0.6);
+      font-size: 16px;
+      max-width: 540px;
+      margin: 0 auto 28px;
+    }
+    .hero-chips {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+    }
+    .chip {
+      padding: 4px 12px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid;
+    }
+    .chip-blue   { background: rgba(37,99,235,0.2);  border-color: rgba(37,99,235,0.4);  color: #93c5fd; }
+    .chip-violet { background: rgba(124,58,237,0.2); border-color: rgba(124,58,237,0.4); color: #c4b5fd; }
+    .chip-green  { background: rgba(5,150,105,0.2);  border-color: rgba(5,150,105,0.4);  color: #6ee7b7; }
+    .chip-amber  { background: rgba(217,119,6,0.2);  border-color: rgba(217,119,6,0.4);  color: #fcd34d; }
+
+    /* ── Sections ── */
+    .docs-body { padding: 48px 0 72px; }
+
+    section { margin-bottom: 52px; }
+
+    h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--slate9);
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    h2 .section-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    h3 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--slate8);
+      margin: 20px 0 10px;
+    }
+    p { margin-bottom: 12px; color: var(--slate7); }
+
+    /* ── Cards ── */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+    }
+    .card {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 18px;
+      transition: box-shadow 0.15s;
+    }
+    .card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+    .card-icon {
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+    .card h3 { margin: 0 0 6px; font-size: 14px; }
+    .card p  { font-size: 13px; margin: 0; line-height: 1.5; }
+
+    /* ── Tables ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+    }
+    th {
+      background: var(--slate1);
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--slate5);
+      border-bottom: 1px solid #e2e8f0;
+    }
+    td {
+      padding: 11px 14px;
+      border-bottom: 1px solid #f1f5f9;
+      color: var(--slate7);
+      vertical-align: top;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #f8fafc; }
+    td strong { color: var(--slate9); font-weight: 600; }
+
+    /* ── Code ── */
+    pre, code {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    code {
+      font-size: 12px;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      border-radius: 4px;
+      padding: 1px 6px;
+      color: var(--violet);
+    }
+    pre {
+      background: var(--slate9);
+      color: #e2e8f0;
+      border-radius: 10px;
+      padding: 20px;
+      font-size: 12.5px;
+      line-height: 1.7;
+      overflow-x: auto;
+      margin: 16px 0;
+    }
+    pre code {
+      background: none;
+      border: none;
+      padding: 0;
+      color: inherit;
+    }
+
+    /* ── Flow diagram ── */
+    .flow {
+      background: var(--slate9);
+      border-radius: 10px;
+      padding: 24px;
+      color: #94a3b8;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px;
+      line-height: 1.9;
+    }
+    .flow .highlight { color: #60a5fa; }
+    .flow .accent    { color: #a78bfa; }
+    .flow .green     { color: #6ee7b7; }
+
+    /* ── Stats band ── */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: #e2e8f0;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+    }
+    .stat {
+      background: white;
+      padding: 20px 16px;
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--blue);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .stat-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--slate5);
+    }
+
+    /* ── Highlights ── */
+    .highlight-box {
+      border-left: 3px solid var(--blue);
+      background: #eff6ff;
+      border-radius: 0 8px 8px 0;
+      padding: 14px 18px;
+      margin: 16px 0;
+      font-size: 14px;
+      color: #1e40af;
+    }
+
+    /* ── Template gallery ── */
+    .template-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 12px;
+    }
+    .template-card {
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      overflow: hidden;
+      background: white;
+    }
+    .template-thumb {
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+    .template-info { padding: 10px 12px; }
+    .template-info .name { font-size: 13px; font-weight: 600; color: var(--slate9); }
+    .template-info .desc { font-size: 11px; color: var(--slate5); margin-top: 2px; }
+
+    /* ── Stack badges ── */
+    .stack-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+    .stack-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 12px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 600;
+      background: #f1f5f9;
+      color: var(--slate7);
+      border: 1px solid #e2e8f0;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      background: var(--slate9);
+      color: rgba(255,255,255,0.5);
+      text-align: center;
+      padding: 28px 24px;
+      font-size: 13px;
+    }
+    .footer a { color: #60a5fa; text-decoration: none; }
+    .footer a:hover { text-decoration: underline; }
+
+    @media (max-width: 600px) {
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .card-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Print / Nav bar -->
+<div class="print-bar no-print">
+  <a href="./" class="btn-back">← Back to App</a>
+  <span class="print-bar-label">Open in browser · Ctrl+P to save as PDF</span>
+  <button class="btn-print" onclick="window.print()">
+    🖨 Save as PDF
+  </button>
+</div>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-badge">✦ Project Documentation</div>
+  <h1>ResumeAI<br><span>Free AI-Powered Resume Builder</span></h1>
+  <p>Build a professional resume in minutes — live preview, 10 templates, AI enhancement, instant PDF export.</p>
+  <div class="hero-chips">
+    <span class="chip chip-blue">React 19</span>
+    <span class="chip chip-violet">Vite 8</span>
+    <span class="chip chip-green">Tailwind CSS v4</span>
+    <span class="chip chip-amber">Groq AI</span>
+    <span class="chip chip-blue">100% Free</span>
+    <span class="chip chip-violet">Open Source</span>
+  </div>
+</div>
+
+<div class="container docs-body">
+
+  <!-- Stats -->
+  <section>
+    <div class="stats">
+      <div class="stat"><div class="stat-value">10</div><div class="stat-label">Templates</div></div>
+      <div class="stat"><div class="stat-value">AI</div><div class="stat-label">Enhanced</div></div>
+      <div class="stat"><div class="stat-value">PDF</div><div class="stat-label">Export</div></div>
+      <div class="stat"><div class="stat-value">0</div><div class="stat-label">Sign-ups</div></div>
+    </div>
+  </section>
+
+  <!-- Overview -->
+  <section>
+    <h2><span class="section-icon" style="background:#eff6ff;">📄</span> Overview</h2>
+    <p>
+      <strong>ResumeAI</strong> is a fully client-side React application that lets anyone build a polished,
+      ATS-friendly resume without an account, without a backend, and entirely for free.
+    </p>
+    <p>
+      The user fills in a multi-section form, watches the A4 preview update live on every keystroke,
+      optionally lets Groq AI rewrite each section with stronger language, and downloads a print-ready PDF
+      in one click.
+    </p>
+    <div class="highlight-box">
+      All data stays in the browser — nothing is sent to any server except optional AI calls to the Groq API.
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section>
+    <h2><span class="section-icon" style="background:#f5f3ff;">⚡</span> Features</h2>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon">👁</div>
+        <h3>Live Preview</h3>
+        <p>Every keystroke reflects instantly in the A4 preview panel — no refresh needed.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">✨</div>
+        <h3>AI Enhancement</h3>
+        <p>Groq AI rewrites content with stronger verbs, quantified metrics, and ATS keywords.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🆚</div>
+        <h3>Side-by-side Compare</h3>
+        <p>Compare original vs AI-enhanced versions section by section before accepting.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📥</div>
+        <h3>PDF Export</h3>
+        <p>react-to-print for selectable text + html2canvas + jsPDF fallback download.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🌙</div>
+        <h3>Dark Mode</h3>
+        <p>Full dark/light mode toggle with localStorage persistence.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">💾</div>
+        <h3>Auto-save</h3>
+        <p>Debounced auto-save to localStorage every 5 seconds — never lose your work.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🎨</div>
+        <h3>Accent Colours</h3>
+        <p>8 presets + full custom colour picker applied per template in real time.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📱</div>
+        <h3>Responsive</h3>
+        <p>Hamburger nav and tab-based section switcher down to 375 px mobile.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Templates -->
+  <section>
+    <h2><span class="section-icon" style="background:#ecfdf5;">🗂</span> 10 Resume Templates</h2>
+    <div class="template-grid">
+      <div class="template-card">
+        <div class="template-thumb" style="background:linear-gradient(135deg,#eff6ff,#dbeafe)">🟦</div>
+        <div class="template-info"><div class="name">Modern</div><div class="desc">2-column accent sidebar</div></div>
+      </div>
+      <div class="template-card">
+        <div class="template-thumb" style="background:linear-gradient(135deg,#f8fafc,#e2e8f0)">📜</div>
+        <div class="template-info"><div class="name">Classic</div><div class="desc">Serif, single column</div></div>
+      </div>
+      <div class="template-card">
+        <div class="template-thumb" style="background:linear-gradient(135deg,#f8fafc,#f1f5f9)">⬜</div>
+        <div class="template-info"><div class="name">Minimal</div><div class="desc">Ultra-clean whitespace</div></div>
+      </div>
+      <div class="template-card">
+        <div class="template-thumb" style="background:linear-gradient(135deg,#f5f3ff,#ede9fe)">🟣</div>
+        <div class="template-info"><div class="name">Creative</div><div class="desc">Bold, skill bars, gradient</div></div>
+      </div>
+      <div class="template-card">
+        <div class="template-thumb" style="background:linear-gradient(135deg,#ecfdf5,#d1fae5)">✅</div>
+        <div class="template-info"><div class="name">Professional</div><div class="desc">ATS-optimised</div></div>
+      </div>
+      <div class="template-card">
+        <div class="template-thumb" style="background:linear-gradient(135deg,#1e293b,#334155)">👔</div>
+        <div class="template-info"><div class="name">Executive</div><div class="desc">Authoritative, leadership</div></div>
+      </div>
+      <div class="template-card">
+        <div class="template-thumb" style="background:linear-gradient(135deg,#0f172a,#1e293b)">💻</div>
+        <div class="template-info"><div class="name">Tech</div><div class="desc">Monospace, engineering</div></div>
+      </div>
+      <div class="template-card">
+        <div class="template-thumb" style="background:linear-gradient(135deg,#f1f5f9,#e2e8f0)">📋</div>
+        <div class="template-info"><div class="name">Compact</div><div class="desc">Dense, experienced</div></div>
+      </div>
+      <div class="template-card">
+        <div class="template-thumb" style="background:linear-gradient(135deg,#fdf4ff,#f3e8ff)">🌸</div>
+        <div class="template-info"><div class="name">Elegant</div><div class="desc">Serif + light accents</div></div>
+      </div>
+      <div class="template-card">
+        <div class="template-thumb" style="background:linear-gradient(135deg,#fef2f2,#fee2e2)">🔴</div>
+        <div class="template-info"><div class="name">Bold</div><div class="desc">High-contrast headings</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tech Stack -->
+  <section>
+    <h2><span class="section-icon" style="background:#fffbeb;">🛠</span> Tech Stack</h2>
+
+    <h3>Frontend</h3>
+    <div class="stack-row">
+      <span class="stack-badge">⚛ React 19</span>
+      <span class="stack-badge">⚡ Vite 8</span>
+      <span class="stack-badge">🎨 Tailwind CSS v4</span>
+      <span class="stack-badge">🗺 react-router-dom v7</span>
+      <span class="stack-badge">✦ lucide-react</span>
+    </div>
+
+    <h3>AI Enhancement</h3>
+    <div class="stack-row">
+      <span class="stack-badge">🤖 Groq API</span>
+      <span class="stack-badge">🧠 llama-3.3-70b-versatile</span>
+      <span class="stack-badge">⏱ Rate limiting (4 s)</span>
+    </div>
+
+    <h3>PDF Export</h3>
+    <div class="stack-row">
+      <span class="stack-badge">🖨 react-to-print</span>
+      <span class="stack-badge">🖼 html2canvas</span>
+      <span class="stack-badge">📄 jsPDF</span>
+    </div>
+
+    <h3>State Management</h3>
+    <div class="stack-row">
+      <span class="stack-badge">📦 ResumeContext</span>
+      <span class="stack-badge">🌙 ThemeContext</span>
+      <span class="stack-badge">🔔 ToastContext</span>
+    </div>
+
+    <h3>Performance</h3>
+    <div class="stack-row">
+      <span class="stack-badge">🦥 React.lazy (10 templates)</span>
+      <span class="stack-badge">⏳ Suspense boundaries</span>
+      <span class="stack-badge">⏱ 5 s debounced auto-save</span>
+    </div>
+  </section>
+
+  <!-- Architecture / Data Flow -->
+  <section class="page-break">
+    <h2><span class="section-icon" style="background:#eff6ff;">🔁</span> Architecture &amp; Data Flow</h2>
+
+    <div class="flow">
+<span class="highlight">User Input (Forms)</span>
+      │
+      ▼
+<span class="accent">ResumeContext</span>  ──(auto-save every 5 s)──▶  <span class="green">localStorage</span>
+      │
+      ├──▶  <span class="highlight">ResumePreview</span>  ──▶  A4Container  ──▶  Template Component
+      │              │
+      │              ├──▶  react-to-print  ──▶  <span class="green">Browser Print Dialog</span>
+      │              └──▶  html2canvas + jsPDF  ──▶  <span class="green">.pdf download</span>
+      │
+      └──▶  <span class="accent">SectionAIPanel</span>  ──▶  <span class="highlight">Groq API</span> (llama-3.3-70b)
+                    │
+                    └──▶  aiResumeData (context)
+                                │
+                                └──▶  <span class="green">AICompareView</span> (side-by-side modal)
+    </div>
+
+    <h3>AI Enhancement Flow</h3>
+    <ol style="padding-left:20px;color:#475569;font-size:14px;line-height:2;">
+      <li>User clicks <strong>"Enhance with AI"</strong> in any form section</li>
+      <li><code>SectionAIPanel</code> calls <code>enhanceSection()</code> in <code>aiEnhance.js</code></li>
+      <li>A rate limiter enforces a 4-second minimum gap between API calls</li>
+      <li>Groq returns improved content (stronger verbs, metrics, ATS keywords)</li>
+      <li>Results are diffed inline (strikethrough original → green AI version)</li>
+      <li>The <code>aiResumeData</code> snapshot in context is updated</li>
+      <li><strong>Compare Versions</strong> button appears in the preview toolbar</li>
+      <li>Accept section-by-section or view the full side-by-side comparison</li>
+    </ol>
+
+    <h3>PDF Export Flow</h3>
+    <ol style="padding-left:20px;color:#475569;font-size:14px;line-height:2;">
+      <li>A hidden <code>794×1123 px</code> <code>&lt;div&gt;</code> renders the template at native A4 resolution with no CSS transforms</li>
+      <li><strong>Print</strong> → <code>react-to-print</code> injects <code>@page { size: A4; margin: 0 }</code> and opens the system dialog — fully text-selectable</li>
+      <li><strong>Download PDF</strong> → <code>html2canvas</code> rasterises at <code>2×</code> DPR, embeds into <code>jsPDF</code>, triggers <code>.save()</code></li>
+    </ol>
+  </section>
+
+  <!-- Project Structure -->
+  <section>
+    <h2><span class="section-icon" style="background:#f5f3ff;">📁</span> Project Structure</h2>
+    <pre><code>resume-builder/
+├── public/
+│   └── docs.html                   # This documentation page (printable)
+├── src/
+│   ├── components/
+│   │   ├── AI/
+│   │   │   ├── AICompareView.jsx   # Side-by-side compare modal
+│   │   │   ├── AISuggestions.jsx   # Per-section tip panel
+│   │   │   └── SectionAIPanel.jsx  # Enhance + diff + accept UI
+│   │   ├── Forms/                  # 6 section forms
+│   │   ├── Layout/
+│   │   │   ├── Navbar.jsx          # Responsive nav + hamburger
+│   │   │   └── Sidebar.jsx         # Section nav + Reset/Sample
+│   │   ├── Preview/
+│   │   │   ├── A4Container.jsx     # Scaled 794×1123 px wrapper
+│   │   │   └── ResumePreview.jsx   # Toolbar + live preview
+│   │   └── Templates/              # 10 templates (lazy-loaded)
+│   ├── context/
+│   │   ├── ResumeContext.jsx       # All resume state + mutations
+│   │   ├── ThemeContext.jsx        # Dark / light mode
+│   │   └── ToastContext.jsx        # Global notifications
+│   ├── data/sampleData.js          # Demo resume data
+│   ├── pages/                      # Home / Builder / Templates / Preview
+│   └── utils/
+│       ├── aiEnhance.js            # Groq API + rate limiting
+│       ├── pdfExport.js            # html2canvas + jsPDF
+│       └── storage.js              # localStorage helpers
+├── .github/workflows/deploy.yml    # Auto-deploy to GitHub Pages
+└── index.html                      # Entry + meta / OG tags</code></pre>
+  </section>
+
+  <!-- Getting Started -->
+  <section>
+    <h2><span class="section-icon" style="background:#ecfdf5;">🚀</span> Getting Started</h2>
+
+    <h3>Prerequisites</h3>
+    <div class="stack-row">
+      <span class="stack-badge">Node.js ≥ 18</span>
+      <span class="stack-badge">npm or pnpm</span>
+      <span class="stack-badge">Groq API key (optional)</span>
+    </div>
+
+    <h3>Installation</h3>
+    <pre><code># 1. Clone
+git clone https://github.com/Snehal-Kanzariya/resume-builder.git
+cd resume-builder
+
+# 2. Install dependencies
+npm install
+
+# 3. (Optional) Add Groq API key
+echo "VITE_GROQ_API_KEY=gsk_your_key_here" > .env
+
+# 4. Start dev server
+npm run dev          # → http://localhost:5173</code></pre>
+
+    <h3>Available Scripts</h3>
+    <table>
+      <tr><th>Command</th><th>Description</th></tr>
+      <tr><td><code>npm run dev</code></td><td>Start Vite dev server with HMR</td></tr>
+      <tr><td><code>npm run build</code></td><td>Build for production to <code>dist/</code></td></tr>
+      <tr><td><code>npm run preview</code></td><td>Preview the production build locally</td></tr>
+      <tr><td><code>npm run lint</code></td><td>Run ESLint across all source files</td></tr>
+    </table>
+  </section>
+
+  <!-- Keyboard Shortcuts -->
+  <section>
+    <h2><span class="section-icon" style="background:#fffbeb;">⌨</span> Keyboard Shortcuts</h2>
+    <table>
+      <tr><th>Shortcut</th><th>Action</th></tr>
+      <tr><td><code>Ctrl + P</code></td><td>Open browser print dialog (also saves as PDF)</td></tr>
+      <tr><td><code>Ctrl + S</code></td><td>Show auto-save confirmation toast</td></tr>
+    </table>
+  </section>
+
+  <!-- Deployment -->
+  <section>
+    <h2><span class="section-icon" style="background:#eff6ff;">🌐</span> Deployment</h2>
+    <p>
+      The app is automatically deployed to <strong>GitHub Pages</strong> via GitHub Actions on every push to <code>main</code>.
+    </p>
+    <table>
+      <tr><th>URL</th><th>Description</th></tr>
+      <tr><td><a href="https://snehal-kanzariya.github.io/resume-builder/">snehal-kanzariya.github.io/resume-builder/</a></td><td>Live application</td></tr>
+      <tr><td><a href="https://snehal-kanzariya.github.io/resume-builder/docs.html">…/docs.html</a></td><td>This documentation (printable PDF)</td></tr>
+    </table>
+
+    <h3>Manual Deployment</h3>
+    <pre><code>npm run build
+# Push dist/ to gh-pages branch (handled automatically by CI)</code></pre>
+  </section>
+
+  <!-- Contributing -->
+  <section>
+    <h2><span class="section-icon" style="background:#ecfdf5;">🤝</span> Contributing</h2>
+    <ol style="padding-left:20px;color:#475569;font-size:14px;line-height:2.2;">
+      <li>Fork the repository on GitHub</li>
+      <li>Create a feature branch: <code>git checkout -b feat/your-feature</code></li>
+      <li>Commit your changes: <code>git commit -m "feat: add your feature"</code></li>
+      <li>Push: <code>git push origin feat/your-feature</code></li>
+      <li>Open a Pull Request</li>
+    </ol>
+  </section>
+
+  <!-- License -->
+  <section>
+    <h2><span class="section-icon" style="background:#ecfdf5;">📝</span> License</h2>
+    <p>MIT © 2026 <a href="https://github.com/Snehal-Kanzariya" style="color:var(--blue)">Snehal Kanzariya</a></p>
+    <p style="font-size:13px;">
+      Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files, to deal in the software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the software.
+    </p>
+  </section>
+
+</div>
+
+<!-- Footer -->
+<div class="footer">
+  <p>
+    <a href="https://snehal-kanzariya.github.io/resume-builder/">Live Demo</a> ·
+    <a href="https://github.com/Snehal-Kanzariya/resume-builder">GitHub</a> ·
+    <a href="https://github.com/Snehal-Kanzariya/resume-builder/issues">Report Bug</a>
+  </p>
+  <p style="margin-top:8px;">Built with React + AI · Open Source · Free Forever</p>
+</div>
+
+</body>
+</html>
