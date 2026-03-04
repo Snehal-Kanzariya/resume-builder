@@ -17,6 +17,11 @@ import ClassicTemplate      from '../Templates/ClassicTemplate';
 import MinimalTemplate      from '../Templates/MinimalTemplate';
 import CreativeTemplate     from '../Templates/CreativeTemplate';
 import ProfessionalTemplate from '../Templates/ProfessionalTemplate';
+import ExecutiveTemplate    from '../Templates/ExecutiveTemplate';
+import TechTemplate         from '../Templates/TechTemplate';
+import CompactTemplate      from '../Templates/CompactTemplate';
+import ElegantTemplate      from '../Templates/ElegantTemplate';
+import BoldTemplate         from '../Templates/BoldTemplate';
 
 // ── Config ────────────────────────────────────────────────────────────────────
 
@@ -26,6 +31,11 @@ export const TEMPLATES = [
   { id: 'minimal',      label: 'Minimal',      Component: MinimalTemplate },
   { id: 'creative',     label: 'Creative',     Component: CreativeTemplate },
   { id: 'professional', label: 'Professional', Component: ProfessionalTemplate },
+  { id: 'executive',    label: 'Executive',    Component: ExecutiveTemplate },
+  { id: 'tech',         label: 'Tech',         Component: TechTemplate },
+  { id: 'compact',      label: 'Compact',      Component: CompactTemplate },
+  { id: 'elegant',      label: 'Elegant',      Component: ElegantTemplate },
+  { id: 'bold',         label: 'Bold',         Component: BoldTemplate },
 ];
 
 export const FONT_SCALES = { small: 0.88, medium: 1.0, large: 1.11 };

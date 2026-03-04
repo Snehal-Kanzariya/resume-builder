@@ -1,5 +1,6 @@
 import { Plus, Trash2, ExternalLink, Github } from 'lucide-react';
 import { useResume } from '../../context/ResumeContext';
+import SectionAIPanel from '../AI/SectionAIPanel';
 
 function ProjectCard({ entry }) {
   const { updateProject, removeProject } = useResume();
@@ -89,7 +90,7 @@ function ProjectCard({ entry }) {
 }
 
 export default function ProjectsForm() {
-  const { resumeData, addProject } = useResume();
+  const { resumeData, addProject, updateSection } = useResume();
   const { projects } = resumeData;
 
   return (
@@ -116,6 +117,14 @@ export default function ProjectsForm() {
         <Plus size={16} />
         Add Project
       </button>
+
+      {projects.length > 0 && (
+        <SectionAIPanel
+          sectionName="projects"
+          sectionData={projects}
+          onAccept={data => updateSection('projects', data)}
+        />
+      )}
     </div>
   );
 }

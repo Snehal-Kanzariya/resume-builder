@@ -1,5 +1,6 @@
 import { Plus, Trash2, GripVertical, PlusCircle, X } from 'lucide-react';
 import { useResume } from '../../context/ResumeContext';
+import SectionAIPanel from '../AI/SectionAIPanel';
 
 function BulletList({ entry, id }) {
   const { addExperienceBullet, updateExperienceBullet, removeExperienceBullet } = useResume();
@@ -145,7 +146,7 @@ function ExperienceCard({ entry }) {
 }
 
 export default function ExperienceForm() {
-  const { resumeData, addExperience } = useResume();
+  const { resumeData, addExperience, updateSection } = useResume();
   const { experience } = resumeData;
 
   return (
@@ -172,6 +173,14 @@ export default function ExperienceForm() {
         <Plus size={16} />
         Add Experience
       </button>
+
+      {experience.length > 0 && (
+        <SectionAIPanel
+          sectionName="experience"
+          sectionData={experience}
+          onAccept={data => updateSection('experience', data)}
+        />
+      )}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Plus, Trash2, X } from 'lucide-react';
 import { useResume } from '../../context/ResumeContext';
+import SectionAIPanel from '../AI/SectionAIPanel';
 
 function SkillTag({ label, onRemove }) {
   return (
@@ -96,7 +97,7 @@ function SkillCategoryCard({ category }) {
 }
 
 export default function SkillsForm() {
-  const { resumeData, addSkillCategory } = useResume();
+  const { resumeData, addSkillCategory, updateSection } = useResume();
   const { skills } = resumeData;
 
   return (
@@ -125,6 +126,14 @@ export default function SkillsForm() {
         <Plus size={16} />
         Add Skill Category
       </button>
+
+      {skills.length > 0 && (
+        <SectionAIPanel
+          sectionName="skills"
+          sectionData={skills}
+          onAccept={data => updateSection('skills', data)}
+        />
+      )}
     </div>
   );
 }
