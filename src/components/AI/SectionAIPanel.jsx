@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Sparkles, Loader2, CheckCircle, X } from 'lucide-react';
+import { Sparkles, Loader2, CheckCircle, X, GitCompare } from 'lucide-react';
 import { enhanceSection, hasApiKey } from '../../utils/aiEnhance';
+import { useResume } from '../../context/ResumeContext';
 
 // ── Diff helpers ──────────────────────────────────────────────────────────────
 
@@ -104,6 +105,7 @@ function DiffRow({ label, orig, ai }) {
  *   onAccept(data) – called with enhanced data when user accepts
  */
 export default function SectionAIPanel({ sectionName, sectionData, onAccept }) {
+  const { resumeData, aiResumeData, setAiResumeData } = useResume();
   const [status,  setStatus]  = useState('idle');   // idle | loading | done | error
   const [aiData,  setAiData]  = useState(null);
   const [error,   setError]   = useState(null);
@@ -117,6 +119,10 @@ export default function SectionAIPanel({ sectionName, sectionData, onAccept }) {
       const result = await enhanceSection(sectionName, sectionData);
       setAiData(result);
       setStatus('done');
+      // Merge this section's AI result into the global aiResumeData snapshot
+      // so the "Compare Versions" button lights up in the preview panel
+      const base = aiResumeData ?? resumeData;
+      setAiResumeData({ ...base, [sectionName]: result });
     } catch (err) {
       setError(err.message);
       setStatus('error');
@@ -157,9 +163,9 @@ export default function SectionAIPanel({ sectionName, sectionData, onAccept }) {
                 <Sparkles size={12} /> Enhance with AI
               </button>
               <div className="absolute bottom-full right-0 mb-2 w-72 p-2.5 bg-slate-800 text-white text-xs rounded-lg shadow-xl z-50 hidden group-hover:block pointer-events-none leading-relaxed">
-                Add <code className="bg-slate-700 px-1 rounded">VITE_GEMINI_API_KEY</code> in your{' '}
+                Add <code className="bg-slate-700 px-1 rounded">VITE_GROQ_API_KEY</code> in your{' '}
                 <code className="bg-slate-700 px-1 rounded">.env</code> file. Get a free key at{' '}
-                <span className="underline">aistudio.google.com</span>
+                <span className="underline">console.groq.com</span>
                 <div className="absolute top-full right-4 border-4 border-transparent border-t-slate-800" />
               </div>
             </div>
@@ -176,7 +182,7 @@ export default function SectionAIPanel({ sectionName, sectionData, onAccept }) {
         {status === 'loading' && (
           <span className="flex items-center gap-1.5 text-xs text-purple-600">
             <Loader2 size={13} className="animate-spin" />
-            Enhancing… (3 s delay to avoid rate limits)
+            Enhancing…
           </span>
         )}
 
@@ -227,6 +233,10 @@ export default function SectionAIPanel({ sectionName, sectionData, onAccept }) {
               AI kept this section mostly the same — accept to apply any subtle improvements.
             </p>
           )}
+          <p className="text-[10px] text-purple-400 mt-3 flex items-center gap-1">
+            <GitCompare size={10} />
+            Click <strong>Compare Versions</strong> in the preview panel to see the full resume side-by-side.
+          </p>
         </div>
       )}
     </div>

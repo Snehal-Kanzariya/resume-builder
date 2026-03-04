@@ -18,7 +18,7 @@ const FEATURES = [
   {
     icon: Sparkles,
     title: 'AI Enhancement',
-    desc: 'Gemini 2.0 Flash rewrites your resume with stronger action verbs, metrics, and ATS-friendly language.',
+    desc: 'AI rewrites your resume with stronger action verbs, metrics, and ATS-friendly language — powered by Groq.',
     color: '#7c3aed',
     bg: '#f5f3ff',
   },
@@ -55,7 +55,7 @@ const STATS = [
 
 const CHECKLIST = [
   'Live preview updates on every keystroke',
-  'Gemini AI rewrites your resume content',
+  'AI rewrites your resume content',
   'ATS-friendly templates included',
   'Download as PDF in one click',
   'Auto-saves to browser storage',
@@ -130,7 +130,7 @@ export default function Home() {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 mb-8">
             <Sparkles size={13} className="text-purple-300" />
-            <span className="text-white/80 text-xs font-medium">Now with Gemini 2.0 Flash AI Enhancement</span>
+            <span className="text-white/80 text-xs font-medium">Now with AI Enhancement</span>
           </div>
 
           {/* Headline */}
@@ -261,14 +261,14 @@ export default function Home() {
             Let AI write a better version
           </h2>
           <p className="text-slate-500 text-base mb-8 max-w-xl mx-auto leading-relaxed">
-            Click &ldquo;Enhance with AI&rdquo; and Gemini rewrites your resume section by section —
+            Click &ldquo;Enhance with AI&rdquo; and AI rewrites your resume section by section —
             stronger verbs, quantified results, ATS keywords. Compare side-by-side and choose
             the best version, or merge section by section.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <div className="flex items-center gap-2 bg-white border border-purple-200 rounded-xl px-4 py-2.5 text-sm text-slate-700 shadow-sm">
               <Star size={14} className="text-amber-400" />
-              Uses Gemini 2.0 Flash — free tier
+              Powered by Groq — free tier
             </div>
             <div className="flex items-center gap-2 bg-white border border-purple-200 rounded-xl px-4 py-2.5 text-sm text-slate-700 shadow-sm">
               <CheckCircle size={14} className="text-emerald-500" />

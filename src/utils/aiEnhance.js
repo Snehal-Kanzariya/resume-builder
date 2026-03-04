@@ -1,8 +1,8 @@
-const MODEL    = 'gemini-1.5-flash';
-const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${import.meta.env.VITE_GEMINI_API_KEY}`;
+const ENDPOINT = 'https://api.groq.com/openai/v1/chat/completions';
+const MODEL    = 'llama-3.3-70b-versatile';
 
 export function hasApiKey() {
-  return Boolean(import.meta.env.VITE_GEMINI_API_KEY);
+  return Boolean(import.meta.env.VITE_GROQ_API_KEY);
 }
 
 const wait = (ms) => new Promise(r => setTimeout(r, ms));
@@ -15,52 +15,68 @@ function stripFences(text) {
     .trim();
 }
 
-async function callGemini(prompt) {
-  // 3-second delay before every call to respect free-tier rate limits
-  await wait(3000);
+async function callGroq(sectionData) {
+  const key = import.meta.env.VITE_GROQ_API_KEY;
 
-  const res = await fetch(ENDPOINT, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
+  const body = JSON.stringify({
+    model: MODEL,
+    messages: [
+      {
+        role: 'system',
+        content:
+          'You are an expert resume writer. Significantly improve this resume section. ' +
+          'Use stronger action verbs, add quantified metrics and real numbers, make it more impactful and ATS-friendly. ' +
+          'Make real creative improvements, don\'t just rephrase. ' +
+          'Return ONLY raw JSON matching the exact input structure. No markdown backticks. No explanation text.',
+      },
+      {
+        role: 'user',
+        content: JSON.stringify(sectionData),
+      },
+    ],
+    temperature: 0.7,
+    max_tokens: 1024,
   });
 
-  if (res.status === 429) {
-    // Wait 10 seconds then retry once
-    await wait(10000);
-    const retry = await fetch(ENDPOINT, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
-    });
-    if (!retry.ok) throw new Error(`Rate limit exceeded. Please wait a minute and try again.`);
-    return retry;
+  const opts = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${key}`,
+    },
+    body,
+  };
+
+  let res = await fetch(ENDPOINT, opts);
+
+  if (!res.ok) {
+    // Wait 3 seconds and retry once
+    await wait(3000);
+    res = await fetch(ENDPOINT, opts);
+    if (!res.ok) throw new Error(`AI error: ${res.status} ${res.statusText}`);
   }
 
-  if (!res.ok) throw new Error(`Gemini error: ${res.status} ${res.statusText}`);
   return res;
 }
 
 /**
- * Enhances ONE resume section via Gemini 1.5 Flash.
- * Sends a single API call; returns parsed JSON matching the input schema.
+ * Enhances ONE resume section via Groq (Llama 3.3 70B).
+ * Returns parsed JSON matching the input schema.
  */
 export async function enhanceSection(sectionName, sectionData) {
-  const prompt =
-    `You are an expert resume writer. Rewrite and significantly improve this resume section. ` +
-    `Use stronger action verbs, add quantified metrics and numbers, make it more impactful and ATS-friendly. ` +
-    `Be creative and make real improvements, don't just rephrase. ` +
-    `Return ONLY raw JSON matching exact input structure. No markdown. No explanation. ` +
-    `Section name: "${sectionName}". Data: ${JSON.stringify(sectionData)}`;
-
-  const res  = await callGemini(prompt);
+  const res  = await callGroq(sectionData);
   const data = await res.json();
-  const raw  = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
+  const raw  = data?.choices?.[0]?.message?.content ?? '';
   const text = stripFences(raw);
 
+  let parsed;
   try {
-    return JSON.parse(text);
+    parsed = JSON.parse(text);
   } catch {
-    throw new Error(`Gemini returned unparseable JSON. Try again.`);
+    throw new Error('AI returned unparseable JSON. Try again.');
   }
+
+  // 1-second safety margin before allowing the next call
+  await wait(1000);
+  return parsed;
 }
