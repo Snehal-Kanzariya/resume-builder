@@ -41,6 +41,31 @@ export function ResumeProvider({ children }) {
     }
   });
 
+  // ── AI state ─────────────────────────────────────────────────────────────
+  const [aiResumeData, setAiResumeData] = useState(null);
+
+  const acceptAllAi = useCallback(() => {
+    if (!aiResumeData) return;
+    setResumeData(prev => ({ ...aiResumeData, settings: prev.settings }));
+    setAiResumeData(null);
+  }, [aiResumeData]);
+
+  const mergeAiSections = useCallback((selectedSections) => {
+    if (!aiResumeData) return;
+    setResumeData(prev => {
+      const updated = { ...prev };
+      for (const section of selectedSections) {
+        if (aiResumeData[section] !== undefined) {
+          updated[section] = aiResumeData[section];
+        }
+      }
+      return updated;
+    });
+    setAiResumeData(null);
+  }, [aiResumeData]);
+
+  const clearAiData = useCallback(() => setAiResumeData(null), []);
+
   // ── Personal Info ────────────────────────────────────────────────────────────
   const updatePersonalInfo = useCallback((field, value) => {
     setResumeData(prev => ({
@@ -320,6 +345,13 @@ export function ResumeProvider({ children }) {
     // Utilities
     loadSampleData,
     resetResume,
+
+    // AI
+    aiResumeData,
+    setAiResumeData,
+    acceptAllAi,
+    mergeAiSections,
+    clearAiData,
   };
 
   return (

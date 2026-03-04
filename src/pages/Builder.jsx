@@ -11,6 +11,7 @@ import EducationForm       from '../components/Forms/EducationForm';
 import SkillsForm          from '../components/Forms/SkillsForm';
 import ProjectsForm        from '../components/Forms/ProjectsForm';
 import CertificationsForm  from '../components/Forms/CertificationsForm';
+import AISuggestions       from '../components/AI/AISuggestions';
 
 const FORM_MAP = {
   personal:       <PersonalInfoForm />,
@@ -84,9 +85,10 @@ export default function Builder() {
             </span>
           </div>
 
-          {/* Active form */}
+          {/* Active form + AI tips */}
           <div className="max-w-2xl mx-auto">
             {FORM_MAP[activeSection]}
+            <AISuggestions section={activeSection} />
           </div>
 
           {/* Prev / Next navigation */}

@@ -3,11 +3,13 @@ import { useReactToPrint } from 'react-to-print';
 import {
   LayoutTemplate, Palette, ZoomIn,
   Type, FlaskConical, Check,
-  Printer, Download, Loader2,
+  Printer, Download, Loader2, Sparkles, GitCompare,
 } from 'lucide-react';
 import { useResume } from '../../context/ResumeContext';
 import { sampleData } from '../../data/sampleData';
 import { downloadPDF, buildFilename, PRINT_PAGE_STYLE } from '../../utils/pdfExport';
+import { enhanceFullResume, hasApiKey } from '../../utils/aiEnhance';
+import AICompareView from '../AI/AICompareView';
 import A4Container from './A4Container';
 
 import ModernTemplate       from '../Templates/ModernTemplate';
@@ -65,12 +67,30 @@ const ResumePreview = forwardRef(function ResumePreview(_props, _externalRef) {
   // Hidden full-res print target (794×1123, no CSS transforms)
   const printContentRef = useRef(null);
 
-  const { resumeData, updateSettings, loadSampleData } = useResume();
+  const { resumeData, updateSettings, loadSampleData, aiResumeData, setAiResumeData } = useResume();
   const { selectedTemplate, accentColor, fontSize } = resumeData.settings;
 
-  const [zoom,        setZoom]        = useState('fit');
-  const [sampleLoaded, setSample]     = useState(false);
+  const [zoom,          setZoom]       = useState('fit');
+  const [sampleLoaded,  setSample]     = useState(false);
   const [isDownloading, setDownloading] = useState(false);
+  const [isEnhancing,   setEnhancing]  = useState(false);
+  const [enhanceError,  setEnhanceError] = useState(null);
+  const [showCompare,   setShowCompare] = useState(false);
+
+  const noApiKey = !hasApiKey();
+
+  async function handleEnhanceFull() {
+    setEnhancing(true);
+    setEnhanceError(null);
+    try {
+      const enhanced = await enhanceFullResume(resumeData);
+      setAiResumeData(enhanced);
+    } catch (err) {
+      setEnhanceError(err.message);
+    } finally {
+      setEnhancing(false);
+    }
+  }
 
   const { Component } = TEMPLATES.find(t => t.id === selectedTemplate) ?? TEMPLATES[0];
   const contentScale  = FONT_SCALES[fontSize] ?? 1.0;
@@ -232,7 +252,66 @@ const ResumePreview = forwardRef(function ResumePreview(_props, _externalRef) {
             }
           </button>
         </div>
+
+        {/* Row 3 — AI actions */}
+        <div className="flex items-center gap-2 px-3 py-1.5 border-t border-purple-100 bg-purple-50 flex-wrap">
+          {noApiKey ? (
+            <div className="relative group">
+              <button
+                disabled
+                className="flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-md bg-slate-200 text-slate-400 cursor-not-allowed flex-shrink-0"
+              >
+                <Sparkles size={13} /> Enhance with AI
+              </button>
+              <div className="absolute bottom-full left-0 mb-2 w-72 p-2.5 bg-slate-800 text-white text-xs rounded-lg shadow-xl z-50 hidden group-hover:block pointer-events-none leading-relaxed">
+                Add your free Gemini API key in <code className="bg-slate-700 px-1 rounded">.env</code> to
+                enable AI features. Get one free at <span className="underline">aistudio.google.com</span>
+                <div className="absolute top-full left-4 border-4 border-transparent border-t-slate-800" />
+              </div>
+            </div>
+          ) : (
+            <button
+              onClick={handleEnhanceFull}
+              disabled={isEnhancing}
+              className="flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-md bg-purple-600 hover:bg-purple-700 disabled:opacity-60 text-white transition-colors flex-shrink-0"
+            >
+              {isEnhancing
+                ? <><Loader2 size={13} className="animate-spin" /> Enhancing full resume…</>
+                : <><Sparkles size={13} /> Enhance with AI</>
+              }
+            </button>
+          )}
+
+          {aiResumeData && (
+            <button
+              onClick={() => setShowCompare(true)}
+              className="flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-md bg-white border border-purple-400 text-purple-700 hover:bg-purple-50 transition-colors flex-shrink-0 animate-pulse"
+            >
+              <GitCompare size={13} /> Compare Versions
+            </button>
+          )}
+
+          {enhanceError && (
+            <span className="text-[11px] text-red-500 flex-shrink-0">{enhanceError}</span>
+          )}
+
+          <span className="text-[10px] text-purple-400 ml-auto flex-shrink-0">
+            Powered by Gemini 2.0 Flash
+          </span>
+        </div>
       </div>
+
+      {/* ── AI READY BANNER ──────────────────────────────────────────────────── */}
+      {aiResumeData && (
+        <button
+          onClick={() => setShowCompare(true)}
+          className="flex-shrink-0 w-full bg-purple-600 hover:bg-purple-700 text-white text-xs font-medium py-2 px-4 flex items-center justify-center gap-2 transition-colors"
+        >
+          <Sparkles size={13} />
+          AI enhanced version is ready — click to compare
+          <GitCompare size={13} />
+        </button>
+      )}
 
       {/* ── A4 PREVIEW (scaled to fit panel) ────────────────────────────────── */}
       <div
@@ -267,6 +346,11 @@ const ResumePreview = forwardRef(function ResumePreview(_props, _externalRef) {
           <Component />
         </div>
       </div>
+
+      {/* ── AI COMPARE MODAL ─────────────────────────────────────────────────── */}
+      {showCompare && aiResumeData && (
+        <AICompareView onClose={() => setShowCompare(false)} />
+      )}
     </div>
   );
 });
