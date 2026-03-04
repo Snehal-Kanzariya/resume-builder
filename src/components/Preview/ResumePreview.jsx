@@ -73,22 +73,27 @@ const ResumePreview = forwardRef(function ResumePreview(_props, _externalRef) {
   const [zoom,          setZoom]       = useState('fit');
   const [sampleLoaded,  setSample]     = useState(false);
   const [isDownloading, setDownloading] = useState(false);
-  const [isEnhancing,   setEnhancing]  = useState(false);
-  const [enhanceError,  setEnhanceError] = useState(null);
-  const [showCompare,   setShowCompare] = useState(false);
+  const [isEnhancing,    setEnhancing]    = useState(false);
+  const [enhanceProgress, setProgress]   = useState('');
+  const [enhanceError,   setEnhanceError] = useState(null);
+  const [showCompare,    setShowCompare]  = useState(false);
 
   const noApiKey = !hasApiKey();
 
   async function handleEnhanceFull() {
     setEnhancing(true);
     setEnhanceError(null);
+    setProgress('');
     try {
-      const enhanced = await enhanceFullResume(resumeData);
+      const enhanced = await enhanceFullResume(resumeData, (section, i, total) => {
+        setProgress(`Enhancing ${section} (${i}/${total})…`);
+      });
       setAiResumeData(enhanced);
     } catch (err) {
       setEnhanceError(err.message);
     } finally {
       setEnhancing(false);
+      setProgress('');
     }
   }
 
@@ -276,7 +281,7 @@ const ResumePreview = forwardRef(function ResumePreview(_props, _externalRef) {
               className="flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-md bg-purple-600 hover:bg-purple-700 disabled:opacity-60 text-white transition-colors flex-shrink-0"
             >
               {isEnhancing
-                ? <><Loader2 size={13} className="animate-spin" /> Enhancing full resume…</>
+                ? <><Loader2 size={13} className="animate-spin" /> {enhanceProgress || 'Starting…'}</>
                 : <><Sparkles size={13} /> Enhance with AI</>
               }
             </button>
