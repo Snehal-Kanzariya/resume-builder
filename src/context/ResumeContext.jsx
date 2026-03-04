@@ -66,6 +66,11 @@ export function ResumeProvider({ children }) {
 
   const clearAiData = useCallback(() => setAiResumeData(null), []);
 
+  // ── Section-level update (used by per-section AI accept) ─────────────────
+  const updateSection = useCallback((sectionName, data) => {
+    setResumeData(prev => ({ ...prev, [sectionName]: data }));
+  }, []);
+
   // ── Personal Info ────────────────────────────────────────────────────────────
   const updatePersonalInfo = useCallback((field, value) => {
     setResumeData(prev => ({
@@ -347,6 +352,7 @@ export function ResumeProvider({ children }) {
     resetResume,
 
     // AI
+    updateSection,
     aiResumeData,
     setAiResumeData,
     acceptAllAi,

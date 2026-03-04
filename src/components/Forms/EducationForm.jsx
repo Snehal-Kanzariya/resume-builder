@@ -1,5 +1,6 @@
 import { Plus, Trash2 } from 'lucide-react';
 import { useResume } from '../../context/ResumeContext';
+import SectionAIPanel from '../AI/SectionAIPanel';
 
 function EducationCard({ entry }) {
   const { updateEducation, removeEducation } = useResume();
@@ -110,7 +111,7 @@ function EducationCard({ entry }) {
 }
 
 export default function EducationForm() {
-  const { resumeData, addEducation } = useResume();
+  const { resumeData, addEducation, updateSection } = useResume();
   const { education } = resumeData;
 
   return (
@@ -137,6 +138,14 @@ export default function EducationForm() {
         <Plus size={16} />
         Add Education
       </button>
+
+      {education.length > 0 && (
+        <SectionAIPanel
+          sectionName="education"
+          sectionData={education}
+          onAccept={data => updateSection('education', data)}
+        />
+      )}
     </div>
   );
 }

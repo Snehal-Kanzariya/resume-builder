@@ -1,5 +1,6 @@
 import { Plus, Trash2, Award } from 'lucide-react';
 import { useResume } from '../../context/ResumeContext';
+import SectionAIPanel from '../AI/SectionAIPanel';
 
 function CertificationCard({ entry }) {
   const { updateCertification, removeCertification } = useResume();
@@ -73,7 +74,7 @@ function CertificationCard({ entry }) {
 }
 
 export default function CertificationsForm() {
-  const { resumeData, addCertification } = useResume();
+  const { resumeData, addCertification, updateSection } = useResume();
   const { certifications } = resumeData;
 
   return (
@@ -100,6 +101,14 @@ export default function CertificationsForm() {
         <Plus size={16} />
         Add Certification
       </button>
+
+      {certifications.length > 0 && (
+        <SectionAIPanel
+          sectionName="certifications"
+          sectionData={certifications}
+          onAccept={data => updateSection('certifications', data)}
+        />
+      )}
     </div>
   );
 }

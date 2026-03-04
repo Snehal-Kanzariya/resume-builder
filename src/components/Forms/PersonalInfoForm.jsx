@@ -1,4 +1,5 @@
 import { useResume } from '../../context/ResumeContext';
+import SectionAIPanel from '../AI/SectionAIPanel';
 
 const fields = [
   { key: 'fullName',   label: 'Full Name',       placeholder: 'Alex Johnson',              type: 'text' },
@@ -11,7 +12,7 @@ const fields = [
 ];
 
 export default function PersonalInfoForm() {
-  const { resumeData, updatePersonalInfo } = useResume();
+  const { resumeData, updatePersonalInfo, updateSection } = useResume();
   const info = resumeData.personalInfo;
 
   return (
@@ -45,6 +46,12 @@ export default function PersonalInfoForm() {
         />
         <p className="text-xs text-slate-400 mt-1 text-right">{info.summary.length} / 500</p>
       </div>
+
+      <SectionAIPanel
+        sectionName="personalInfo"
+        sectionData={resumeData.personalInfo}
+        onAccept={data => updateSection('personalInfo', data)}
+      />
     </div>
   );
 }
