@@ -282,12 +282,13 @@ const initialResumeData = {
 5. Wire forms to context (real-time state updates)
 - **Git commit after each major component**
 
-### Day 2: Templates + Preview + PDF
+### Day 2: Templates + Preview + PDF + AI
 6. A4Container component with proper scaling
 7. Build all 5 resume templates
 8. Live preview rendering with template switching
 9. Color picker for accent color
 10. PDF download + print functionality
+11. Build AI enhancement feature with Gemini API, compare view, and rule-based suggestions
 - **Git commit after each template**
 
 ### Day 3: Landing Page + Polish + Deploy
@@ -349,6 +350,58 @@ Read @SPEC.md — Add auto-save to localStorage (useAutoSave hook + storage util
 
 ---
 
+## AI Enhancement Feature (Google Gemini API - Free)
+
+### Overview
+Users can enhance their resume content using AI. The app uses Google Gemini 2.0 Flash (free, no credit card needed) via REST API directly from the browser.
+
+### API Configuration
+- Key stored in .env as VITE_GEMINI_API_KEY (accessed via import.meta.env.VITE_GEMINI_API_KEY)
+- Endpoint: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}
+- Headers: Content-Type: application/json
+- Body: { contents: [{ parts: [{ text: prompt }] }] }
+- Response: data.candidates[0].content.parts[0].text
+
+### AI Files Structure
+```
+src/
+├── utils/
+│   └── aiEnhance.js           → Gemini API call, prompt builder, JSON parser
+├── components/
+│   └── AI/
+│       ├── AIEnhanceButton.jsx → "Enhance with AI" button with loading state
+│       ├── AICompareView.jsx   → Side-by-side original vs AI comparison modal
+│       └── AISuggestions.jsx   → Rule-based instant tips (no API calls)
+```
+
+### AI Data Flow
+1. User clicks "Enhance with AI" → sends current resume data to Gemini
+2. Gemini returns improved version as JSON → stored as aiResumeData in context
+3. User clicks "Compare Versions" → sees side-by-side in AICompareView
+4. User can: Keep Original, Use AI Version, or Merge section-by-section
+5. Both versions can be downloaded as separate PDFs
+
+### Context Additions
+- aiResumeData: null | object (same shape as resumeData)
+- setAiResumeData(data)
+- acceptAllAi() → replaces resumeData with aiResumeData
+- mergeAiSections(selectedSections) → replaces only chosen sections
+- clearAiData() → resets aiResumeData to null
+
+### AISuggestions Rules (No API, instant feedback)
+- Check bullets start with action verbs (managed, developed, led, etc.)
+- Check bullets contain numbers/metrics/percentages
+- Check summary is 2-4 sentences
+- Check skills count > 5
+- Check each experience has 3+ bullet points
+- Green checkmark = good, Yellow warning = needs improvement
+
+### Graceful Fallback
+- If VITE_GEMINI_API_KEY is missing, AI buttons show tooltip: "Add your free Gemini API key to enable AI features. Get one at aistudio.google.com"
+- AI features are optional - app works fully without them
+
+---
+
 ## Deployment Checklist
 - [ ] All 5 templates render correctly
 - [ ] PDF download works (text selectable, not blurry)
@@ -358,6 +411,9 @@ Read @SPEC.md — Add auto-save to localStorage (useAutoSave hook + storage util
 - [ ] Lighthouse score > 90
 - [ ] `npm run build` succeeds
 - [ ] Deploy to Vercel: `npx vercel --prod`
+- [ ] VITE_GEMINI_API_KEY set in Vercel environment variables
+- [ ] AI enhance and compare working
+- [ ] App works without API key (graceful fallback)
 
 ---
 
