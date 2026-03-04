@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { PanelRight, PanelLeft, FileText } from 'lucide-react';
 import ResumePreview from '../components/Preview/ResumePreview';
+import { useToast } from '../context/ToastContext';
 
 import Navbar from '../components/Layout/Navbar';
 import Sidebar, { SECTIONS } from '../components/Layout/Sidebar';
@@ -51,6 +52,31 @@ function MobileTabBar({ activeSection, onSectionChange }) {
 export default function Builder() {
   const [activeSection, setActiveSection] = useState('personal');
   const [mobileView, setMobileView]       = useState('form');
+  const previewRef = useRef(null);
+  const toast = useToast();
+
+  // Keyboard shortcuts: Ctrl+P → print, Ctrl+S → save toast
+  useEffect(() => {
+    function handleKey(e) {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+        e.preventDefault();
+        document.querySelector('[data-print-btn]')?.click();
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        toast('Auto-saved to browser storage.', 'success', 2000);
+      }
+    }
+    function handleQuota() {
+      toast('Browser storage full — resume may not be saved. Try clearing old data.', 'warning', 6000);
+    }
+    window.addEventListener('keydown', handleKey);
+    window.addEventListener('storage-quota-exceeded', handleQuota);
+    return () => {
+      window.removeEventListener('keydown', handleKey);
+      window.removeEventListener('storage-quota-exceeded', handleQuota);
+    };
+  }, [toast]);
 
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-slate-50 dark:bg-slate-950 transition-colors">

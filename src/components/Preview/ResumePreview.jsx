@@ -1,4 +1,4 @@
-import { forwardRef, useRef, useState } from 'react';
+import { forwardRef, lazy, Suspense, useRef, useState } from 'react';
 import { useReactToPrint } from 'react-to-print';
 import {
   LayoutTemplate, Palette, ZoomIn,
@@ -6,21 +6,31 @@ import {
   Printer, Download, Loader2, Sparkles, GitCompare,
 } from 'lucide-react';
 import { useResume } from '../../context/ResumeContext';
+import { useToast } from '../../context/ToastContext';
 import { sampleData } from '../../data/sampleData';
 import { downloadPDF, buildFilename, PRINT_PAGE_STYLE } from '../../utils/pdfExport';
 import AICompareView from '../AI/AICompareView';
 import A4Container from './A4Container';
 
-import ModernTemplate       from '../Templates/ModernTemplate';
-import ClassicTemplate      from '../Templates/ClassicTemplate';
-import MinimalTemplate      from '../Templates/MinimalTemplate';
-import CreativeTemplate     from '../Templates/CreativeTemplate';
-import ProfessionalTemplate from '../Templates/ProfessionalTemplate';
-import ExecutiveTemplate    from '../Templates/ExecutiveTemplate';
-import TechTemplate         from '../Templates/TechTemplate';
-import CompactTemplate      from '../Templates/CompactTemplate';
-import ElegantTemplate      from '../Templates/ElegantTemplate';
-import BoldTemplate         from '../Templates/BoldTemplate';
+// Lazy-load all 10 templates to split the main bundle
+const ModernTemplate       = lazy(() => import('../Templates/ModernTemplate'));
+const ClassicTemplate      = lazy(() => import('../Templates/ClassicTemplate'));
+const MinimalTemplate      = lazy(() => import('../Templates/MinimalTemplate'));
+const CreativeTemplate     = lazy(() => import('../Templates/CreativeTemplate'));
+const ProfessionalTemplate = lazy(() => import('../Templates/ProfessionalTemplate'));
+const ExecutiveTemplate    = lazy(() => import('../Templates/ExecutiveTemplate'));
+const TechTemplate         = lazy(() => import('../Templates/TechTemplate'));
+const CompactTemplate      = lazy(() => import('../Templates/CompactTemplate'));
+const ElegantTemplate      = lazy(() => import('../Templates/ElegantTemplate'));
+const BoldTemplate         = lazy(() => import('../Templates/BoldTemplate'));
+
+function TemplateFallback() {
+  return (
+    <div className="flex items-center justify-center h-full min-h-[400px] text-slate-300">
+      <Loader2 size={24} className="animate-spin" />
+    </div>
+  );
+}
 
 // ── Config ────────────────────────────────────────────────────────────────────
 
@@ -77,6 +87,7 @@ const ResumePreview = forwardRef(function ResumePreview(_props, _externalRef) {
   const printContentRef = useRef(null);
 
   const { resumeData, updateSettings, loadSampleData, aiResumeData } = useResume();
+  const toast = useToast();
   const { selectedTemplate, accentColor, fontSize } = resumeData.settings;
 
   const [zoom,          setZoom]       = useState('fit');
@@ -102,8 +113,10 @@ const ResumePreview = forwardRef(function ResumePreview(_props, _externalRef) {
         printContentRef.current,
         buildFilename(resumeData.personalInfo.fullName),
       );
+      toast('PDF downloaded successfully!', 'success');
     } catch (err) {
       console.error('PDF export failed:', err);
+      toast('PDF download failed. Try the Print button instead.', 'error');
     } finally {
       setDownloading(false);
     }
@@ -224,8 +237,9 @@ const ResumePreview = forwardRef(function ResumePreview(_props, _externalRef) {
           {/* Print (react-to-print — selectable text) */}
           <button
             onClick={handlePrint}
+            data-print-btn
             className="flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors flex-shrink-0"
-            title="Open browser print dialog (text selectable)"
+            title="Open browser print dialog (Ctrl+P)"
           >
             <Printer size={13} />
             Print
@@ -287,7 +301,9 @@ const ResumePreview = forwardRef(function ResumePreview(_props, _externalRef) {
           }}
         >
           <A4Container contentScale={contentScale}>
-            <Component />
+            <Suspense fallback={<TemplateFallback />}>
+              <Component />
+            </Suspense>
           </A4Container>
         </div>
       </div>
@@ -303,7 +319,9 @@ const ResumePreview = forwardRef(function ResumePreview(_props, _externalRef) {
           ref={printContentRef}
           style={{ width: '794px', height: '1123px', backgroundColor: '#ffffff', overflow: 'hidden' }}
         >
-          <Component />
+          <Suspense fallback={null}>
+            <Component />
+          </Suspense>
         </div>
       </div>
 

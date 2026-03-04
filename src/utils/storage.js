@@ -4,7 +4,13 @@ export function saveToStorage(data) {
   try {
     localStorage.setItem(KEY, JSON.stringify(data));
   } catch (e) {
-    console.warn('Failed to save resume to localStorage:', e);
+    if (e instanceof DOMException && e.name === 'QuotaExceededError') {
+      console.warn('localStorage quota exceeded — resume not saved.');
+      // Dispatch a custom event so UI layers can show a toast
+      window.dispatchEvent(new CustomEvent('storage-quota-exceeded'));
+    } else {
+      console.warn('Failed to save resume to localStorage:', e);
+    }
   }
 }
 

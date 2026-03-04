@@ -1,9 +1,26 @@
+import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Eye, Sparkles, LayoutTemplate, Download,
   ArrowRight, CheckCircle, Zap, FileText, Star,
 } from 'lucide-react';
 import Navbar from '../components/Layout/Navbar';
+
+// ── Scroll reveal hook ────────────────────────────────────────────────────────
+function useReveal() {
+  const ref = useRef(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { el.classList.add('visible'); obs.disconnect(); } },
+      { threshold: 0.15 },
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+  return ref;
+}
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 
@@ -107,6 +124,10 @@ function TemplateCard({ id, name, desc, color }) {
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function Home() {
+  const featuresRef   = useReveal();
+  const templatesRef  = useReveal();
+  const aiRef         = useReveal();
+
   return (
     <div className="min-h-screen bg-white dark:bg-slate-900 transition-colors">
       <Navbar />
@@ -195,7 +216,7 @@ export default function Home() {
 
       {/* ── FEATURES ────────────────────────────────────────────────────────── */}
       <section className="bg-slate-50 dark:bg-slate-900 py-20 px-6">
-        <div className="max-w-5xl mx-auto">
+        <div ref={featuresRef} className="max-w-5xl mx-auto reveal">
           <div className="text-center mb-14">
             <div className="inline-flex items-center gap-2 bg-blue-50 dark:bg-blue-950 border border-blue-100 dark:border-blue-900 rounded-full px-4 py-1.5 mb-4">
               <Zap size={13} className="text-blue-500" />
@@ -217,7 +238,7 @@ export default function Home() {
 
       {/* ── TEMPLATE SHOWCASE ───────────────────────────────────────────────── */}
       <section className="py-20 px-6 bg-white dark:bg-slate-950">
-        <div className="max-w-5xl mx-auto">
+        <div ref={templatesRef} className="max-w-5xl mx-auto reveal">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             {/* Left: text */}
             <div>
@@ -251,7 +272,7 @@ export default function Home() {
       <section
         className="py-20 px-6 bg-gradient-to-br from-violet-50 to-blue-50 dark:from-slate-900 dark:to-slate-900"
       >
-        <div className="max-w-3xl mx-auto text-center">
+        <div ref={aiRef} className="max-w-3xl mx-auto text-center reveal">
           <div className="inline-flex items-center gap-2 bg-purple-100 dark:bg-purple-950 border border-purple-200 dark:border-purple-800 rounded-full px-4 py-1.5 mb-4">
             <Sparkles size={13} className="text-purple-600 dark:text-purple-400" />
             <span className="text-purple-700 dark:text-purple-300 text-xs font-semibold">AI Powered</span>
@@ -309,7 +330,7 @@ export default function Home() {
             <Link to="/templates" className="hover:text-white transition-colors">Templates</Link>
             <Link to="/preview"   className="hover:text-white transition-colors">Preview</Link>
           </div>
-          <p className="text-slate-600 text-xs">Built with React + Vite + Tailwind CSS</p>
+          <p className="text-slate-600 text-xs">© {new Date().getFullYear()} · Built with React + AI · Open Source</p>
         </div>
       </footer>
     </div>
