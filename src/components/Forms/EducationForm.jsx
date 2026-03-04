@@ -7,9 +7,9 @@ function EducationCard({ entry }) {
   const update = (field, value) => updateEducation(entry.id, field, value);
 
   return (
-    <div className="border border-slate-200 rounded-xl p-4 bg-white shadow-sm space-y-3">
+    <div className="border border-slate-200 dark:border-slate-700 rounded-xl p-4 bg-white dark:bg-slate-800 shadow-sm space-y-3 transition-colors">
       <div className="flex items-start justify-between">
-        <h4 className="text-sm font-semibold text-slate-700">
+        <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-200">
           {entry.school || entry.degree ? (
             <span>{entry.degree || 'Degree'}{entry.school ? ` · ${entry.school}` : ''}</span>
           ) : (
@@ -28,7 +28,7 @@ function EducationCard({ entry }) {
       {/* School + Degree */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1">School / University</label>
+          <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">School / University</label>
           <input
             type="text"
             value={entry.school}
@@ -38,7 +38,7 @@ function EducationCard({ entry }) {
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1">Degree</label>
+          <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Degree</label>
           <input
             type="text"
             value={entry.degree}
@@ -52,7 +52,7 @@ function EducationCard({ entry }) {
       {/* Field + GPA */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1">Field of Study</label>
+          <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Field of Study</label>
           <input
             type="text"
             value={entry.field}
@@ -62,7 +62,7 @@ function EducationCard({ entry }) {
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1">GPA (optional)</label>
+          <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">GPA (optional)</label>
           <input
             type="text"
             value={entry.gpa}
@@ -76,7 +76,7 @@ function EducationCard({ entry }) {
       {/* Dates */}
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1">Start Date</label>
+          <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Start Date</label>
           <input
             type="month"
             value={entry.startDate}
@@ -85,7 +85,7 @@ function EducationCard({ entry }) {
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1">End Date</label>
+          <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">End Date</label>
           <input
             type="month"
             value={entry.endDate}
@@ -97,7 +97,7 @@ function EducationCard({ entry }) {
 
       {/* Achievements */}
       <div>
-        <label className="block text-xs font-medium text-slate-600 mb-1">Achievements / Honours (optional)</label>
+        <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Achievements / Honours (optional)</label>
         <textarea
           rows={2}
           value={entry.achievements}
@@ -116,12 +116,12 @@ export default function EducationForm() {
 
   return (
     <div>
-      <h2 className="text-xl font-bold text-slate-800 mb-1">Education</h2>
-      <p className="text-sm text-slate-500 mb-6">Add your academic background, starting with the most recent.</p>
+      <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-1">Education</h2>
+      <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Add your academic background, starting with the most recent.</p>
 
       <div className="space-y-4">
         {education.length === 0 && (
-          <div className="text-center py-10 text-slate-400 border-2 border-dashed border-slate-200 rounded-xl">
+          <div className="text-center py-10 text-slate-400 dark:text-slate-500 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl">
             <p className="text-sm">No education added yet.</p>
             <p className="text-xs mt-1">Click the button below to add your first entry.</p>
           </div>
@@ -133,7 +133,7 @@ export default function EducationForm() {
 
       <button
         onClick={addEducation}
-        className="mt-4 flex items-center gap-2 px-4 py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 font-medium text-sm rounded-lg transition-colors w-full justify-center border border-blue-200"
+        className="mt-4 flex items-center gap-2 px-4 py-2.5 bg-blue-50 dark:bg-blue-950 hover:bg-blue-100 dark:hover:bg-blue-900 text-blue-700 dark:text-blue-300 font-medium text-sm rounded-lg transition-colors w-full justify-center border border-blue-200 dark:border-blue-800"
       >
         <Plus size={16} />
         Add Education

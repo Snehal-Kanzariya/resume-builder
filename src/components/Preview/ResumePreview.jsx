@@ -49,18 +49,18 @@ const ZOOM_WIDTHS = { fit: '100%', '75': '75%', '100': '794px' };
 // ── Small helpers ─────────────────────────────────────────────────────────────
 
 function Sep() {
-  return <div className="w-px h-4 bg-slate-200 flex-shrink-0" />;
+  return <div className="w-px h-4 bg-slate-200 dark:bg-slate-700 flex-shrink-0" />;
 }
 
 function SegmentedBtn({ options, value, onChange }) {
   return (
-    <div className="flex rounded-md border border-slate-200 overflow-hidden">
+    <div className="flex rounded-md border border-slate-200 dark:border-slate-700 overflow-hidden">
       {options.map(({ key, label }) => (
         <button
           key={key}
           onClick={() => onChange(key)}
-          className={`px-2 py-0.5 text-[10px] font-medium transition-colors border-r last:border-r-0 border-slate-200 ${
-            value === key ? 'bg-blue-600 text-white' : 'text-slate-500 hover:bg-slate-50'
+          className={`px-2 py-0.5 text-[10px] font-medium transition-colors border-r last:border-r-0 border-slate-200 dark:border-slate-700 ${
+            value === key ? 'bg-blue-600 text-white' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
           }`}
         >
           {label}
@@ -119,7 +119,7 @@ const ResumePreview = forwardRef(function ResumePreview(_props, _externalRef) {
     <div className="flex flex-col h-full bg-slate-100 overflow-hidden">
 
       {/* ── TOOLBAR ──────────────────────────────────────────────────────────── */}
-      <div className="flex-shrink-0 bg-white border-b border-slate-200">
+      <div className="flex-shrink-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 transition-colors">
 
         {/* Row 1 — template · colours · sample data */}
         <div className="flex items-center gap-2 px-3 py-2 flex-wrap">
@@ -130,7 +130,7 @@ const ResumePreview = forwardRef(function ResumePreview(_props, _externalRef) {
             <select
               value={selectedTemplate}
               onChange={e => updateSettings('selectedTemplate', e.target.value)}
-              className="text-xs font-medium text-slate-700 bg-transparent border-none outline-none cursor-pointer"
+              className="text-xs font-medium text-slate-700 dark:text-slate-200 bg-transparent border-none outline-none cursor-pointer dark:bg-slate-900"
             >
               {TEMPLATES.map(t => <option key={t.id} value={t.id}>{t.label}</option>)}
             </select>
@@ -179,7 +179,7 @@ const ResumePreview = forwardRef(function ResumePreview(_props, _externalRef) {
             className={`flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-md transition-all flex-shrink-0 ${
               sampleLoaded
                 ? 'bg-emerald-50 text-emerald-600'
-                : 'bg-slate-50 hover:bg-slate-100 text-slate-600 hover:text-slate-800'
+                : 'bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white'
             }`}
           >
             {sampleLoaded ? <><Check size={12} /> Loaded!</> : <><FlaskConical size={12} /> Sample Data</>}
@@ -187,7 +187,7 @@ const ResumePreview = forwardRef(function ResumePreview(_props, _externalRef) {
         </div>
 
         {/* Row 2 — font size · zoom · print · download */}
-        <div className="flex items-center gap-2 px-3 py-1.5 border-t border-slate-100 flex-wrap">
+        <div className="flex items-center gap-2 px-3 py-1.5 border-t border-slate-100 dark:border-slate-700/50 flex-wrap">
 
           {/* Font size */}
           <div className="flex items-center gap-1.5">
@@ -224,7 +224,7 @@ const ResumePreview = forwardRef(function ResumePreview(_props, _externalRef) {
           {/* Print (react-to-print — selectable text) */}
           <button
             onClick={handlePrint}
-            className="flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors flex-shrink-0"
+            className="flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors flex-shrink-0"
             title="Open browser print dialog (text selectable)"
           >
             <Printer size={13} />
@@ -275,7 +275,7 @@ const ResumePreview = forwardRef(function ResumePreview(_props, _externalRef) {
 
       {/* ── A4 PREVIEW (scaled to fit panel) ────────────────────────────────── */}
       <div
-        className="flex-1 overflow-y-auto overflow-x-auto p-4"
+        className="flex-1 overflow-y-auto overflow-x-auto p-4 bg-slate-100 dark:bg-slate-950 transition-colors"
         style={{ scrollbarWidth: 'thin' }}
       >
         <div

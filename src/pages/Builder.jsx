@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { PanelRight, PanelLeft, FileText } from 'lucide-react'; // FileText used in mobile toggle
+import { PanelRight, PanelLeft, FileText } from 'lucide-react';
 import ResumePreview from '../components/Preview/ResumePreview';
 
 import Navbar from '../components/Layout/Navbar';
@@ -22,11 +22,10 @@ const FORM_MAP = {
   certifications: <CertificationsForm />,
 };
 
-
 // ── Mobile section tab bar ───────────────────────────────────────────────────
 function MobileTabBar({ activeSection, onSectionChange }) {
   return (
-    <div className="md:hidden flex overflow-x-auto bg-white border-b border-slate-200 px-2 gap-1 flex-shrink-0 scrollbar-none">
+    <div className="md:hidden flex overflow-x-auto bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 px-2 gap-1 flex-shrink-0 scrollbar-none transition-colors">
       {SECTIONS.map(({ id, label, icon: Icon }) => {
         const active = activeSection === id;
         return (
@@ -35,8 +34,8 @@ function MobileTabBar({ activeSection, onSectionChange }) {
             onClick={() => onSectionChange(id)}
             className={`flex flex-col items-center gap-0.5 px-3 py-2 flex-shrink-0 text-[10px] font-medium border-b-2 transition-colors ${
               active
-                ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-slate-500 hover:text-slate-700'
+                ? 'border-blue-600 text-blue-600 dark:text-blue-400'
+                : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
             }`}
           >
             <Icon size={16} />
@@ -51,47 +50,40 @@ function MobileTabBar({ activeSection, onSectionChange }) {
 // ── Builder page ─────────────────────────────────────────────────────────────
 export default function Builder() {
   const [activeSection, setActiveSection] = useState('personal');
-  const [mobileView, setMobileView]       = useState('form'); // 'form' | 'preview'
+  const [mobileView, setMobileView]       = useState('form');
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden bg-slate-50">
-      {/* Top navbar */}
+    <div className="flex flex-col h-screen overflow-hidden bg-slate-50 dark:bg-slate-950 transition-colors">
       <Navbar />
 
-      {/* Mobile section tab bar */}
       <MobileTabBar activeSection={activeSection} onSectionChange={setActiveSection} />
 
-      {/* 3-column body */}
       <div className="flex flex-1 overflow-hidden">
 
-        {/* ── LEFT: Sidebar (desktop only) ────────────────────────────── */}
+        {/* LEFT: Sidebar */}
         <div className="hidden md:flex flex-col" style={{ width: '20%', minWidth: '180px', maxWidth: '240px' }}>
           <Sidebar activeSection={activeSection} onSectionChange={setActiveSection} />
         </div>
 
-        {/* ── CENTER: Active form ──────────────────────────────────────── */}
+        {/* CENTER: Active form */}
         <main
-          className={`flex-1 overflow-y-auto p-5 md:p-7 ${
+          className={`flex-1 overflow-y-auto p-5 md:p-7 bg-slate-50 dark:bg-slate-950 transition-colors ${
             mobileView === 'preview' ? 'hidden md:block' : 'block'
           }`}
-          style={{ maxWidth: '100%' }}
         >
-          {/* Section nav breadcrumb (desktop) */}
-          <div className="hidden md:flex items-center gap-2 text-xs text-slate-400 mb-5">
+          <div className="hidden md:flex items-center gap-2 text-xs text-slate-400 dark:text-slate-500 mb-5">
             <span>Builder</span>
             <span>›</span>
-            <span className="text-slate-600 font-medium">
+            <span className="text-slate-600 dark:text-slate-300 font-medium">
               {SECTIONS.find(s => s.id === activeSection)?.label}
             </span>
           </div>
 
-          {/* Active form + AI tips */}
           <div className="max-w-2xl mx-auto">
             {FORM_MAP[activeSection]}
             <AISuggestions section={activeSection} />
           </div>
 
-          {/* Prev / Next navigation */}
           <div className="max-w-2xl mx-auto mt-8 flex justify-between">
             {(() => {
               const idx = SECTIONS.findIndex(s => s.id === activeSection);
@@ -102,7 +94,7 @@ export default function Builder() {
                   {prev ? (
                     <button
                       onClick={() => setActiveSection(prev.id)}
-                      className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800 transition-colors"
+                      className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors"
                     >
                       <PanelLeft size={15} />
                       {prev.label}
@@ -124,9 +116,9 @@ export default function Builder() {
           </div>
         </main>
 
-        {/* ── RIGHT: Preview panel — sticky by flex layout (only center scrolls) ── */}
+        {/* RIGHT: Preview panel */}
         <div
-          className={`md:flex flex-col border-l border-slate-200 ${
+          className={`md:flex flex-col border-l border-slate-200 dark:border-slate-700 ${
             mobileView === 'preview' ? 'flex flex-1' : 'hidden'
           }`}
           style={{
@@ -135,7 +127,7 @@ export default function Builder() {
             position: 'sticky',
             top: 0,
             alignSelf: 'flex-start',
-            height: 'calc(100vh - 56px)',   /* viewport minus navbar */
+            height: 'calc(100vh - 56px)',
             overflowY: 'auto',
           }}
         >
@@ -143,7 +135,7 @@ export default function Builder() {
         </div>
       </div>
 
-      {/* ── Mobile: floating toggle button ──────────────────────────────── */}
+      {/* Mobile: floating toggle */}
       <div className="md:hidden fixed bottom-5 right-5 z-30">
         <button
           onClick={() => setMobileView(v => v === 'form' ? 'preview' : 'form')}

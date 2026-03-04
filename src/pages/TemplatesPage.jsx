@@ -95,7 +95,7 @@ function TemplateCard({ template, onSelect, isActive }) {
 
   return (
     <div
-      className="group flex flex-col bg-white rounded-2xl border border-slate-200 hover:border-slate-300 hover:shadow-xl transition-all duration-300 overflow-hidden"
+      className="group flex flex-col bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 hover:shadow-xl transition-all duration-300 overflow-hidden"
       style={isActive ? { borderColor: accent, boxShadow: `0 0 0 2px ${accent}30` } : {}}
     >
       {/* Top accent strip */}
@@ -121,9 +121,9 @@ function TemplateCard({ template, onSelect, isActive }) {
           )}
         </div>
 
-        <h3 className="text-lg font-bold text-slate-900 mb-0.5">{name}</h3>
+        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-0.5">{name}</h3>
         <p className="text-xs font-medium mb-3" style={{ color: accent }}>{tagline}</p>
-        <p className="text-slate-500 text-sm leading-relaxed flex-1 mb-4">{description}</p>
+        <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed flex-1 mb-4">{description}</p>
 
         {/* Trait tags */}
         <div className="flex flex-wrap gap-1.5 mb-5">
@@ -168,7 +168,7 @@ export default function TemplatesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors">
       <Navbar />
 
       {/* ── HEADER ────────────────────────────────────────────────────────── */}
@@ -202,7 +202,7 @@ export default function TemplatesPage() {
         </div>
 
         {/* Bottom note */}
-        <p className="text-center text-slate-400 text-sm mt-10">
+        <p className="text-center text-slate-400 dark:text-slate-500 text-sm mt-10">
           All templates render every section of your resume and support custom accent colors.
         </p>
       </div>

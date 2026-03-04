@@ -153,8 +153,8 @@ export default function AISuggestions({ section }) {
   if (tips.length === 0) return null;
 
   return (
-    <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-3">
-      <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1.5">
+    <div className="mt-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 p-3 transition-colors">
+      <p className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide mb-1.5">
         Resume Tips
       </p>
       {tips.map((t, i) => <Tip key={i} ok={t.ok} message={t.message} />)}

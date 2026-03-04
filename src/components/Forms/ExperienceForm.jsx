@@ -7,7 +7,7 @@ function BulletList({ entry, id }) {
 
   return (
     <div className="mt-3">
-      <label className="block text-sm font-medium text-slate-700 mb-2">Key Responsibilities / Achievements</label>
+      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Key Responsibilities / Achievements</label>
       <div className="space-y-2">
         {entry.bullets.map((bullet, idx) => (
           <div key={idx} className="flex items-start gap-2">
@@ -47,10 +47,10 @@ function ExperienceCard({ entry }) {
   const update = (field, value) => updateExperience(entry.id, field, value);
 
   return (
-    <div className="border border-slate-200 rounded-xl p-4 bg-white shadow-sm space-y-3">
+    <div className="border border-slate-200 dark:border-slate-700 rounded-xl p-4 bg-white dark:bg-slate-800 shadow-sm space-y-3 transition-colors">
       {/* Card header */}
       <div className="flex items-start justify-between">
-        <h4 className="text-sm font-semibold text-slate-700">
+        <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-200">
           {entry.company || entry.position ? (
             <span>{entry.position || 'New Position'}{entry.company ? ` · ${entry.company}` : ''}</span>
           ) : (
@@ -69,7 +69,7 @@ function ExperienceCard({ entry }) {
       {/* Row 1: Company + Position */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1">Company</label>
+          <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Company</label>
           <input
             type="text"
             value={entry.company}
@@ -79,7 +79,7 @@ function ExperienceCard({ entry }) {
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1">Job Title</label>
+          <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Job Title</label>
           <input
             type="text"
             value={entry.position}
@@ -92,7 +92,7 @@ function ExperienceCard({ entry }) {
 
       {/* Row 2: Location */}
       <div>
-        <label className="block text-xs font-medium text-slate-600 mb-1">Location</label>
+        <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Location</label>
         <input
           type="text"
           value={entry.location}
@@ -105,7 +105,7 @@ function ExperienceCard({ entry }) {
       {/* Row 3: Dates */}
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1">Start Date</label>
+          <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Start Date</label>
           <input
             type="month"
             value={entry.startDate}
@@ -114,7 +114,7 @@ function ExperienceCard({ entry }) {
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1">End Date</label>
+          <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">End Date</label>
           <input
             type="month"
             value={entry.endDate}
@@ -136,7 +136,7 @@ function ExperienceCard({ entry }) {
           }}
           className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
         />
-        <span className="text-sm text-slate-600">I currently work here</span>
+        <span className="text-sm text-slate-600 dark:text-slate-400">I currently work here</span>
       </label>
 
       {/* Bullets */}
@@ -151,12 +151,12 @@ export default function ExperienceForm() {
 
   return (
     <div>
-      <h2 className="text-xl font-bold text-slate-800 mb-1">Work Experience</h2>
-      <p className="text-sm text-slate-500 mb-6">Add your work history starting with the most recent role.</p>
+      <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-1">Work Experience</h2>
+      <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Add your work history starting with the most recent role.</p>
 
       <div className="space-y-4">
         {experience.length === 0 && (
-          <div className="text-center py-10 text-slate-400 border-2 border-dashed border-slate-200 rounded-xl">
+          <div className="text-center py-10 text-slate-400 dark:text-slate-500 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl">
             <p className="text-sm">No experience added yet.</p>
             <p className="text-xs mt-1">Click the button below to add your first role.</p>
           </div>
@@ -168,7 +168,7 @@ export default function ExperienceForm() {
 
       <button
         onClick={addExperience}
-        className="mt-4 flex items-center gap-2 px-4 py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 font-medium text-sm rounded-lg transition-colors w-full justify-center border border-blue-200"
+        className="mt-4 flex items-center gap-2 px-4 py-2.5 bg-blue-50 dark:bg-blue-950 hover:bg-blue-100 dark:hover:bg-blue-900 text-blue-700 dark:text-blue-300 font-medium text-sm rounded-lg transition-colors w-full justify-center border border-blue-200 dark:border-blue-800"
       >
         <Plus size={16} />
         Add Experience
