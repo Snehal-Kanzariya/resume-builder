@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Sparkles, Loader2, CheckCircle, X, GitCompare } from 'lucide-react';
 import { enhanceSection, hasApiKey } from '../../utils/aiEnhance';
 import { useResume } from '../../context/ResumeContext';
+import { useToast } from '../../context/ToastContext';
 
 // ── Diff helpers ──────────────────────────────────────────────────────────────
 
@@ -106,6 +107,7 @@ function DiffRow({ label, orig, ai }) {
  */
 export default function SectionAIPanel({ sectionName, sectionData, onAccept }) {
   const { resumeData, aiResumeData, setAiResumeData } = useResume();
+  const toast = useToast();
   const [status,  setStatus]  = useState('idle');   // idle | loading | done | error
   const [aiData,  setAiData]  = useState(null);
   const [error,   setError]   = useState(null);
@@ -123,9 +125,11 @@ export default function SectionAIPanel({ sectionName, sectionData, onAccept }) {
       // so the "Compare Versions" button lights up in the preview panel
       const base = aiResumeData ?? resumeData;
       setAiResumeData({ ...base, [sectionName]: result });
+      toast('AI enhancement ready! Accept or compare below.', 'success');
     } catch (err) {
       setError(err.message);
       setStatus('error');
+      toast(`AI enhancement failed: ${err.message}`, 'error');
     }
   }
 
