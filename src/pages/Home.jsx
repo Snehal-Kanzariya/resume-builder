@@ -65,15 +65,15 @@ const CHECKLIST = [
 
 function FeatureCard({ icon: Icon, title, desc, color, bg }) {
   return (
-    <div className="group bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+    <div className="group bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
       <div
         className="w-11 h-11 rounded-xl flex items-center justify-center mb-4"
         style={{ backgroundColor: bg }}
       >
         <Icon size={22} style={{ color }} />
       </div>
-      <h3 className="font-semibold text-slate-800 text-base mb-2">{title}</h3>
-      <p className="text-slate-500 text-sm leading-relaxed">{desc}</p>
+      <h3 className="font-semibold text-slate-800 dark:text-slate-100 text-base mb-2">{title}</h3>
+      <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">{desc}</p>
     </div>
   );
 }
@@ -83,7 +83,7 @@ function TemplateCard({ id, name, desc, color }) {
     <Link
       to={`/builder`}
       state={{ template: id }}
-      className="group flex items-center gap-4 bg-white rounded-xl px-5 py-4 border border-slate-200 hover:border-slate-300 hover:shadow-md transition-all duration-200"
+      className="group flex items-center gap-4 bg-white dark:bg-slate-800 rounded-xl px-5 py-4 border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 hover:shadow-md transition-all duration-200"
     >
       {/* Color dot */}
       <div
@@ -93,8 +93,8 @@ function TemplateCard({ id, name, desc, color }) {
         <div className="w-3.5 h-3.5 rounded-full" style={{ backgroundColor: color }} />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="font-semibold text-slate-800 text-sm">{name}</p>
-        <p className="text-slate-400 text-xs truncate">{desc}</p>
+        <p className="font-semibold text-slate-800 dark:text-slate-100 text-sm">{name}</p>
+        <p className="text-slate-400 dark:text-slate-500 text-xs truncate">{desc}</p>
       </div>
       <ArrowRight
         size={16}
@@ -108,7 +108,7 @@ function TemplateCard({ id, name, desc, color }) {
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-slate-900 transition-colors">
       <Navbar />
 
       {/* ── HERO ────────────────────────────────────────────────────────────── */}
@@ -194,17 +194,17 @@ export default function Home() {
       </section>
 
       {/* ── FEATURES ────────────────────────────────────────────────────────── */}
-      <section className="bg-slate-50 py-20 px-6">
+      <section className="bg-slate-50 dark:bg-slate-900 py-20 px-6">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-14">
-            <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-100 rounded-full px-4 py-1.5 mb-4">
+            <div className="inline-flex items-center gap-2 bg-blue-50 dark:bg-blue-950 border border-blue-100 dark:border-blue-900 rounded-full px-4 py-1.5 mb-4">
               <Zap size={13} className="text-blue-500" />
-              <span className="text-blue-600 text-xs font-semibold">Features</span>
+              <span className="text-blue-600 dark:text-blue-400 text-xs font-semibold">Features</span>
             </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">
               Everything you need to land your next job
             </h2>
-            <p className="text-slate-500 text-base max-w-xl mx-auto">
+            <p className="text-slate-500 dark:text-slate-400 text-base max-w-xl mx-auto">
               Built for job seekers who want a polished resume without spending hours on formatting.
             </p>
           </div>
@@ -216,19 +216,19 @@ export default function Home() {
       </section>
 
       {/* ── TEMPLATE SHOWCASE ───────────────────────────────────────────────── */}
-      <section className="py-20 px-6 bg-white">
+      <section className="py-20 px-6 bg-white dark:bg-slate-950">
         <div className="max-w-5xl mx-auto">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             {/* Left: text */}
             <div>
-              <div className="inline-flex items-center gap-2 bg-purple-50 border border-purple-100 rounded-full px-4 py-1.5 mb-4">
+              <div className="inline-flex items-center gap-2 bg-purple-50 dark:bg-purple-950 border border-purple-100 dark:border-purple-900 rounded-full px-4 py-1.5 mb-4">
                 <LayoutTemplate size={13} className="text-purple-500" />
-                <span className="text-purple-600 text-xs font-semibold">5 Designs</span>
+                <span className="text-purple-600 dark:text-purple-400 text-xs font-semibold">5 Designs</span>
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">
                 Pick a style,<br />make it yours
               </h2>
-              <p className="text-slate-500 text-base mb-8 leading-relaxed">
+              <p className="text-slate-500 dark:text-slate-400 text-base mb-8 leading-relaxed">
                 Switch between templates in real time — no re-entering data. Customize accent color, font size, and section order. Preview exactly how it&apos;ll look printed.
               </p>
               <Link
@@ -249,28 +249,27 @@ export default function Home() {
 
       {/* ── AI SECTION ──────────────────────────────────────────────────────── */}
       <section
-        className="py-20 px-6"
-        style={{ background: 'linear-gradient(135deg, #f5f3ff 0%, #eff6ff 100%)' }}
+        className="py-20 px-6 bg-gradient-to-br from-violet-50 to-blue-50 dark:from-slate-900 dark:to-slate-900"
       >
         <div className="max-w-3xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-purple-100 border border-purple-200 rounded-full px-4 py-1.5 mb-4">
-            <Sparkles size={13} className="text-purple-600" />
-            <span className="text-purple-700 text-xs font-semibold">AI Powered</span>
+          <div className="inline-flex items-center gap-2 bg-purple-100 dark:bg-purple-950 border border-purple-200 dark:border-purple-800 rounded-full px-4 py-1.5 mb-4">
+            <Sparkles size={13} className="text-purple-600 dark:text-purple-400" />
+            <span className="text-purple-700 dark:text-purple-300 text-xs font-semibold">AI Powered</span>
           </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">
             Let AI write a better version
           </h2>
-          <p className="text-slate-500 text-base mb-8 max-w-xl mx-auto leading-relaxed">
+          <p className="text-slate-500 dark:text-slate-400 text-base mb-8 max-w-xl mx-auto leading-relaxed">
             Click &ldquo;Enhance with AI&rdquo; and AI rewrites your resume section by section —
             stronger verbs, quantified results, ATS keywords. Compare side-by-side and choose
             the best version, or merge section by section.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <div className="flex items-center gap-2 bg-white border border-purple-200 rounded-xl px-4 py-2.5 text-sm text-slate-700 shadow-sm">
+            <div className="flex items-center gap-2 bg-white dark:bg-slate-800 border border-purple-200 dark:border-purple-800 rounded-xl px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 shadow-sm">
               <Star size={14} className="text-amber-400" />
               Powered by Groq — free tier
             </div>
-            <div className="flex items-center gap-2 bg-white border border-purple-200 rounded-xl px-4 py-2.5 text-sm text-slate-700 shadow-sm">
+            <div className="flex items-center gap-2 bg-white dark:bg-slate-800 border border-purple-200 dark:border-purple-800 rounded-xl px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 shadow-sm">
               <CheckCircle size={14} className="text-emerald-500" />
               Works without API key (tips still show)
             </div>

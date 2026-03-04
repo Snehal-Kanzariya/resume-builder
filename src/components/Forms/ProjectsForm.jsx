@@ -7,7 +7,7 @@ function ProjectCard({ entry }) {
   const update = (field, value) => updateProject(entry.id, field, value);
 
   return (
-    <div className="border border-slate-200 rounded-xl p-4 bg-white shadow-sm space-y-3">
+    <div className="border border-slate-200 dark:border-slate-700 rounded-xl p-4 bg-white dark:bg-slate-800 shadow-sm space-y-3 transition-colors">
       {/* Header */}
       <div className="flex items-start justify-between">
         <h4 className="text-sm font-semibold text-slate-700">
@@ -24,7 +24,7 @@ function ProjectCard({ entry }) {
 
       {/* Name */}
       <div>
-        <label className="block text-xs font-medium text-slate-600 mb-1">Project Name</label>
+        <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Project Name</label>
         <input
           type="text"
           value={entry.name}
@@ -36,7 +36,7 @@ function ProjectCard({ entry }) {
 
       {/* Description */}
       <div>
-        <label className="block text-xs font-medium text-slate-600 mb-1">Description</label>
+        <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Description</label>
         <textarea
           rows={3}
           value={entry.description}
@@ -48,7 +48,7 @@ function ProjectCard({ entry }) {
 
       {/* Technologies */}
       <div>
-        <label className="block text-xs font-medium text-slate-600 mb-1">Technologies Used</label>
+        <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Technologies Used</label>
         <input
           type="text"
           value={entry.technologies}
@@ -95,12 +95,12 @@ export default function ProjectsForm() {
 
   return (
     <div>
-      <h2 className="text-xl font-bold text-slate-800 mb-1">Projects</h2>
-      <p className="text-sm text-slate-500 mb-6">Showcase personal, academic, or open-source projects that highlight your skills.</p>
+      <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-1">Projects</h2>
+      <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Showcase personal, academic, or open-source projects that highlight your skills.</p>
 
       <div className="space-y-4">
         {projects.length === 0 && (
-          <div className="text-center py-10 text-slate-400 border-2 border-dashed border-slate-200 rounded-xl">
+          <div className="text-center py-10 text-slate-400 dark:text-slate-500 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl">
             <p className="text-sm">No projects added yet.</p>
             <p className="text-xs mt-1">Add a project to show off your work.</p>
           </div>
@@ -112,7 +112,7 @@ export default function ProjectsForm() {
 
       <button
         onClick={addProject}
-        className="mt-4 flex items-center gap-2 px-4 py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 font-medium text-sm rounded-lg transition-colors w-full justify-center border border-blue-200"
+        className="mt-4 flex items-center gap-2 px-4 py-2.5 bg-blue-50 dark:bg-blue-950 hover:bg-blue-100 dark:hover:bg-blue-900 text-blue-700 dark:text-blue-300 font-medium text-sm rounded-lg transition-colors w-full justify-center border border-blue-200 dark:border-blue-800"
       >
         <Plus size={16} />
         Add Project

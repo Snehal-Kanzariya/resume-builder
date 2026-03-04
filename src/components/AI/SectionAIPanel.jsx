@@ -145,7 +145,7 @@ export default function SectionAIPanel({ sectionName, sectionData, onAccept }) {
     : [];
 
   return (
-    <div className="mt-5 rounded-xl border border-purple-100 bg-gradient-to-r from-purple-50 to-indigo-50 p-4">
+    <div className="mt-5 rounded-xl border border-purple-100 dark:border-purple-900 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-950/40 dark:to-indigo-950/40 p-4 transition-colors">
       {/* Header row */}
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-1.5">
@@ -190,7 +190,7 @@ export default function SectionAIPanel({ sectionName, sectionData, onAccept }) {
           <div className="flex items-center gap-2">
             <button
               onClick={handleDismiss}
-              className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-100 transition-colors"
+              className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
             >
               <X size={12} /> Dismiss
             </button>
@@ -218,7 +218,7 @@ export default function SectionAIPanel({ sectionName, sectionData, onAccept }) {
 
       {/* Diff view */}
       {status === 'done' && (
-        <div className="mt-3 pt-3 border-t border-purple-100">
+        <div className="mt-3 pt-3 border-t border-purple-100 dark:border-purple-900">
           {diffItems.length > 0 ? (
             <>
               <p className="text-[10px] text-purple-500 font-semibold uppercase tracking-wide mb-2">

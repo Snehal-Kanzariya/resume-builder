@@ -42,11 +42,11 @@ function SkillCategoryCard({ category }) {
   };
 
   return (
-    <div className="border border-slate-200 rounded-xl p-4 bg-white shadow-sm space-y-3">
+    <div className="border border-slate-200 dark:border-slate-700 rounded-xl p-4 bg-white dark:bg-slate-800 shadow-sm space-y-3 transition-colors">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex-1 mr-3">
-          <label className="block text-xs font-medium text-slate-600 mb-1">Category Name</label>
+          <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Category Name</label>
           <input
             type="text"
             value={category.category}
@@ -102,14 +102,14 @@ export default function SkillsForm() {
 
   return (
     <div>
-      <h2 className="text-xl font-bold text-slate-800 mb-1">Skills</h2>
-      <p className="text-sm text-slate-500 mb-6">
-        Group skills by category. Type a skill and press <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-200 rounded text-xs">Enter</kbd> or <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-200 rounded text-xs">,</kbd> to add.
+      <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-1">Skills</h2>
+      <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
+        Group skills by category. Type a skill and press <kbd className="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded text-xs dark:text-slate-300">Enter</kbd> or <kbd className="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded text-xs dark:text-slate-300">,</kbd> to add.
       </p>
 
       <div className="space-y-4">
         {skills.length === 0 && (
-          <div className="text-center py-10 text-slate-400 border-2 border-dashed border-slate-200 rounded-xl">
+          <div className="text-center py-10 text-slate-400 dark:text-slate-500 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl">
             <p className="text-sm">No skill categories yet.</p>
             <p className="text-xs mt-1">Add a category like "Languages" or "Tools" to get started.</p>
           </div>
@@ -121,7 +121,7 @@ export default function SkillsForm() {
 
       <button
         onClick={addSkillCategory}
-        className="mt-4 flex items-center gap-2 px-4 py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 font-medium text-sm rounded-lg transition-colors w-full justify-center border border-blue-200"
+        className="mt-4 flex items-center gap-2 px-4 py-2.5 bg-blue-50 dark:bg-blue-950 hover:bg-blue-100 dark:hover:bg-blue-900 text-blue-700 dark:text-blue-300 font-medium text-sm rounded-lg transition-colors w-full justify-center border border-blue-200 dark:border-blue-800"
       >
         <Plus size={16} />
         Add Skill Category

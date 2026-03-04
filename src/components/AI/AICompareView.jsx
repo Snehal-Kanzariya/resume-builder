@@ -81,8 +81,8 @@ export default function AICompareView({ onClose }) {
     <div className="fixed inset-0 z-50 flex flex-col bg-black/75">
 
       {/* ── TOP TOOLBAR ──────────────────────────────────────────────────────── */}
-      <div className="flex-shrink-0 bg-white border-b border-slate-200 px-4 py-3 flex items-center gap-2 flex-wrap">
-        <h2 className="font-semibold text-slate-800 text-sm flex-1 min-w-0">
+      <div className="flex-shrink-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 px-4 py-3 flex items-center gap-2 flex-wrap">
+        <h2 className="font-semibold text-slate-800 dark:text-slate-100 text-sm flex-1 min-w-0">
           ✨ AI Resume Comparison
         </h2>
 
@@ -90,7 +90,7 @@ export default function AICompareView({ onClose }) {
           <>
             <button
               onClick={handleKeepOriginal}
-              className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border border-slate-300 hover:bg-slate-50 text-slate-700 transition-colors"
+              className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition-colors"
             >
               <RotateCcw size={13} /> Keep Original
             </button>
@@ -109,7 +109,7 @@ export default function AICompareView({ onClose }) {
           </>
         ) : (
           <>
-            <span className="text-xs text-slate-500 flex-shrink-0">Take from AI:</span>
+            <span className="text-xs text-slate-500 dark:text-slate-400 flex-shrink-0">Take from AI:</span>
             {SECTIONS_LIST.map(({ key, label }) => (
               <label key={key} className="flex items-center gap-1 text-xs text-slate-700 cursor-pointer select-none flex-shrink-0">
                 <input
@@ -123,7 +123,7 @@ export default function AICompareView({ onClose }) {
             ))}
             <button
               onClick={() => setShowMerge(false)}
-              className="text-xs px-2.5 py-1.5 rounded-lg border border-slate-300 hover:bg-slate-50 text-slate-600 transition-colors flex-shrink-0"
+              className="text-xs px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors flex-shrink-0"
             >
               Cancel
             </button>
@@ -146,7 +146,7 @@ export default function AICompareView({ onClose }) {
       </div>
 
       {/* ── SIDE-BY-SIDE PREVIEWS ─────────────────────────────────────────────── */}
-      <div className="flex-1 overflow-auto flex flex-col md:flex-row gap-4 p-4 bg-slate-200">
+      <div className="flex-1 overflow-auto flex flex-col md:flex-row gap-4 p-4 bg-slate-200 dark:bg-slate-950">
 
         {/* Original */}
         <div className="flex-1 flex flex-col min-w-0">
@@ -198,11 +198,11 @@ export default function AICompareView({ onClose }) {
       </div>
 
       {/* ── BOTTOM BAR ───────────────────────────────────────────────────────── */}
-      <div className="flex-shrink-0 bg-white border-t border-slate-200 px-4 py-2.5 flex items-center justify-center gap-3 flex-wrap">
+      <div className="flex-shrink-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 px-4 py-2.5 flex items-center justify-center gap-3 flex-wrap">
         <button
           onClick={() => handleDownload('original')}
           disabled={downloading === 'original'}
-          className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border border-slate-300 hover:bg-slate-50 text-slate-700 transition-colors disabled:opacity-50"
+          className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition-colors disabled:opacity-50"
         >
           <Download size={13} /> Download Original PDF
         </button>

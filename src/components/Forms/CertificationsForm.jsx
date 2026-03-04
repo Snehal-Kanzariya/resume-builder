@@ -7,7 +7,7 @@ function CertificationCard({ entry }) {
   const update = (field, value) => updateCertification(entry.id, field, value);
 
   return (
-    <div className="border border-slate-200 rounded-xl p-4 bg-white shadow-sm space-y-3">
+    <div className="border border-slate-200 dark:border-slate-700 rounded-xl p-4 bg-white dark:bg-slate-800 shadow-sm space-y-3 transition-colors">
       {/* Header */}
       <div className="flex items-start justify-between">
         <h4 className="text-sm font-semibold text-slate-700 flex items-center gap-1.5">
@@ -26,7 +26,7 @@ function CertificationCard({ entry }) {
       {/* Name + Issuer */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1">Certification Name</label>
+          <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Certification Name</label>
           <input
             type="text"
             value={entry.name}
@@ -36,7 +36,7 @@ function CertificationCard({ entry }) {
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1">Issuing Organisation</label>
+          <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Issuing Organisation</label>
           <input
             type="text"
             value={entry.issuer}
@@ -50,7 +50,7 @@ function CertificationCard({ entry }) {
       {/* Date + Link */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1">Date Issued</label>
+          <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Date Issued</label>
           <input
             type="month"
             value={entry.date}
@@ -59,7 +59,7 @@ function CertificationCard({ entry }) {
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1">Credential URL (optional)</label>
+          <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Credential URL (optional)</label>
           <input
             type="text"
             value={entry.link}
@@ -79,12 +79,12 @@ export default function CertificationsForm() {
 
   return (
     <div>
-      <h2 className="text-xl font-bold text-slate-800 mb-1">Certifications</h2>
-      <p className="text-sm text-slate-500 mb-6">Add professional certifications, licences, or online course completions.</p>
+      <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-1">Certifications</h2>
+      <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Add professional certifications, licences, or online course completions.</p>
 
       <div className="space-y-4">
         {certifications.length === 0 && (
-          <div className="text-center py-10 text-slate-400 border-2 border-dashed border-slate-200 rounded-xl">
+          <div className="text-center py-10 text-slate-400 dark:text-slate-500 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl">
             <p className="text-sm">No certifications added yet.</p>
             <p className="text-xs mt-1">Add a certification to validate your expertise.</p>
           </div>
@@ -96,7 +96,7 @@ export default function CertificationsForm() {
 
       <button
         onClick={addCertification}
-        className="mt-4 flex items-center gap-2 px-4 py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 font-medium text-sm rounded-lg transition-colors w-full justify-center border border-blue-200"
+        className="mt-4 flex items-center gap-2 px-4 py-2.5 bg-blue-50 dark:bg-blue-950 hover:bg-blue-100 dark:hover:bg-blue-900 text-blue-700 dark:text-blue-300 font-medium text-sm rounded-lg transition-colors w-full justify-center border border-blue-200 dark:border-blue-800"
       >
         <Plus size={16} />
         Add Certification
