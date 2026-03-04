@@ -21,6 +21,16 @@
   </head>
   <body>
     <div id="root"></div>
+    <!-- GitHub Pages SPA: restore path from 404.html redirect -->
+    <script>
+      (function(){
+        var p = window.location.search.slice(1).split('&').find(function(s){ return s.startsWith('p='); });
+        if (p) {
+          p = decodeURIComponent(p.slice(2));
+          window.history.replaceState(null, null, p || '/');
+        }
+      })();
+    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
