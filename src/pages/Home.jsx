@@ -41,8 +41,8 @@ const FEATURES = [
   },
   {
     icon: LayoutTemplate,
-    title: '5 Templates',
-    desc: 'Switch between Modern, Classic, Minimal, Creative, and Professional designs in real time.',
+    title: '10 Templates',
+    desc: 'Switch between Modern, Classic, Minimal, Creative, Professional, Executive, Tech, Compact, Elegant, and Bold designs in real time.',
     color: '#059669',
     bg: '#ecfdf5',
   },
@@ -61,10 +61,15 @@ const TEMPLATES = [
   { id: 'minimal',      name: 'Minimal',      desc: 'Ultra-clean, maximum whitespace',      color: '#64748b' },
   { id: 'creative',     name: 'Creative',     desc: 'Bold colors, skill bars, gradient',    color: '#7c3aed' },
   { id: 'professional', name: 'Professional', desc: 'ATS-optimized, machine-readable',      color: '#059669' },
+  { id: 'executive',    name: 'Executive',    desc: 'Authoritative layout, heavy typography', color: '#1e40af' },
+  { id: 'tech',         name: 'Tech',         desc: 'Monospace accents, technical layout',  color: '#0f766e' },
+  { id: 'compact',      name: 'Compact',      desc: 'Dense layout, fits more content',      color: '#92400e' },
+  { id: 'elegant',      name: 'Elegant',      desc: 'Refined serif + light accents',        color: '#9f1239' },
+  { id: 'bold',         name: 'Bold',         desc: 'High-contrast, impactful headings',    color: '#b45309' },
 ];
 
 const STATS = [
-  { value: '5',     label: 'Templates'    },
+  { value: '10',    label: 'Templates'    },
   { value: 'AI',    label: 'Powered'      },
   { value: 'PDF',   label: 'Export'       },
   { value: '100%',  label: 'Free'         },
@@ -244,7 +249,7 @@ export default function Home() {
             <div>
               <div className="inline-flex items-center gap-2 bg-purple-50 dark:bg-purple-950 border border-purple-100 dark:border-purple-900 rounded-full px-4 py-1.5 mb-4">
                 <LayoutTemplate size={13} className="text-purple-500" />
-                <span className="text-purple-600 dark:text-purple-400 text-xs font-semibold">5 Designs</span>
+                <span className="text-purple-600 dark:text-purple-400 text-xs font-semibold">10 Designs</span>
               </div>
               <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">
                 Pick a style,<br />make it yours
