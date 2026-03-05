@@ -4,8 +4,8 @@
 
 **Build a professional resume in minutes. Live preview · 10 templates · AI enhancement · One-click PDF export.**
 
-[![Live Demo](https://img.shields.io/badge/Live_Demo-Visit_App-2563eb?style=for-the-badge&logo=githubpages&logoColor=white)](https://snehal-kanzariya.github.io/resume-builder/)
-[![Documentation](https://img.shields.io/badge/Documentation-View_PDF-7c3aed?style=for-the-badge&logo=readthedocs&logoColor=white)](https://snehal-kanzariya.github.io/resume-builder/docs.html)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Visit_App-2563eb?style=for-the-badge&logo=vercel&logoColor=white)](https://resume-builder-lovat-mu.vercel.app/)
+[![Documentation](https://img.shields.io/badge/Documentation-View_PDF-7c3aed?style=for-the-badge&logo=readthedocs&logoColor=white)](https://resume-builder-lovat-mu.vercel.app/docs.html)
 [![React](https://img.shields.io/badge/React_19-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
 [![Vite](https://img.shields.io/badge/Vite_8-646CFF?style=flat-square&logo=vite&logoColor=white)](https://vitejs.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_v4-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
@@ -25,24 +25,24 @@ Fill in the form → watch the preview update live → let AI rewrite your conte
 
 ## Features
 
-| Feature | Detail |
-|---|---|
-| **Live Preview** | Every keystroke reflects instantly in the A4 preview panel |
-| **10 Resume Templates** | Modern, Classic, Minimal, Creative, Professional, Executive, Tech, Compact, Elegant, Bold |
-| **AI Enhancement** | Groq-powered (`llama-3.3-70b-versatile`) rewrites content with stronger verbs, metrics, and ATS keywords |
-| **Side-by-side Compare** | Compare original vs AI-enhanced version section by section before accepting |
-| **PDF Export** | `react-to-print` (text-selectable) + `html2canvas + jsPDF` fallback |
-| **Dark / Light Mode** | System-preference-aware toggle, persisted in `localStorage` |
-| **Accent Colour** | 8 presets + full custom colour picker per template |
-| **Font Size** | Small / Medium / Large scale applied across the whole resume |
-| **Zoom** | Fit / 75% / 100% zoom for the in-app preview |
-| **Reset Resume** | One-click clear with confirmation dialog |
-| **Load Sample Data** | Instantly populate with a realistic sample resume |
-| **Keyboard Shortcuts** | `Ctrl+P` → Print · `Ctrl+S` → Save confirmation |
-| **Auto-save** | Debounced save to `localStorage` every 5 seconds |
-| **Toast Notifications** | Inline feedback for AI, PDF, save, and error events |
-| **Scroll Animations** | IntersectionObserver reveal on the landing page |
-| **Responsive** | Works on mobile (375 px) with hamburger nav and tab-based section switcher |
+| Feature                  | Detail                                                                                                   |
+| ------------------------ | -------------------------------------------------------------------------------------------------------- |
+| **Live Preview**         | Every keystroke reflects instantly in the A4 preview panel                                               |
+| **10 Resume Templates**  | Modern, Classic, Minimal, Creative, Professional, Executive, Tech, Compact, Elegant, Bold                |
+| **AI Enhancement**       | Groq-powered (`llama-3.3-70b-versatile`) rewrites content with stronger verbs, metrics, and ATS keywords |
+| **Side-by-side Compare** | Compare original vs AI-enhanced version section by section before accepting                              |
+| **PDF Export**           | `react-to-print` (text-selectable) + `html2canvas + jsPDF` fallback                                      |
+| **Dark / Light Mode**    | System-preference-aware toggle, persisted in `localStorage`                                              |
+| **Accent Colour**        | 8 presets + full custom colour picker per template                                                       |
+| **Font Size**            | Small / Medium / Large scale applied across the whole resume                                             |
+| **Zoom**                 | Fit / 75% / 100% zoom for the in-app preview                                                             |
+| **Reset Resume**         | One-click clear with confirmation dialog                                                                 |
+| **Load Sample Data**     | Instantly populate with a realistic sample resume                                                        |
+| **Keyboard Shortcuts**   | `Ctrl+P` → Print · `Ctrl+S` → Save confirmation                                                          |
+| **Auto-save**            | Debounced save to `localStorage` every 5 seconds                                                         |
+| **Toast Notifications**  | Inline feedback for AI, PDF, save, and error events                                                      |
+| **Scroll Animations**    | IntersectionObserver reveal on the landing page                                                          |
+| **Responsive**           | Works on mobile (375 px) with hamburger nav and tab-based section switcher                               |
 
 ---
 
@@ -118,8 +118,6 @@ resume-builder/
 │       ├── aiEnhance.js           # Groq API calls with rate limiting
 │       ├── pdfExport.js           # html2canvas + jsPDF export
 │       └── storage.js             # localStorage helpers
-├── .github/workflows/
-│   └── deploy.yml                 # Auto-deploy to GitHub Pages on push
 ├── index.html                     # Entry point + meta/OG tags
 └── vite.config.js
 ```
@@ -131,7 +129,7 @@ resume-builder/
 ### Prerequisites
 
 - Node.js ≥ 18
-- A free [Groq API key](https://console.groq.com/) *(optional — app fully works without one)*
+- A free [Groq API key](https://console.groq.com/) _(optional — app fully works without one)_
 
 ### Installation
 
@@ -154,9 +152,9 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ### Environment Variables
 
-| Variable | Required | Description |
-|---|---|---|
-| `VITE_GROQ_API_KEY` | No | Groq API key for AI enhancement. Get one free at [console.groq.com](https://console.groq.com) |
+| Variable            | Required | Description                                                                                   |
+| ------------------- | -------- | --------------------------------------------------------------------------------------------- |
+| `VITE_GROQ_API_KEY` | No       | Groq API key for AI enhancement. Get one free at [console.groq.com](https://console.groq.com) |
 
 ---
 
@@ -203,25 +201,25 @@ ResumeContext  ──(auto-save every 5 s)──▶  localStorage
 
 ## Templates
 
-| Template | Style | Best For |
-|---|---|---|
-| **Modern** | 2-column with accent sidebar | Tech & design roles |
-| **Classic** | Serif headings, single column | Traditional industries |
-| **Minimal** | Ultra-clean, maximum whitespace | Any role, premium feel |
-| **Creative** | Bold colours, skill bars, gradient | Creative fields |
-| **Professional** | ATS-optimised, machine-readable | Applicant tracking systems |
-| **Executive** | Authoritative layout, heavy typography | Senior leadership |
-| **Tech** | Monospace accents, technical layout | Engineering / DevOps |
-| **Compact** | Dense layout, fits more content | Experienced professionals |
-| **Elegant** | Refined serif + light accents | Finance, law, consulting |
-| **Bold** | High-contrast, impactful headings | Sales, marketing |
+| Template         | Style                                  | Best For                   |
+| ---------------- | -------------------------------------- | -------------------------- |
+| **Modern**       | 2-column with accent sidebar           | Tech & design roles        |
+| **Classic**      | Serif headings, single column          | Traditional industries     |
+| **Minimal**      | Ultra-clean, maximum whitespace        | Any role, premium feel     |
+| **Creative**     | Bold colours, skill bars, gradient     | Creative fields            |
+| **Professional** | ATS-optimised, machine-readable        | Applicant tracking systems |
+| **Executive**    | Authoritative layout, heavy typography | Senior leadership          |
+| **Tech**         | Monospace accents, technical layout    | Engineering / DevOps       |
+| **Compact**      | Dense layout, fits more content        | Experienced professionals  |
+| **Elegant**      | Refined serif + light accents          | Finance, law, consulting   |
+| **Bold**         | High-contrast, impactful headings      | Sales, marketing           |
 
 ---
 
 ## Keyboard Shortcuts
 
-| Shortcut | Action |
-|---|---|
+| Shortcut   | Action            |
+| ---------- | ----------------- |
 | `Ctrl + P` | Open print dialog |
 | `Ctrl + S` | Confirm auto-save |
 
@@ -229,9 +227,9 @@ ResumeContext  ──(auto-save every 5 s)──▶  localStorage
 
 ## Deployment
 
-The app is automatically deployed to **GitHub Pages** via GitHub Actions on every push to `main`.
+The app is deployed on **Vercel** and served from the root `/`.
 
-**Live URL:** [https://snehal-kanzariya.github.io/resume-builder/](https://snehal-kanzariya.github.io/resume-builder/)
+**Live URL:** [https://resume-builder-lovat-mu.vercel.app/](https://resume-builder-lovat-mu.vercel.app/)
 
 ```bash
 # Manual build
@@ -258,8 +256,8 @@ MIT © 2026 [Snehal Kanzariya](https://github.com/Snehal-Kanzariya)
 
 <div align="center">
 
-**[Live Demo](https://snehal-kanzariya.github.io/resume-builder/) · [Documentation](https://snehal-kanzariya.github.io/resume-builder/docs.html) · [Report Bug](https://github.com/Snehal-Kanzariya/resume-builder/issues)**
+**[Live Demo](https://resume-builder-lovat-mu.vercel.app/) · [Documentation](https://resume-builder-lovat-mu.vercel.app/docs.html) · [Report Bug](https://github.com/Snehal-Kanzariya/resume-builder/issues)**
 
-*Built with React + AI · Open Source · Free Forever*
+_Built with React + AI · Open Source · Free Forever_
 
 </div>
