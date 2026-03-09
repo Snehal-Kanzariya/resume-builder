@@ -35,7 +35,14 @@ export function ResumeProvider({ children }) {
   const [resumeData, setResumeData] = useState(() => {
     try {
       const saved = localStorage.getItem('resumeData');
-      return saved ? JSON.parse(saved) : initialResumeData;
+      if (!saved) return initialResumeData;
+      const parsed = JSON.parse(saved);
+      return {
+        ...initialResumeData,
+        ...parsed,
+        personalInfo: { ...initialResumeData.personalInfo, ...(parsed.personalInfo || {}) },
+        settings: { ...initialResumeData.settings, ...(parsed.settings || {}) },
+      };
     } catch {
       return initialResumeData;
     }
@@ -308,6 +315,74 @@ export function ResumeProvider({ children }) {
     localStorage.removeItem('resumeData');
   }, []);
 
+  // ── Import from upload ───────────────────────────────────────────────────────
+  // Merges parsed upload data, generating fresh IDs for every array item.
+  const importResumeData = useCallback((parsedData) => {
+    setResumeData(prev => ({
+      ...prev,
+      personalInfo: {
+        ...initialResumeData.personalInfo,
+        ...(parsedData.personalInfo || {}),
+      },
+      experience: (parsedData.experience || []).map(e => ({
+        id: generateId(),
+        company: e.company || '',
+        position: e.position || '',
+        startDate: e.startDate || '',
+        endDate: e.endDate || '',
+        current: e.current || false,
+        location: e.location || '',
+        bullets: Array.isArray(e.bullets) && e.bullets.length ? e.bullets : [''],
+      })),
+      education: (parsedData.education || []).map(e => ({
+        id: generateId(),
+        school: e.school || '',
+        degree: e.degree || '',
+        field: e.field || '',
+        startDate: e.startDate || '',
+        endDate: e.endDate || '',
+        gpa: e.gpa || '',
+        achievements: e.achievements || '',
+      })),
+      skills: (parsedData.skills || []).map(s => ({
+        id: generateId(),
+        category: s.category || '',
+        items: Array.isArray(s.items) ? s.items : [],
+      })),
+      projects: (parsedData.projects || []).map(p => ({
+        id: generateId(),
+        name: p.name || '',
+        description: p.description || '',
+        technologies: p.technologies || '',
+        liveLink: p.liveLink || '',
+        githubLink: p.githubLink || '',
+      })),
+      certifications: (parsedData.certifications || []).map(c => ({
+        id: generateId(),
+        name: c.name || '',
+        issuer: c.issuer || '',
+        date: c.date || '',
+        link: c.link || '',
+      })),
+    }));
+  }, []);
+
+  // Replace full resume data (used after AI interview answers are applied).
+  // Preserves existing settings and generates fresh IDs for array items.
+  const setFullResumeData = useCallback((data) => {
+    setResumeData(prev => ({
+      ...initialResumeData,
+      ...data,
+      personalInfo: { ...initialResumeData.personalInfo, ...(data.personalInfo || {}) },
+      settings: { ...prev.settings, ...(data.settings || {}) },
+      experience:     (data.experience     || []).map(e => ({ ...e, id: e.id || generateId() })),
+      education:      (data.education      || []).map(e => ({ ...e, id: e.id || generateId() })),
+      skills:         (data.skills         || []).map(s => ({ ...s, id: s.id || generateId() })),
+      projects:       (data.projects       || []).map(p => ({ ...p, id: p.id || generateId() })),
+      certifications: (data.certifications || []).map(c => ({ ...c, id: c.id || generateId() })),
+    }));
+  }, []);
+
   const value = {
     resumeData,
     setResumeData,
@@ -350,6 +425,8 @@ export function ResumeProvider({ children }) {
     // Utilities
     loadSampleData,
     resetResume,
+    importResumeData,
+    setFullResumeData,
 
     // AI
     updateSection,

@@ -1,10 +1,13 @@
-import { useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Eye, Sparkles, LayoutTemplate, Download,
-  ArrowRight, CheckCircle, Zap, FileText, Star,
+  ArrowRight, CheckCircle, Zap, FileText, Star, Upload,
 } from 'lucide-react';
 import Navbar from '../components/Layout/Navbar';
+import ResumeUpload from '../components/Upload/ResumeUpload';
+import AIInterviewModal from '../components/Upload/AIInterviewModal';
+import { useResume } from '../context/ResumeContext';
 
 // ── Scroll reveal hook ────────────────────────────────────────────────────────
 function useReveal() {
@@ -133,6 +136,30 @@ export default function Home() {
   const templatesRef  = useReveal();
   const aiRef         = useReveal();
 
+  const navigate = useNavigate();
+  const { importResumeData, setFullResumeData, resumeData } = useResume();
+
+  // Upload modal state
+  const [showUpload, setShowUpload]       = useState(false);
+  const [showInterview, setShowInterview] = useState(false);
+  const [parsedResume, setParsedResume]   = useState(null);
+
+  function handleParsed(parsed) {
+    importResumeData(parsed);
+    setParsedResume(parsed);
+    setShowUpload(false);
+    setShowInterview(true);
+  }
+
+  function handleInterviewUpdate(updated) {
+    setFullResumeData(updated);
+  }
+
+  function handleInterviewClose() {
+    setShowInterview(false);
+    navigate('/builder');
+  }
+
   return (
     <div className="min-h-screen bg-white dark:bg-slate-900 transition-colors">
       <Navbar />
@@ -186,9 +213,16 @@ export default function Home() {
               <FileText size={16} />
               Start Building — It&apos;s Free
             </Link>
+            <button
+              onClick={() => setShowUpload(true)}
+              className="flex items-center gap-2 px-7 py-3.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-medium rounded-xl transition-all duration-200 text-sm"
+            >
+              <Upload size={15} />
+              Upload Existing Resume
+            </button>
             <Link
               to="/templates"
-              className="flex items-center gap-2 px-7 py-3.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-medium rounded-xl transition-all duration-200 text-sm"
+              className="flex items-center gap-2 px-7 py-3.5 bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white font-medium rounded-xl transition-all duration-200 text-sm"
             >
               View Templates
               <ArrowRight size={15} />
@@ -338,6 +372,27 @@ export default function Home() {
           <p className="text-slate-600 text-xs">© {new Date().getFullYear()} · Built with React + AI · Open Source</p>
         </div>
       </footer>
+
+      {/* ── UPLOAD MODAL ─────────────────────────────────────────────────────── */}
+      {showUpload && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md border border-slate-200 dark:border-slate-700 relative">
+            <ResumeUpload
+              onParsed={handleParsed}
+              onClose={() => setShowUpload(false)}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* ── AI INTERVIEW MODAL ───────────────────────────────────────────────── */}
+      {showInterview && parsedResume && (
+        <AIInterviewModal
+          resumeData={parsedResume}
+          onUpdate={handleInterviewUpdate}
+          onClose={handleInterviewClose}
+        />
+      )}
     </div>
   );
 }

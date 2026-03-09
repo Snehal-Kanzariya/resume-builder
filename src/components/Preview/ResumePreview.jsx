@@ -88,7 +88,7 @@ const ResumePreview = forwardRef(function ResumePreview(_props, _externalRef) {
 
   const { resumeData, updateSettings, loadSampleData, aiResumeData } = useResume();
   const toast = useToast();
-  const { selectedTemplate, accentColor, fontSize } = resumeData.settings;
+  const { selectedTemplate, accentColor, fontSize } = resumeData?.settings ?? {};
 
   const [zoom,          setZoom]       = useState('fit');
   const [sampleLoaded,  setSample]     = useState(false);
@@ -101,7 +101,7 @@ const ResumePreview = forwardRef(function ResumePreview(_props, _externalRef) {
   // ── react-to-print (primary — selectable text, exact colours) ────────────
   const handlePrint = useReactToPrint({
     contentRef: printContentRef,
-    documentTitle: buildFilename(resumeData.personalInfo.fullName).replace('.pdf', ''),
+    documentTitle: buildFilename(resumeData?.personalInfo?.fullName ?? '').replace('.pdf', ''),
     pageStyle: PRINT_PAGE_STYLE,
   });
 
@@ -111,7 +111,7 @@ const ResumePreview = forwardRef(function ResumePreview(_props, _externalRef) {
     try {
       await downloadPDF(
         printContentRef.current,
-        buildFilename(resumeData.personalInfo.fullName),
+        buildFilename(resumeData?.personalInfo?.fullName ?? ''),
       );
       toast('PDF downloaded successfully!', 'success');
     } catch (err) {

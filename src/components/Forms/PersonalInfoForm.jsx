@@ -13,7 +13,7 @@ const fields = [
 
 export default function PersonalInfoForm() {
   const { resumeData, updatePersonalInfo, updateSection } = useResume();
-  const info = resumeData.personalInfo;
+  const info = resumeData?.personalInfo ?? {};
 
   return (
     <div>

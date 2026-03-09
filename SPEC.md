@@ -402,6 +402,68 @@ src/
 
 ---
 
+## Resume Upload & AI Interview Feature
+
+### Overview
+Users can upload an existing resume (PDF or DOCX). The app extracts text, uses AI to parse it into structured data, fills all forms automatically, then asks smart follow-up questions to improve and update the resume based on the user's current situation.
+
+### Files Structure
+```
+src/
+├── components/
+│   └── Upload/
+│       ├── ResumeUpload.jsx        → Drag-and-drop upload area with file type validation
+│       ├── ResumeParsingStatus.jsx  → Progress steps: Upload → Extract → Parse → Fill
+│       └── AIInterviewModal.jsx     → Follow-up questions modal with chat-like UI
+├── utils/
+│   ├── pdfParser.js                → Extract text from PDF using pdfjs-dist
+│   ├── docxParser.js               → Extract text from DOCX using mammoth
+│   └── resumeParser.js             → Send extracted text to Groq AI to structure into resume JSON
+```
+
+### Upload Flow
+1. User drags/drops or clicks to upload PDF or DOCX file (max 5MB)
+2. File type detected → appropriate parser called
+3. pdfParser.js uses pdfjs-dist to extract all text from PDF pages
+4. docxParser.js uses mammoth to extract raw text from DOCX
+5. Extracted text sent to Groq API with prompt to structure it into resumeData JSON schema
+6. Parsed data populates ResumeContext → all forms auto-fill
+7. Show success with summary of what was extracted
+
+### AI Interview Flow (Post-Upload)
+After upload and parsing, AIInterviewModal opens with smart questions:
+
+Round 1 - Verify & Update:
+- "I see you were at [company] as [role]. Are you still there, or have you moved on?"
+- "Your latest skills include [skills]. Any new technologies you have picked up?"
+- "I found [X] years of experience. Is that still accurate?"
+
+Round 2 - Enhance:
+- "What is your target job title or role right now?"
+- "Any recent achievements or metrics you would like to highlight?"
+- "Are there any projects or certifications to add?"
+
+The AI generates questions dynamically based on the parsed resume data.
+User answers in a chat-like interface. After all questions, AI updates the resume data.
+
+### Groq API Prompts
+
+For parsing:
+"You are a resume parser. Extract structured data from this resume text. Return ONLY valid JSON matching this exact schema: {personalInfo: {fullName, jobTitle, email, phone, location, linkedin, portfolio, summary}, experience: [{company, position, startDate, endDate, current, location, bullets}], education: [{school, degree, field, startDate, endDate, gpa}], skills: [{category, items}], projects: [{name, description, technologies, liveLink, githubLink}], certifications: [{name, issuer, date}]}. Fill every field you can find. Use empty string for missing fields. For dates use format like Jan 2023."
+
+For interview questions:
+"Based on this resume data, generate 5 smart follow-up questions to update and improve the resume. Focus on: current role status, new skills, recent achievements with metrics, target role, and gaps. Return JSON array of {id, question, field} where field is the resume section the answer relates to."
+
+For applying answers:
+"Given this resume data and these user answers to interview questions, update the resume data with the new information. Merge answers into appropriate sections. Return the complete updated resume JSON."
+
+### UI Placement
+- Upload button on Home page hero: "Upload Existing Resume" next to "Start Building"
+- Upload option in Builder page: Upload icon button in top toolbar
+- Also accessible via Sidebar: "Import Resume" option at top
+
+---
+
 ## Deployment Checklist
 - [ ] All 5 templates render correctly
 - [ ] PDF download works (text selectable, not blurry)
