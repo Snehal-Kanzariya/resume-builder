@@ -45,7 +45,7 @@ export default function AISuggestions({ section }) {
 
   // ── Personal Info ──────────────────────────────────────────────────────────
   if (section === 'personal') {
-    const { summary } = resumeData.personalInfo;
+    const { summary } = resumeData?.personalInfo ?? {};
     if (summary?.trim()) {
       const sentences = summary.split(/[.!?]+/).filter(s => s.trim().length > 0);
       const ok = sentences.length >= 2 && sentences.length <= 4;
@@ -116,7 +116,7 @@ export default function AISuggestions({ section }) {
 
   // ── Skills ─────────────────────────────────────────────────────────────────
   if (section === 'skills') {
-    const total = resumeData.skills.reduce(
+    const total = (resumeData?.skills ?? []).reduce(
       (sum, cat) => sum + cat.items.filter(i => i.trim()).length, 0,
     );
     tips.push({

@@ -1,10 +1,14 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { PanelRight, PanelLeft, FileText, Columns2 } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
+import { PanelRight, PanelLeft, FileText, Columns2, Upload } from 'lucide-react';
 import ResumePreview from '../components/Preview/ResumePreview';
 import { useToast } from '../context/ToastContext';
+import { useResume } from '../context/ResumeContext';
 
 import Navbar from '../components/Layout/Navbar';
 import Sidebar, { SECTIONS } from '../components/Layout/Sidebar';
+import ResumeUpload from '../components/Upload/ResumeUpload';
+import AIInterviewModal from '../components/Upload/AIInterviewModal';
 
 import PersonalInfoForm    from '../components/Forms/PersonalInfoForm';
 import ExperienceForm      from '../components/Forms/ExperienceForm';
@@ -74,11 +78,42 @@ export default function Builder() {
   const [activeSection, setActiveSection] = useState('personal');
   const [mobileView, setMobileView]       = useState('form');
   const [splitView, setSplitView]         = useState(false);
-  const [splitPos, setSplitPos]           = useState(45); // left side % of total width (max 50)
+  const [splitPos, setSplitPos]           = useState(45);
+  const [showUpload, setShowUpload]       = useState(false);
+  const [showInterview, setShowInterview] = useState(false);
+  const [parsedResume, setParsedResume]   = useState(null);
   const isDragging   = useRef(false);
   const containerRef = useRef(null);
   const previewRef   = useRef(null);
-  const toast = useToast();
+  const toast  = useToast();
+  const location = useLocation();
+  const { importResumeData, setFullResumeData, resumeData } = useResume();
+
+  // Open interview modal if navigated here from Home upload flow
+  useEffect(() => {
+    if (location.state?.openInterview) {
+      setShowInterview(true);
+      // Clear state so refresh doesn't re-open
+      window.history.replaceState({}, '');
+    }
+  }, [location.state]);
+
+  function handleParsed(parsed) {
+    importResumeData(parsed);
+    setParsedResume(parsed);
+    setShowUpload(false);
+    setShowInterview(true);
+  }
+
+  function handleInterviewUpdate(updated) {
+    setFullResumeData(updated);
+  }
+
+  function handleInterviewClose() {
+    setShowInterview(false);
+    setParsedResume(null);
+    toast('Resume updated from interview answers!', 'success', 3000);
+  }
 
   // Keyboard shortcuts: Ctrl+P → print, Ctrl+S → save toast
   useEffect(() => {
@@ -142,7 +177,11 @@ export default function Builder() {
           className="hidden md:flex flex-col flex-shrink-0"
           style={{ width: '20%', minWidth: '180px', maxWidth: '240px' }}
         >
-          <Sidebar activeSection={activeSection} onSectionChange={setActiveSection} />
+          <Sidebar
+            activeSection={activeSection}
+            onSectionChange={setActiveSection}
+            onImportResume={() => setShowUpload(true)}
+          />
         </div>
 
         {/* CENTER: Active form */}
@@ -156,7 +195,7 @@ export default function Builder() {
             minWidth: '260px',
           } : {}}
         >
-          {/* Breadcrumb + Split View toggle */}
+          {/* Breadcrumb + toolbar */}
           <div className="hidden md:flex items-center justify-between mb-5">
             <div className="flex items-center gap-2 text-xs text-slate-400 dark:text-slate-500">
               <span>Builder</span>
@@ -166,18 +205,31 @@ export default function Builder() {
               </span>
             </div>
 
-            <button
-              onClick={() => setSplitView(v => !v)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
-                splitView
-                  ? 'bg-blue-50 dark:bg-blue-950 border-blue-300 dark:border-blue-700 text-blue-600 dark:text-blue-400'
-                  : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:border-slate-300 dark:hover:border-slate-600'
-              }`}
-              title="Toggle split preview (quick view)"
-            >
-              <Columns2 size={13} />
-              {splitView ? 'Exit Split' : 'Split View'}
-            </button>
+            <div className="flex items-center gap-2">
+              {/* Upload resume button */}
+              <button
+                onClick={() => setShowUpload(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-300 dark:hover:border-blue-700 transition-colors"
+                title="Upload existing resume (PDF/DOCX)"
+              >
+                <Upload size={13} />
+                Import Resume
+              </button>
+
+              {/* Split view toggle */}
+              <button
+                onClick={() => setSplitView(v => !v)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                  splitView
+                    ? 'bg-blue-50 dark:bg-blue-950 border-blue-300 dark:border-blue-700 text-blue-600 dark:text-blue-400'
+                    : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:border-slate-300 dark:hover:border-slate-600'
+                }`}
+                title="Toggle split preview (quick view)"
+              >
+                <Columns2 size={13} />
+                {splitView ? 'Exit Split' : 'Split View'}
+              </button>
+            </div>
           </div>
 
           <div className="max-w-2xl mx-auto">
@@ -263,6 +315,27 @@ export default function Builder() {
           )}
         </button>
       </div>
+
+      {/* Upload modal */}
+      {showUpload && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md border border-slate-200 dark:border-slate-700 relative">
+            <ResumeUpload
+              onParsed={handleParsed}
+              onClose={() => setShowUpload(false)}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* AI Interview modal */}
+      {showInterview && (
+        <AIInterviewModal
+          resumeData={parsedResume || resumeData}
+          onUpdate={handleInterviewUpdate}
+          onClose={handleInterviewClose}
+        />
+      )}
     </div>
   );
 }

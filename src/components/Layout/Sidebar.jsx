@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { User, Briefcase, GraduationCap, Code2, FolderOpen, Award, ChevronRight, RotateCcw, FlaskConical } from 'lucide-react';
+import { User, Briefcase, GraduationCap, Code2, FolderOpen, Award, ChevronRight, RotateCcw, FlaskConical, Upload } from 'lucide-react';
 import { useResume } from '../../context/ResumeContext';
 import { useToast } from '../../context/ToastContext';
 import { sampleData } from '../../data/sampleData';
@@ -15,19 +15,31 @@ export const SECTIONS = [
 
 function completionDot(resumeData, section) {
   if (section.dataKey === null) {
-    const { fullName, email } = resumeData.personalInfo;
+    const fullName = resumeData?.personalInfo?.fullName ?? '';
+    const email = resumeData?.personalInfo?.email ?? '';
     return fullName.trim() && email.trim();
   }
-  return resumeData[section.dataKey]?.length > 0;
+  return (resumeData?.[section.dataKey]?.length ?? 0) > 0;
 }
 
-export default function Sidebar({ activeSection, onSectionChange }) {
+export default function Sidebar({ activeSection, onSectionChange, onImportResume }) {
   const { resumeData, resetResume, loadSampleData } = useResume();
   const toast = useToast();
   const [confirmReset, setConfirmReset] = useState(false);
 
   return (
     <aside className="flex flex-col h-full bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-700 py-4 px-3 gap-1 overflow-y-auto transition-colors">
+
+      {/* Import Resume button */}
+      {onImportResume && (
+        <button
+          onClick={onImportResume}
+          className="flex items-center gap-2 px-3 py-2 mb-2 rounded-lg text-xs font-semibold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-950 transition-colors w-full"
+        >
+          <Upload size={13} /> Import Resume (PDF/DOCX)
+        </button>
+      )}
+
       <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500 px-2 mb-2">
         Resume Sections
       </p>
