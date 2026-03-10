@@ -4,6 +4,19 @@ import { generateInterviewQuestions, applyInterviewAnswers } from '../../utils/r
 import { useResume } from '../../context/ResumeContext';
 import { useToast } from '../../context/ToastContext';
 
+const FIELD_PLACEHOLDERS = {
+  personalInfo:   'e.g. Senior Software Engineer at Microsoft',
+  experience:     'e.g. Increased team productivity by 40% through CI/CD automation',
+  education:      'e.g. Completed an online ML specialisation on Coursera',
+  skills:         'e.g. React, Node.js, Python, AWS, Docker',
+  projects:       'e.g. E-commerce platform with real-time inventory management',
+  certifications: 'e.g. AWS Solutions Architect, completed March 2025',
+};
+
+function getPlaceholder(question) {
+  return question.placeholder || FIELD_PLACEHOLDERS[question.field] || 'Type your answer…';
+}
+
 // screen: loading | questions | applying | done | error
 export default function AIInterviewModal({ resumeData, onUpdate, onClose, onViewPreview }) {
   const { importResumeData } = useResume();
@@ -170,10 +183,13 @@ export default function AIInterviewModal({ resumeData, onUpdate, onClose, onView
                     value={inputVal}
                     onChange={(e) => setInputVal(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder="Type your answer… (Ctrl+Enter to submit)"
+                    placeholder={getPlaceholder(currentQ)}
                     rows={3}
-                    className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-2xl rounded-tl-sm text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow"
+                    className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-2xl rounded-tl-sm text-sm text-slate-800 dark:text-slate-100 placeholder:text-slate-300 dark:placeholder:text-slate-600 placeholder:italic resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow"
                   />
+                  <p className="mt-1 text-[10px] text-slate-400 dark:text-slate-500 pl-1">
+                    Ctrl+Enter to submit · press Skip to skip this question
+                  </p>
                 </div>
               </div>
 

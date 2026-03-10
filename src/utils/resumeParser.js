@@ -175,8 +175,9 @@ export async function generateInterviewQuestions(resumeData) {
         `to help update and improve the resume. Focus on: current role status, new skills ` +
         `picked up since the resume was written, recent achievements with metrics, target role, ` +
         `and any gaps. Return ONLY a JSON array with this exact shape: ` +
-        `[{"id":"q1","question":"...","field":"experience"}]. ` +
+        `[{"id":"q1","question":"...","field":"experience","placeholder":"..."}]. ` +
         `The field value must be one of: personalInfo, experience, education, skills, projects, certifications. ` +
+        `For each question also include a placeholder field with a realistic example answer the user might type. ` +
         `No markdown, no explanation. Raw JSON array only.`,
     },
     {
@@ -195,11 +196,11 @@ export async function generateInterviewQuestions(resumeData) {
     // Fallback questions if AI fails or returns bad JSON
     await wait(4000);
     return [
-      { id: 'q1', question: 'Are you currently employed? If so, at what company and in what role?', field: 'experience' },
-      { id: 'q2', question: 'What new technical skills or tools have you picked up recently?', field: 'skills' },
-      { id: 'q3', question: 'What is your target job title or role right now?', field: 'personalInfo' },
-      { id: 'q4', question: 'Any recent achievements or metrics you would like to highlight (e.g. "increased sales by 30%")?', field: 'experience' },
-      { id: 'q5', question: 'Are there any new projects or certifications you would like to add?', field: 'projects' },
+      { id: 'q1', question: 'Are you currently employed? If so, at what company and in what role?',               field: 'experience',     placeholder: 'e.g. I recently moved to Senior Frontend Developer at Google' },
+      { id: 'q2', question: 'What new technical skills or tools have you picked up recently?',                    field: 'skills',         placeholder: 'e.g. TypeScript, Next.js, AWS, Docker, GraphQL' },
+      { id: 'q3', question: 'What is your target job title or role right now?',                                   field: 'personalInfo',   placeholder: 'e.g. Senior Full Stack Developer at a Series B startup' },
+      { id: 'q4', question: 'Any recent achievements or metrics you would like to highlight?',                    field: 'experience',     placeholder: 'e.g. Led a team of 5, increased revenue by 30%, reduced load time by 60%' },
+      { id: 'q5', question: 'Are there any new projects or certifications you would like to add?',                field: 'projects',       placeholder: 'e.g. Built an AI-powered dashboard using React and OpenAI API' },
     ];
   }
 }
