@@ -1,21 +1,72 @@
-import { Plus, Trash2, ExternalLink, Github } from 'lucide-react';
+import { Plus, Trash2, ExternalLink, Github, GripVertical, ArrowUp, ArrowDown } from 'lucide-react';
 import { useResume } from '../../context/ResumeContext';
 import SectionAIPanel from '../AI/SectionAIPanel';
+import { useDragReorder } from '../../hooks/useDragReorder';
 
-function ProjectCard({ entry }) {
+function ProjectCard({
+  entry, index, total,
+  dragging, dragOver, flash,
+  onDragStart, onDragOver, onDrop, onDragEnd,
+  onMoveUp, onMoveDown,
+}) {
   const { updateProject, removeProject } = useResume();
   const update = (field, value) => updateProject(entry.id, field, value);
 
   return (
-    <div className="border border-slate-200 dark:border-slate-700 rounded-xl p-4 bg-white dark:bg-slate-800 shadow-sm space-y-3 transition-colors">
+    <div
+      onDragOver={onDragOver}
+      onDrop={onDrop}
+      onDragEnd={onDragEnd}
+      className={[
+        'relative border border-slate-200 dark:border-slate-700 rounded-xl p-4',
+        'bg-white dark:bg-slate-800 shadow-sm space-y-3 transition-all duration-200',
+        dragging ? 'opacity-50 scale-[1.02] shadow-lg z-10' : '',
+        flash    ? 'ring-2 ring-blue-300 dark:ring-blue-700 bg-blue-50 dark:bg-blue-950/50' : '',
+      ].join(' ')}
+    >
+      {/* Blue drop-position indicator */}
+      {dragOver && !dragging && (
+        <div className="absolute -top-[3px] left-3 right-3 h-[2px] bg-blue-400 rounded-full z-20 pointer-events-none" />
+      )}
+
       {/* Header */}
-      <div className="flex items-start justify-between">
-        <h4 className="text-sm font-semibold text-slate-700">
+      <div className="flex items-center gap-2">
+        {/* Mobile up/down arrows */}
+        <div className="flex md:hidden flex-col flex-shrink-0">
+          <button
+            onClick={onMoveUp}
+            disabled={index === 0}
+            className="text-slate-300 hover:text-slate-500 dark:hover:text-slate-400 disabled:opacity-20 disabled:cursor-not-allowed transition-colors p-0.5"
+            title="Move up"
+          >
+            <ArrowUp size={13} />
+          </button>
+          <button
+            onClick={onMoveDown}
+            disabled={index === total - 1}
+            className="text-slate-300 hover:text-slate-500 dark:hover:text-slate-400 disabled:opacity-20 disabled:cursor-not-allowed transition-colors p-0.5"
+            title="Move down"
+          >
+            <ArrowDown size={13} />
+          </button>
+        </div>
+
+        {/* Drag handle (md+) */}
+        <div
+          draggable
+          onDragStart={onDragStart}
+          className="hidden md:flex items-center cursor-grab active:cursor-grabbing text-slate-300 hover:text-slate-500 dark:hover:text-slate-400 transition-colors flex-shrink-0 select-none"
+          title="Drag to reorder"
+        >
+          <GripVertical size={16} />
+        </div>
+
+        <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-200 flex-1 min-w-0 truncate">
           {entry.name ? entry.name : <span className="text-slate-400 font-normal">New Project</span>}
         </h4>
         <button
           onClick={() => removeProject(entry.id)}
-          className="text-slate-300 hover:text-red-400 transition-colors"
+          className="text-slate-300 hover:text-red-400 transition-colors flex-shrink-0"
           title="Remove project"
         >
           <Trash2 size={16} />
@@ -90,8 +141,13 @@ function ProjectCard({ entry }) {
 }
 
 export default function ProjectsForm() {
-  const { resumeData, addProject, updateSection } = useResume();
+  const { resumeData, addProject, updateSection, reorderProjects } = useResume();
   const { projects } = resumeData;
+
+  const {
+    draggingIndex, overIndex, flashIndex,
+    handleDragStart, handleDragOver, handleDrop, handleDragEnd,
+  } = useDragReorder(reorderProjects);
 
   return (
     <div>
@@ -105,8 +161,22 @@ export default function ProjectsForm() {
             <p className="text-xs mt-1">Add a project to show off your work.</p>
           </div>
         )}
-        {projects.map(entry => (
-          <ProjectCard key={entry.id} entry={entry} />
+        {projects.map((entry, index) => (
+          <ProjectCard
+            key={entry.id}
+            entry={entry}
+            index={index}
+            total={projects.length}
+            dragging={draggingIndex === index}
+            dragOver={overIndex === index}
+            flash={flashIndex === index}
+            onDragStart={() => handleDragStart(index)}
+            onDragOver={e => handleDragOver(e, index)}
+            onDrop={e => handleDrop(e, index)}
+            onDragEnd={handleDragEnd}
+            onMoveUp={() => reorderProjects(index, index - 1)}
+            onMoveDown={() => reorderProjects(index, index + 1)}
+          />
         ))}
       </div>
 

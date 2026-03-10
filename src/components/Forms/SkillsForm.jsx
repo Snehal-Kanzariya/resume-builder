@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Plus, Trash2, X } from 'lucide-react';
+import { Plus, Trash2, X, GripVertical, ArrowUp, ArrowDown } from 'lucide-react';
 import { useResume } from '../../context/ResumeContext';
 import SectionAIPanel from '../AI/SectionAIPanel';
+import { useDragReorder } from '../../hooks/useDragReorder';
 
 function SkillTag({ label, onRemove }) {
   return (
@@ -18,7 +19,12 @@ function SkillTag({ label, onRemove }) {
   );
 }
 
-function SkillCategoryCard({ category }) {
+function SkillCategoryCard({
+  category, index, total,
+  dragging, dragOver, flash,
+  onDragStart, onDragOver, onDrop, onDragEnd,
+  onMoveUp, onMoveDown,
+}) {
   const { updateSkillCategory, removeSkillCategory } = useResume();
   const [inputValue, setInputValue] = useState('');
 
@@ -42,10 +48,56 @@ function SkillCategoryCard({ category }) {
   };
 
   return (
-    <div className="border border-slate-200 dark:border-slate-700 rounded-xl p-4 bg-white dark:bg-slate-800 shadow-sm space-y-3 transition-colors">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex-1 mr-3">
+    <div
+      onDragOver={onDragOver}
+      onDrop={onDrop}
+      onDragEnd={onDragEnd}
+      className={[
+        'relative border border-slate-200 dark:border-slate-700 rounded-xl p-4',
+        'bg-white dark:bg-slate-800 shadow-sm space-y-3 transition-all duration-200',
+        dragging ? 'opacity-50 scale-[1.02] shadow-lg z-10' : '',
+        flash    ? 'ring-2 ring-blue-300 dark:ring-blue-700 bg-blue-50 dark:bg-blue-950/50' : '',
+      ].join(' ')}
+    >
+      {/* Blue drop-position indicator */}
+      {dragOver && !dragging && (
+        <div className="absolute -top-[3px] left-3 right-3 h-[2px] bg-blue-400 rounded-full z-20 pointer-events-none" />
+      )}
+
+      {/* Header row: mobile arrows + drag handle + category input + delete */}
+      <div className="flex items-center gap-2">
+        {/* Mobile up/down arrows */}
+        <div className="flex md:hidden flex-col flex-shrink-0">
+          <button
+            onClick={onMoveUp}
+            disabled={index === 0}
+            className="text-slate-300 hover:text-slate-500 dark:hover:text-slate-400 disabled:opacity-20 disabled:cursor-not-allowed transition-colors p-0.5"
+            title="Move up"
+          >
+            <ArrowUp size={13} />
+          </button>
+          <button
+            onClick={onMoveDown}
+            disabled={index === total - 1}
+            className="text-slate-300 hover:text-slate-500 dark:hover:text-slate-400 disabled:opacity-20 disabled:cursor-not-allowed transition-colors p-0.5"
+            title="Move down"
+          >
+            <ArrowDown size={13} />
+          </button>
+        </div>
+
+        {/* Drag handle (md+) */}
+        <div
+          draggable
+          onDragStart={onDragStart}
+          className="hidden md:flex items-center cursor-grab active:cursor-grabbing text-slate-300 hover:text-slate-500 dark:hover:text-slate-400 transition-colors flex-shrink-0 select-none self-center"
+          title="Drag to reorder"
+        >
+          <GripVertical size={16} />
+        </div>
+
+        {/* Category name input */}
+        <div className="flex-1 min-w-0">
           <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Category Name</label>
           <input
             type="text"
@@ -55,6 +107,7 @@ function SkillCategoryCard({ category }) {
             className="input-field"
           />
         </div>
+
         <button
           onClick={() => removeSkillCategory(category.id)}
           className="mt-5 text-slate-300 hover:text-red-400 transition-colors flex-shrink-0"
@@ -97,8 +150,13 @@ function SkillCategoryCard({ category }) {
 }
 
 export default function SkillsForm() {
-  const { resumeData, addSkillCategory, updateSection } = useResume();
+  const { resumeData, addSkillCategory, updateSection, reorderSkillCategory } = useResume();
   const { skills } = resumeData;
+
+  const {
+    draggingIndex, overIndex, flashIndex,
+    handleDragStart, handleDragOver, handleDrop, handleDragEnd,
+  } = useDragReorder(reorderSkillCategory);
 
   return (
     <div>
@@ -114,8 +172,22 @@ export default function SkillsForm() {
             <p className="text-xs mt-1">Add a category like "Languages" or "Tools" to get started.</p>
           </div>
         )}
-        {skills.map(category => (
-          <SkillCategoryCard key={category.id} category={category} />
+        {skills.map((category, index) => (
+          <SkillCategoryCard
+            key={category.id}
+            category={category}
+            index={index}
+            total={skills.length}
+            dragging={draggingIndex === index}
+            dragOver={overIndex === index}
+            flash={flashIndex === index}
+            onDragStart={() => handleDragStart(index)}
+            onDragOver={e => handleDragOver(e, index)}
+            onDrop={e => handleDrop(e, index)}
+            onDragEnd={handleDragEnd}
+            onMoveUp={() => reorderSkillCategory(index, index - 1)}
+            onMoveDown={() => reorderSkillCategory(index, index + 1)}
+          />
         ))}
       </div>
 

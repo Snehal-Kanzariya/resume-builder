@@ -1,6 +1,7 @@
-import { Plus, Trash2, GripVertical, PlusCircle, X } from 'lucide-react';
+import { Plus, Trash2, GripVertical, PlusCircle, X, ArrowUp, ArrowDown } from 'lucide-react';
 import { useResume } from '../../context/ResumeContext';
 import SectionAIPanel from '../AI/SectionAIPanel';
+import { useDragReorder } from '../../hooks/useDragReorder';
 
 function BulletList({ entry, id }) {
   const { addExperienceBullet, updateExperienceBullet, removeExperienceBullet } = useResume();
@@ -42,15 +43,65 @@ function BulletList({ entry, id }) {
   );
 }
 
-function ExperienceCard({ entry }) {
+function ExperienceCard({
+  entry, index, total,
+  dragging, dragOver, flash,
+  onDragStart, onDragOver, onDrop, onDragEnd,
+  onMoveUp, onMoveDown,
+}) {
   const { updateExperience, removeExperience } = useResume();
   const update = (field, value) => updateExperience(entry.id, field, value);
 
   return (
-    <div className="border border-slate-200 dark:border-slate-700 rounded-xl p-4 bg-white dark:bg-slate-800 shadow-sm space-y-3 transition-colors">
+    <div
+      onDragOver={onDragOver}
+      onDrop={onDrop}
+      onDragEnd={onDragEnd}
+      className={[
+        'relative border border-slate-200 dark:border-slate-700 rounded-xl p-4',
+        'bg-white dark:bg-slate-800 shadow-sm space-y-3 transition-all duration-200',
+        dragging ? 'opacity-50 scale-[1.02] shadow-lg z-10' : '',
+        flash    ? 'ring-2 ring-blue-300 dark:ring-blue-700 bg-blue-50 dark:bg-blue-950/50' : '',
+      ].join(' ')}
+    >
+      {/* Blue drop-position indicator */}
+      {dragOver && !dragging && (
+        <div className="absolute -top-[3px] left-3 right-3 h-[2px] bg-blue-400 rounded-full z-20 pointer-events-none" />
+      )}
+
       {/* Card header */}
-      <div className="flex items-start justify-between">
-        <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+      <div className="flex items-center gap-2">
+        {/* Mobile up/down arrows (visible below md) */}
+        <div className="flex md:hidden flex-col flex-shrink-0">
+          <button
+            onClick={onMoveUp}
+            disabled={index === 0}
+            className="text-slate-300 hover:text-slate-500 dark:hover:text-slate-400 disabled:opacity-20 disabled:cursor-not-allowed transition-colors p-0.5"
+            title="Move up"
+          >
+            <ArrowUp size={13} />
+          </button>
+          <button
+            onClick={onMoveDown}
+            disabled={index === total - 1}
+            className="text-slate-300 hover:text-slate-500 dark:hover:text-slate-400 disabled:opacity-20 disabled:cursor-not-allowed transition-colors p-0.5"
+            title="Move down"
+          >
+            <ArrowDown size={13} />
+          </button>
+        </div>
+
+        {/* Drag handle (visible md+) */}
+        <div
+          draggable
+          onDragStart={onDragStart}
+          className="hidden md:flex items-center cursor-grab active:cursor-grabbing text-slate-300 hover:text-slate-500 dark:hover:text-slate-400 transition-colors flex-shrink-0 select-none"
+          title="Drag to reorder"
+        >
+          <GripVertical size={16} />
+        </div>
+
+        <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-200 flex-1 min-w-0 truncate">
           {entry.company || entry.position ? (
             <span>{entry.position || 'New Position'}{entry.company ? ` · ${entry.company}` : ''}</span>
           ) : (
@@ -59,7 +110,7 @@ function ExperienceCard({ entry }) {
         </h4>
         <button
           onClick={() => removeExperience(entry.id)}
-          className="text-slate-300 hover:text-red-400 transition-colors"
+          className="text-slate-300 hover:text-red-400 transition-colors flex-shrink-0"
           title="Remove entry"
         >
           <Trash2 size={16} />
@@ -146,8 +197,13 @@ function ExperienceCard({ entry }) {
 }
 
 export default function ExperienceForm() {
-  const { resumeData, addExperience, updateSection } = useResume();
+  const { resumeData, addExperience, updateSection, reorderExperience } = useResume();
   const { experience } = resumeData;
+
+  const {
+    draggingIndex, overIndex, flashIndex,
+    handleDragStart, handleDragOver, handleDrop, handleDragEnd,
+  } = useDragReorder(reorderExperience);
 
   return (
     <div>
@@ -161,8 +217,22 @@ export default function ExperienceForm() {
             <p className="text-xs mt-1">Click the button below to add your first role.</p>
           </div>
         )}
-        {experience.map(entry => (
-          <ExperienceCard key={entry.id} entry={entry} />
+        {experience.map((entry, index) => (
+          <ExperienceCard
+            key={entry.id}
+            entry={entry}
+            index={index}
+            total={experience.length}
+            dragging={draggingIndex === index}
+            dragOver={overIndex === index}
+            flash={flashIndex === index}
+            onDragStart={() => handleDragStart(index)}
+            onDragOver={e => handleDragOver(e, index)}
+            onDrop={e => handleDrop(e, index)}
+            onDragEnd={handleDragEnd}
+            onMoveUp={() => reorderExperience(index, index - 1)}
+            onMoveDown={() => reorderExperience(index, index + 1)}
+          />
         ))}
       </div>
 
