@@ -284,6 +284,34 @@ export function ResumeProvider({ children }) {
     }));
   }, []);
 
+  // ── Reorder helpers ──────────────────────────────────────────────────────────
+  function reorderArray(arr, from, to) {
+    const next = [...arr];
+    const [item] = next.splice(from, 1);
+    next.splice(to, 0, item);
+    return next;
+  }
+
+  const reorderExperience = useCallback((from, to) => {
+    setResumeData(prev => ({ ...prev, experience: reorderArray(prev.experience, from, to) }));
+  }, []);
+
+  const reorderEducation = useCallback((from, to) => {
+    setResumeData(prev => ({ ...prev, education: reorderArray(prev.education, from, to) }));
+  }, []);
+
+  const reorderProjects = useCallback((from, to) => {
+    setResumeData(prev => ({ ...prev, projects: reorderArray(prev.projects, from, to) }));
+  }, []);
+
+  const reorderCertifications = useCallback((from, to) => {
+    setResumeData(prev => ({ ...prev, certifications: reorderArray(prev.certifications, from, to) }));
+  }, []);
+
+  const reorderSkillCategory = useCallback((from, to) => {
+    setResumeData(prev => ({ ...prev, skills: reorderArray(prev.skills, from, to) }));
+  }, []);
+
   // ── Settings ─────────────────────────────────────────────────────────────────
   const updateSettings = useCallback((field, value) => {
     setResumeData(prev => ({
@@ -440,6 +468,13 @@ export function ResumeProvider({ children }) {
     // Settings
     updateSettings,
     reorderSections,
+
+    // Reorder
+    reorderExperience,
+    reorderEducation,
+    reorderProjects,
+    reorderCertifications,
+    reorderSkillCategory,
 
     // Utilities
     loadSampleData,
