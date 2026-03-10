@@ -587,6 +587,78 @@ For applying answers:
 
 ---
 
+## Drag-and-Drop Section Reordering
+
+### Overview
+Users can reorder entries within Experience, Education, Projects, Certifications, and Skills sections by dragging them up or down. This uses native HTML5 drag-and-drop API with no external libraries.
+
+### UI Design
+- Each entry card has a GripVertical icon (lucide-react) as a drag handle on the left side of the entry header
+- Drag handle: gray color, darkens on hover, cursor changes to grab/grabbing
+- Only the drag handle initiates dragging (not the entire card)
+- Subtle tooltip on handle: "Drag to reorder"
+
+### Drag Behavior
+- onDragStart: store dragged item index in a ref, set dragged item opacity to 0.5
+- onDragOver: preventDefault, show 2px blue indicator line at drop position
+- onDrop: reorder the array in context, clear visual indicators
+- onDragEnd: reset all styles
+- After drop: brief blue highlight flash on the dropped item
+
+### Mobile Support
+- Touch devices cannot reliably drag-and-drop
+- Show ArrowUp and ArrowDown icon buttons (lucide-react) next to drag handle on small screens
+- ArrowUp moves item one position up, ArrowDown moves one position down
+- Hide ArrowUp on first item, ArrowDown on last item
+- Use Tailwind responsive classes: drag handle visible on md+, arrow buttons visible on sm only
+
+### Context Functions (ResumeContext.jsx)
+```javascript
+reorderExperience(fromIndex, toIndex)
+reorderEducation(fromIndex, toIndex)
+reorderProjects(fromIndex, toIndex)
+reorderCertifications(fromIndex, toIndex)
+reorderSkillCategory(fromIndex, toIndex)
+```
+Each function:
+- Copies the array
+- Splices the item from fromIndex
+- Inserts at toIndex
+- Updates state
+
+### Affected Components
+| Component | Context Function | Array |
+|-----------|-----------------|-------|
+| ExperienceForm.jsx | reorderExperience | experience[] |
+| EducationForm.jsx | reorderEducation | education[] |
+| ProjectsForm.jsx | reorderProjects | projects[] |
+| CertificationsForm.jsx | reorderCertifications | certifications[] |
+| SkillsForm.jsx | reorderSkillCategory | skills[] |
+
+### Implementation Pattern (reusable across all forms)
+Entry Card Layout:
+```
+┌──────────────────────────────────────┐
+│ ⠿ [Drag Handle]  Entry Title    [Delete] │
+│ ↑↓ [Mobile arrows]                       │
+│    Form fields...                         │
+└──────────────────────────────────────┘
+```
+
+### Animations
+- Dragged item: opacity 0.5 with slight scale(1.02)
+- Drop zone: 2px solid blue line indicator
+- After drop: background briefly flashes blue then fades (300ms transition)
+- Array reorder triggers smooth layout shift
+
+### Edge Cases
+- Single entry: drag handle visible but non-functional (nothing to reorder)
+- Two entries: drag works normally
+- Dragging cancelled (drop outside): item returns to original position
+- Preview updates in real-time as items reorder
+
+---
+
 ## Deployment Checklist
 - [ ] All 5 templates render correctly
 - [ ] PDF download works (text selectable, not blurry)
