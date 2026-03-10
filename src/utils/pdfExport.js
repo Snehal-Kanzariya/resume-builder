@@ -46,8 +46,9 @@ export async function downloadPDF(element, filename = 'resume.pdf') {
     scrollX: 0,
     scrollY: 0,
     logging: false,
-    // Remove any CSS transforms so we capture the raw layout
-    ignoreElements: el => el.getAttribute('aria-hidden') === 'true' && el !== element,
+    // Skip aria-hidden elements, but never skip the target or any of its ancestors
+    // (the parent wrapper has aria-hidden="true" — excluding it would hide the target too)
+    ignoreElements: el => el.getAttribute('aria-hidden') === 'true' && !el.contains(element),
   });
 
   const imgData = canvas.toDataURL('image/jpeg', 1.0);
