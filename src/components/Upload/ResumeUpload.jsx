@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback } from 'react';
-import { Upload, FileText, FileType2, AlertCircle, X } from 'lucide-react';
+import { Upload, FileText, FileType2, AlertCircle, X, CheckCircle, Sparkles, PenLine } from 'lucide-react';
 import { extractTextFromPDF } from '../../utils/pdfParser';
 import { extractTextFromDOCX } from '../../utils/docxParser';
 import { parseResumeText, hasApiKey } from '../../utils/resumeParser';
@@ -33,12 +33,15 @@ function buildSummary(parsed) {
   };
 }
 
-export default function ResumeUpload({ onParsed, onClose }) {
+// onGoToBuilder(parsed) — user wants to go straight to builder
+// onEnhanceWithAI(parsed) — user wants AI interview first
+export default function ResumeUpload({ onGoToBuilder, onEnhanceWithAI, onClose }) {
   const [status, setStatus]         = useState('idle');
   const [error, setError]           = useState('');
   const [dragOver, setDragOver]     = useState(false);
   const [fileName, setFileName]     = useState('');
   const [summary, setSummary]       = useState(null);
+  const [parsed, setParsed]         = useState(null);
   const fileInputRef                = useRef(null);
 
   const noKey = !hasApiKey();
@@ -54,7 +57,7 @@ export default function ResumeUpload({ onParsed, onClose }) {
     try {
       // Step 1: uploading
       setStatus('uploading');
-      await new Promise(r => setTimeout(r, 400)); // brief pause for UX
+      await new Promise(r => setTimeout(r, 400));
 
       // Step 2: extracting
       setStatus('extracting');
@@ -69,21 +72,17 @@ export default function ResumeUpload({ onParsed, onClose }) {
 
       // Step 3: AI parsing
       setStatus('parsing');
-      const parsed = await parseResumeText(text);
+      const result = await parseResumeText(text);
 
-      // Step 4: success
-      const sum = buildSummary(parsed);
-      setSummary(sum);
+      // Step 4: success — show action buttons, let user choose what to do
+      setSummary(buildSummary(result));
+      setParsed(result);
       setStatus('success');
-
-      // Small delay so user sees the success state
-      await new Promise(r => setTimeout(r, 800));
-      onParsed(parsed);
     } catch (err) {
       setError(err.message || 'Something went wrong. Please try again.');
       setStatus('error');
     }
-  }, [onParsed]);
+  }, []);
 
   const handleDrop = useCallback((e) => {
     e.preventDefault();
@@ -133,8 +132,8 @@ export default function ResumeUpload({ onParsed, onClose }) {
           </div>
         )}
 
-        {/* Drop zone */}
-        {status === 'idle' || status === 'error' ? (
+        {/* Drop zone — idle or error */}
+        {(status === 'idle' || status === 'error') && (
           <div
             onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
             onDragLeave={() => setDragOver(false)}
@@ -179,22 +178,80 @@ export default function ResumeUpload({ onParsed, onClose }) {
               disabled={noKey}
             />
           </div>
-        ) : (
-          /* Processing / success state */
+        )}
+
+        {/* Processing state */}
+        {isProcessing && (
           <div className="py-4">
             <div className="flex items-center gap-2 mb-5">
               <FileText size={16} className="text-blue-500 flex-shrink-0" />
               <p className="text-sm font-medium text-slate-700 dark:text-slate-300 truncate">{fileName}</p>
             </div>
-            <ResumeParsingStatus
-              currentStep={stepForStatus(status)}
-              summary={summary}
-            />
-            {status === 'success' && (
-              <p className="text-center text-xs text-emerald-600 dark:text-emerald-400 font-medium mt-4">
-                All done! Opening AI interview…
+            <ResumeParsingStatus currentStep={stepForStatus(status)} summary={null} />
+            <p className="text-center text-xs text-slate-400 dark:text-slate-500 mt-4">
+              This may take 10–20 seconds…
+            </p>
+          </div>
+        )}
+
+        {/* Success screen — let user choose action */}
+        {status === 'success' && summary && parsed && (
+          <div className="flex flex-col items-center gap-4 py-2">
+            <div className="w-14 h-14 rounded-2xl bg-emerald-100 dark:bg-emerald-950 flex items-center justify-center">
+              <CheckCircle size={28} className="text-emerald-500" />
+            </div>
+
+            <div className="text-center">
+              <p className="font-bold text-slate-800 dark:text-slate-100 text-base mb-1">
+                Resume Imported!
               </p>
-            )}
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Found:{' '}
+                <span className="font-medium text-slate-700 dark:text-slate-300">
+                  {summary.jobs} job{summary.jobs !== 1 ? 's' : ''}
+                </span>
+                {', '}
+                <span className="font-medium text-slate-700 dark:text-slate-300">
+                  {summary.degrees} degree{summary.degrees !== 1 ? 's' : ''}
+                </span>
+                {', '}
+                <span className="font-medium text-slate-700 dark:text-slate-300">
+                  {summary.skills} skill group{summary.skills !== 1 ? 's' : ''}
+                </span>
+                {summary.projects > 0 && (
+                  <>
+                    {', '}
+                    <span className="font-medium text-slate-700 dark:text-slate-300">
+                      {summary.projects} project{summary.projects !== 1 ? 's' : ''}
+                    </span>
+                  </>
+                )}
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-2.5 w-full mt-1">
+              {/* Primary: go straight to builder */}
+              <button
+                onClick={() => onGoToBuilder?.(parsed)}
+                className="flex items-center justify-center gap-2 w-full px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl transition-colors"
+              >
+                <PenLine size={15} /> Edit in Builder
+              </button>
+
+              {/* Secondary: AI enhancement (optional) */}
+              {onEnhanceWithAI && (
+                <button
+                  onClick={() => onEnhanceWithAI?.(parsed)}
+                  className="flex items-center justify-center gap-2 w-full px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-sm font-semibold rounded-xl transition-colors"
+                >
+                  <Sparkles size={15} /> Enhance with AI
+                </button>
+              )}
+            </div>
+
+            <p className="text-[11px] text-slate-400 dark:text-slate-500 text-center">
+              You can edit any field manually in the builder after importing.
+            </p>
           </div>
         )}
 
@@ -209,18 +266,11 @@ export default function ResumeUpload({ onParsed, onClose }) {
         {/* Retry button after error */}
         {status === 'error' && (
           <button
-            onClick={() => { setStatus('idle'); setError(''); setSummary(null); }}
+            onClick={() => { setStatus('idle'); setError(''); setSummary(null); setParsed(null); }}
             className="mt-3 w-full py-2 text-xs font-semibold text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-colors"
           >
             Try again
           </button>
-        )}
-
-        {/* Loading hint */}
-        {isProcessing && (
-          <p className="text-center text-xs text-slate-400 dark:text-slate-500 mt-4">
-            This may take 10–20 seconds…
-          </p>
         )}
       </div>
     </div>

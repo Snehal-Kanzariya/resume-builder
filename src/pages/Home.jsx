@@ -8,6 +8,7 @@ import Navbar from '../components/Layout/Navbar';
 import ResumeUpload from '../components/Upload/ResumeUpload';
 import AIInterviewModal from '../components/Upload/AIInterviewModal';
 import { useResume } from '../context/ResumeContext';
+import { useToast } from '../context/ToastContext';
 
 // ── Scroll reveal hook ────────────────────────────────────────────────────────
 function useReveal() {
@@ -138,13 +139,24 @@ export default function Home() {
 
   const navigate = useNavigate();
   const { importResumeData, setFullResumeData, resumeData } = useResume();
+  const toast = useToast();
 
   // Upload modal state
   const [showUpload, setShowUpload]       = useState(false);
   const [showInterview, setShowInterview] = useState(false);
   const [parsedResume, setParsedResume]   = useState(null);
 
-  function handleParsed(parsed) {
+  // Upload success: user chose "Edit in Builder" — import data and go directly
+  function handleGoToBuilder(parsed) {
+    importResumeData(parsed);
+    setShowUpload(false);
+    setParsedResume(null);
+    toast('Resume imported! Review and edit your details.', 'success', 3500);
+    navigate('/builder');
+  }
+
+  // Upload success: user chose "Enhance with AI" — import data then open interview
+  function handleEnhanceWithAI(parsed) {
     importResumeData(parsed);
     setParsedResume(parsed);
     setShowUpload(false);
@@ -157,7 +169,15 @@ export default function Home() {
 
   function handleInterviewClose() {
     setShowInterview(false);
+    setParsedResume(null);
+    toast('Resume updated with your answers!', 'success', 3000);
     navigate('/builder');
+  }
+
+  function handleInterviewViewPreview() {
+    setShowInterview(false);
+    setParsedResume(null);
+    navigate('/preview');
   }
 
   return (
@@ -378,7 +398,8 @@ export default function Home() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
           <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md border border-slate-200 dark:border-slate-700 relative">
             <ResumeUpload
-              onParsed={handleParsed}
+              onGoToBuilder={handleGoToBuilder}
+              onEnhanceWithAI={handleEnhanceWithAI}
               onClose={() => setShowUpload(false)}
             />
           </div>
@@ -391,6 +412,7 @@ export default function Home() {
           resumeData={parsedResume}
           onUpdate={handleInterviewUpdate}
           onClose={handleInterviewClose}
+          onViewPreview={handleInterviewViewPreview}
         />
       )}
     </div>

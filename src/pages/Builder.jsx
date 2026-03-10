@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { PanelRight, PanelLeft, FileText, Columns2, Upload } from 'lucide-react';
 import ResumePreview from '../components/Preview/ResumePreview';
 import { useToast } from '../context/ToastContext';
@@ -85,8 +85,9 @@ export default function Builder() {
   const isDragging   = useRef(false);
   const containerRef = useRef(null);
   const previewRef   = useRef(null);
-  const toast  = useToast();
+  const toast    = useToast();
   const location = useLocation();
+  const navigate = useNavigate();
   const { importResumeData, setFullResumeData, resumeData } = useResume();
 
   // Open interview modal if navigated here from Home upload flow
@@ -98,7 +99,17 @@ export default function Builder() {
     }
   }, [location.state]);
 
-  function handleParsed(parsed) {
+  // Upload success: user chose "Edit in Builder" — import data and close modal
+  function handleGoToBuilder(parsed) {
+    importResumeData(parsed);
+    setShowUpload(false);
+    setParsedResume(null);
+    setActiveSection('personal');
+    toast('Resume imported! Review and edit your details.', 'success', 3500);
+  }
+
+  // Upload success: user chose "Enhance with AI" — import data then open interview
+  function handleEnhanceWithAI(parsed) {
     importResumeData(parsed);
     setParsedResume(parsed);
     setShowUpload(false);
@@ -112,7 +123,14 @@ export default function Builder() {
   function handleInterviewClose() {
     setShowInterview(false);
     setParsedResume(null);
-    toast('Resume updated from interview answers!', 'success', 3000);
+    setActiveSection('personal');
+    toast('Resume updated with your answers!', 'success', 3000);
+  }
+
+  function handleInterviewViewPreview() {
+    setShowInterview(false);
+    setParsedResume(null);
+    navigate('/preview');
   }
 
   // Keyboard shortcuts: Ctrl+P → print, Ctrl+S → save toast
@@ -321,7 +339,8 @@ export default function Builder() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
           <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md border border-slate-200 dark:border-slate-700 relative">
             <ResumeUpload
-              onParsed={handleParsed}
+              onGoToBuilder={handleGoToBuilder}
+              onEnhanceWithAI={handleEnhanceWithAI}
               onClose={() => setShowUpload(false)}
             />
           </div>
@@ -334,6 +353,7 @@ export default function Builder() {
           resumeData={parsedResume || resumeData}
           onUpdate={handleInterviewUpdate}
           onClose={handleInterviewClose}
+          onViewPreview={handleInterviewViewPreview}
         />
       )}
     </div>

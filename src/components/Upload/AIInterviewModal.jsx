@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
-import { X, Bot, User, ChevronRight, SkipForward, Loader2, CheckCircle, Sparkles } from 'lucide-react';
+import { X, Bot, User, ChevronRight, SkipForward, Loader2, CheckCircle, Sparkles, Eye } from 'lucide-react';
 import { generateInterviewQuestions, applyInterviewAnswers } from '../../utils/resumeParser';
 
 // screen: loading | questions | applying | done | error
-export default function AIInterviewModal({ resumeData, onUpdate, onClose }) {
+export default function AIInterviewModal({ resumeData, onUpdate, onClose, onViewPreview }) {
   const [screen, setScreen]       = useState('loading');
   const [questions, setQuestions] = useState([]);
   const [current, setCurrent]     = useState(0);
@@ -223,12 +223,22 @@ export default function AIInterviewModal({ resumeData, onUpdate, onClose }) {
                   Your answers have been merged into the resume. All forms are now up to date.
                 </p>
               </div>
-              <button
-                onClick={onClose}
-                className="mt-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl transition-colors"
-              >
-                Go to Builder
-              </button>
+              <div className="flex flex-col sm:flex-row gap-2.5 mt-2 w-full max-w-xs">
+                <button
+                  onClick={onClose}
+                  className="flex-1 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl transition-colors"
+                >
+                  Go to Builder
+                </button>
+                {onViewPreview && (
+                  <button
+                    onClick={onViewPreview}
+                    className="flex-1 flex items-center justify-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl transition-colors"
+                  >
+                    <Eye size={15} /> View Full Preview
+                  </button>
+                )}
+              </div>
             </div>
           )}
 

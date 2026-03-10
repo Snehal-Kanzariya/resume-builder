@@ -402,54 +402,177 @@ src/
 
 ---
 
-## Resume Upload & AI Interview Feature
+## Resume Upload & AI Interview Feature (Redesigned)
 
-### Overview
-Users can upload an existing resume (PDF or DOCX). The app extracts text, uses AI to parse it into structured data, fills all forms automatically, then asks smart follow-up questions to improve and update the resume based on the user's current situation.
+### Core Principle
+Upload → Instantly see resume in Builder with Preview → User edits manually → AI enhancement is OPTIONAL.
+
+### User Flows
+
+#### Flow 1: Upload from Home Page
+1. User clicks "Upload Your Resume" on Home hero
+2. Upload modal opens with drag-and-drop zone
+3. User drops PDF or DOCX file (max 5MB)
+4. Progress bar: Upload ✓ → Extracting Text ✓ → AI Parsing ✓ → Done ✓
+5. Success screen shows: "Resume imported! Found: X jobs, X degrees, X skills"
+6. Two buttons: "Edit in Builder" (primary) | "Enhance with AI" (secondary)
+7. "Edit in Builder" → navigates to /builder with all forms filled + live preview showing resume
+8. User edits any field manually → preview updates live in real-time
+
+#### Flow 2: Upload from Builder Page
+1. User clicks upload icon in Builder toolbar or "Import Resume" in sidebar
+2. Same upload modal opens
+3. After parsing, success screen shows with same two buttons
+4. "Edit in Builder" → closes modal, forms and preview update immediately
+5. No automatic AI interview — user controls everything
+
+#### Flow 3: Optional AI Enhancement (After Upload or Manual Entry)
+1. User clicks "Enhance with AI" from the upload success screen
+2. AI Interview modal opens with chat-like UI
+3. AI generates 5 smart questions based on current resumeData:
+   - Current role status (still at company or moved?)
+   - New skills or technologies learned
+   - Recent achievements with quantified metrics
+   - Target job title or role
+   - New projects or certifications to add
+4. User answers each question (can skip any)
+5. After all questions, AI merges answers into existing resumeData (does NOT replace, only updates/adds)
+6. Modal closes → Builder shows updated data + preview refreshes instantly
+7. Success toast: "Resume updated with your answers!"
+8. Done screen also offers "View Full Preview" button → navigates to /preview
 
 ### Files Structure
 ```
 src/
 ├── components/
 │   └── Upload/
-│       ├── ResumeUpload.jsx        → Drag-and-drop upload area with file type validation
-│       ├── ResumeParsingStatus.jsx  → Progress steps: Upload → Extract → Parse → Fill
-│       └── AIInterviewModal.jsx     → Follow-up questions modal with chat-like UI
+│       ├── ResumeUpload.jsx          → Drag-and-drop upload with file validation
+│       ├── ResumeParsingStatus.jsx    → Step progress: Upload → Extract → Parse → Fill
+│       └── AIInterviewModal.jsx       → Optional chat-like follow-up questions
+│   └── Templates/
+│       └── UploadedTemplate.jsx      → Clean default template for uploaded resumes
 ├── utils/
-│   ├── pdfParser.js                → Extract text from PDF using pdfjs-dist
-│   ├── docxParser.js               → Extract text from DOCX using mammoth
-│   └── resumeParser.js             → Send extracted text to Groq AI to structure into resume JSON
+│   ├── pdfParser.js                  → Extract text from PDF using pdfjs-dist
+│   ├── docxParser.js                 → Extract text from DOCX using mammoth
+│   └── resumeParser.js              → AI parse text into resume JSON + interview helpers
 ```
 
-### Upload Flow
-1. User drags/drops or clicks to upload PDF or DOCX file (max 5MB)
-2. File type detected → appropriate parser called
-3. pdfParser.js uses pdfjs-dist to extract all text from PDF pages
-4. docxParser.js uses mammoth to extract raw text from DOCX
-5. Extracted text sent to Groq API with prompt to structure it into resumeData JSON schema
-6. Parsed data populates ResumeContext → all forms auto-fill
-7. Show success with summary of what was extracted
+### Dependencies
+- pdfjs-dist (PDF text extraction)
+- mammoth (DOCX text extraction)
+- Groq API llama-3.3-70b-versatile (same as AI enhance)
 
-### AI Interview Flow (Post-Upload)
-After upload and parsing, AIInterviewModal opens with smart questions:
+### Upload Component Spec (ResumeUpload.jsx)
+- Drag-and-drop zone with dashed border
+- Accept: .pdf, .docx only
+- Max size: 5MB
+- States: idle → uploading → extracting → parsing → success → error
+- Idle: Upload icon + "Drag your resume here or click to browse" + file type badges
+- Extracting: "Reading your resume..." with spinner
+- Parsing: "AI is analyzing your content..." with spinner
+- Success: Summary card showing extracted counts + two action buttons
+- Error: Error message + "Try Again" button
+- Props: `onGoToBuilder(parsed)`, `onEnhanceWithAI(parsed)`, `onClose`
 
-Round 1 - Verify & Update:
-- "I see you were at [company] as [role]. Are you still there, or have you moved on?"
-- "Your latest skills include [skills]. Any new technologies you have picked up?"
-- "I found [X] years of experience. Is that still accurate?"
+### PDF Parser Spec (pdfParser.js)
+- Use pdfjs-dist with CDN worker: https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs
+- Function: `extractTextFromPDF(file)` → Promise<string>
+- Load file as ArrayBuffer → pdf.getPage for each page → page.getTextContent → concatenate all items
+- Handle multi-page resumes (typically 1-3 pages)
 
-Round 2 - Enhance:
-- "What is your target job title or role right now?"
-- "Any recent achievements or metrics you would like to highlight?"
-- "Are there any projects or certifications to add?"
+### DOCX Parser Spec (docxParser.js)
+- Use mammoth.extractRawText()
+- Function: `extractTextFromDOCX(file)` → Promise<string>
+- Load file as ArrayBuffer → pass to mammoth → return raw text
 
-The AI generates questions dynamically based on the parsed resume data.
-User answers in a chat-like interface. After all questions, AI updates the resume data.
+### Resume Parser Spec (resumeParser.js)
+- Function: `parseResumeText(text)` → Promise<resumeData>
+  - Sends text to Groq API (llama-3.3-70b-versatile)
+  - System prompt: "You are a resume parser. Extract ALL information from this resume text into structured JSON. Return ONLY valid JSON matching this exact schema: {personalInfo: {fullName, jobTitle, email, phone, location, linkedin, portfolio, summary}, experience: [{company, position, startDate, endDate, current, location, bullets}], education: [{school, degree, field, startDate, endDate, gpa}], skills: [{category, items}], projects: [{name, description, technologies, liveLink, githubLink}], certifications: [{name, issuer, date}]}. Extract every detail. Use empty string for fields you cannot find. For experience bullets, extract each bullet point as a separate string in the array."
+  - Strip markdown backticks from response before JSON.parse
+  - Run result through `validateParsedData()` before returning
+  - Deep merge with initialResumeData to ensure complete structure
+  - Generate unique IDs for all array items
+
+- Function: `generateInterviewQuestions(resumeData)` → Promise<questions[]>
+  - Sends current resumeData to Groq
+  - Returns array of `{id, question, field, type}` where type is "text" or "textarea"
+  - 4 second delay before API call
+
+- Function: `applyInterviewAnswers(resumeData, answers)` → Promise<updatedResumeData>
+  - Sends resume + answers to Groq
+  - AI merges answers into existing data (adds/updates, never removes)
+  - Returns complete updated resumeData
+  - 4 second delay before API call
+
+- Function: `validateParsedData(data)` → sanitizedData
+  - Ensures every field exists with correct type
+  - Adds missing fields with empty string defaults
+  - Generates IDs for array items missing them
+  - Ensures bullets and items are always arrays (not strings)
+  - Returns fully valid resumeData safe to put into context
+
+- Function: `hasApiKey()` → boolean — checks VITE_GROQ_API_KEY exists
+
+### ResumeContext Additions
+- `importResumeData(parsedData)`: Deep merges parsed data with initialResumeData, generates IDs
+- `setFullResumeData(data)`: Replaces entire resumeData, preserves settings, deep merges personalInfo
+- Both functions use safe defaults so no field is ever undefined
+
+### AIInterviewModal Spec (AIInterviewModal.jsx)
+- Only opens when user explicitly clicks "Enhance with AI" — never auto-opens
+- Chat-like interface: AI message bubble (question) → User textarea → Skip / Next buttons
+- Progress bar + "Question X of 5" label
+- After last question: "Applying your updates…" loading spinner
+- Final done screen: "Resume Updated!" + "Go to Builder" button + "View Full Preview" button
+- Props: `resumeData`, `onUpdate(updated)`, `onClose`, `onViewPreview`
+- `onClose` → caller resets section to 'personal', shows success toast, stays in Builder
+- `onViewPreview` → caller navigates to /preview
+
+### Uploaded Template Spec (UploadedTemplate.jsx)
+- Clean, modern single-column professional layout
+- Auto-selected when resume is uploaded (settings.selectedTemplate = 'uploaded')
+- Similar to ProfessionalTemplate but with slightly more modern typography
+- Renders ALL sections from resumeData using accentColor from settings
+- Handles missing sections gracefully (hides entire section if array is empty)
+- Print-friendly, ATS-safe (no graphics)
+
+### Template Selector Update
+- Add "Uploaded" as 11th template option in dropdown and TemplatesPage gallery
+- Key: `"uploaded"` in settings.selectedTemplate
+- TEMPLATES array in ResumePreview.jsx must include `{ id: 'uploaded', label: 'Uploaded', Component: UploadedTemplate }`
+
+### Home Page Update
+- Hero buttons: "Start from Scratch" (primary) | "Upload Your Resume" (secondary)
+- "Upload Your Resume" opens ResumeUpload modal
+- After successful upload → navigate to /builder with data filled + preview live
+
+### Builder Page Update
+- Upload icon button in toolbar opens ResumeUpload modal
+- "Import Resume" button at top of Sidebar opens ResumeUpload modal
+- "Enhance with AI" button in sidebar triggers AIInterviewModal (does not auto-run)
+- Preview panel always renders resume when resumeData has any content
+
+### Error Handling
+- PDF parse fail: "Could not read this PDF. Please try a text-based PDF (not scanned image)."
+- DOCX parse fail: "Could not read this file. Please try a .docx format."
+- AI parse fail: "AI could not parse the resume. Please try again or enter details manually."
+- File too large: "File is too large. Please upload a file under 5MB."
+- Wrong file type: "Please upload a PDF or DOCX file."
+- Network error: "No internet connection. Please check your network and try again."
+- All errors show retry option
+
+### Rate Limiting
+- 4 second delay between all Groq API calls
+- parseResumeText: 1 call
+- generateInterviewQuestions: 1 call (4s after parse)
+- applyInterviewAnswers: 1 call (4s after last question)
+- Total: max 3 API calls for full upload + interview flow
 
 ### Groq API Prompts
 
 For parsing:
-"You are a resume parser. Extract structured data from this resume text. Return ONLY valid JSON matching this exact schema: {personalInfo: {fullName, jobTitle, email, phone, location, linkedin, portfolio, summary}, experience: [{company, position, startDate, endDate, current, location, bullets}], education: [{school, degree, field, startDate, endDate, gpa}], skills: [{category, items}], projects: [{name, description, technologies, liveLink, githubLink}], certifications: [{name, issuer, date}]}. Fill every field you can find. Use empty string for missing fields. For dates use format like Jan 2023."
+"You are a resume parser. Extract ALL information from this resume text into structured JSON. Return ONLY valid JSON matching this exact schema: {personalInfo: {fullName, jobTitle, email, phone, location, linkedin, portfolio, summary}, experience: [{company, position, startDate, endDate, current, location, bullets}], education: [{school, degree, field, startDate, endDate, gpa}], skills: [{category, items}], projects: [{name, description, technologies, liveLink, githubLink}], certifications: [{name, issuer, date}]}. Extract every detail. Use empty string for fields you cannot find. For experience bullets, extract each bullet point as a separate string in the array."
 
 For interview questions:
 "Based on this resume data, generate 5 smart follow-up questions to update and improve the resume. Focus on: current role status, new skills, recent achievements with metrics, target role, and gaps. Return JSON array of {id, question, field} where field is the resume section the answer relates to."
@@ -458,9 +581,9 @@ For applying answers:
 "Given this resume data and these user answers to interview questions, update the resume data with the new information. Merge answers into appropriate sections. Return the complete updated resume JSON."
 
 ### UI Placement
-- Upload button on Home page hero: "Upload Existing Resume" next to "Start Building"
-- Upload option in Builder page: Upload icon button in top toolbar
-- Also accessible via Sidebar: "Import Resume" option at top
+- Upload button on Home page hero: "Upload Your Resume" next to "Start from Scratch"
+- Upload option in Builder page: "Import Resume" button in top toolbar + sidebar button
+- AI Enhance option: only appears in upload success screen and Builder sidebar "Enhance with AI" button
 
 ---
 
