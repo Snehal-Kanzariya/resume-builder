@@ -8,7 +8,7 @@ import {
 import { useResume } from '../../context/ResumeContext';
 import { useToast } from '../../context/ToastContext';
 import { sampleData } from '../../data/sampleData';
-import { downloadPDF, buildFilename, PRINT_PAGE_STYLE } from '../../utils/pdfExport';
+import { downloadResumePDF, buildFilename, PRINT_PAGE_STYLE } from '../../utils/pdfExport';
 import AICompareView from '../AI/AICompareView';
 import A4Container from './A4Container';
 
@@ -105,12 +105,12 @@ const ResumePreview = forwardRef(function ResumePreview(_props, _externalRef) {
     pageStyle: PRINT_PAGE_STYLE,
   });
 
-  // ── html2canvas + jsPDF (fallback download) ───────────────────────────────
+  // ── html2canvas + jsPDF download ─────────────────────────────────────────
   async function handleDownload() {
     setDownloading(true);
     try {
-      await downloadPDF(
-        printContentRef.current,
+      await downloadResumePDF(
+        'resume-print-area-builder',
         buildFilename(resumeData?.personalInfo?.fullName ?? ''),
       );
       toast('PDF downloaded successfully!', 'success');
@@ -316,6 +316,7 @@ const ResumePreview = forwardRef(function ResumePreview(_props, _externalRef) {
         aria-hidden="true"
       >
         <div
+          id="resume-print-area-builder"
           ref={printContentRef}
           style={{ width: '794px', height: '1123px', backgroundColor: '#ffffff', overflow: 'hidden' }}
         >

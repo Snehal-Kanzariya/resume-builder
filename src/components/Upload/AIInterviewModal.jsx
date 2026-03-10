@@ -1,9 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { X, Bot, User, ChevronRight, SkipForward, Loader2, CheckCircle, Sparkles, Eye } from 'lucide-react';
 import { generateInterviewQuestions, applyInterviewAnswers } from '../../utils/resumeParser';
+import { useResume } from '../../context/ResumeContext';
+import { useToast } from '../../context/ToastContext';
 
 // screen: loading | questions | applying | done | error
 export default function AIInterviewModal({ resumeData, onUpdate, onClose, onViewPreview }) {
+  const { importResumeData } = useResume();
+  const toast = useToast();
   const [screen, setScreen]       = useState('loading');
   const [questions, setQuestions] = useState([]);
   const [current, setCurrent]     = useState(0);
@@ -65,9 +69,14 @@ export default function AIInterviewModal({ resumeData, onUpdate, onClose, onView
         ? await applyInterviewAnswers(resumeData, answered)
         : resumeData;
 
-      onUpdate(updated);
+      // Import into context using safe deep-merge (never blanks existing data)
+      importResumeData(updated);
+      // Notify parent (Home/Builder) so it can sync its local parsedResume state
+      if (onUpdate) onUpdate(updated);
+      toast('Resume updated with your answers!', 'success', 3000);
       setScreen('done');
     } catch (err) {
+      toast(err.message || 'Failed to update resume. Your existing data is unchanged.', 'error', 4000);
       setError(err.message || 'Failed to update resume.');
       setScreen('error');
     }

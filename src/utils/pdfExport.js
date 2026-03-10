@@ -64,6 +64,20 @@ export async function downloadPDF(element, filename = 'resume.pdf') {
   pdf.save(filename);
 }
 
+// ── ID-based download (preferred) ─────────────────────────────────────────────
+/**
+ * Find an element by ID and download it as a PDF.
+ * Falls back to the raw element if ID lookup fails.
+ *
+ * @param {string} elementId  – id attribute of the 794×1123 hidden print div
+ * @param {string} fileName   – output filename
+ */
+export async function downloadResumePDF(elementId, fileName = 'resume.pdf') {
+  const element = document.getElementById(elementId);
+  if (!element) throw new Error(`downloadResumePDF: element #${elementId} not found`);
+  return downloadPDF(element, fileName);
+}
+
 // ── Helper: derive a filename from the resume owner's name ────────────────────
 export function buildFilename(fullName) {
   const slug = (fullName || 'resume')

@@ -1,6 +1,65 @@
 const ENDPOINT = 'https://api.groq.com/openai/v1/chat/completions';
 const MODEL = 'llama-3.3-70b-versatile';
 
+/**
+ * Sanitise parsed/AI-returned data so every field has the correct type.
+ * Safe to call on partial or malformed AI responses.
+ */
+export function validateParsedData(data) {
+  return {
+    personalInfo: {
+      fullName:  data?.personalInfo?.fullName  || '',
+      jobTitle:  data?.personalInfo?.jobTitle  || '',
+      email:     data?.personalInfo?.email     || '',
+      phone:     data?.personalInfo?.phone     || '',
+      location:  data?.personalInfo?.location  || '',
+      linkedin:  data?.personalInfo?.linkedin  || '',
+      portfolio: data?.personalInfo?.portfolio || '',
+      summary:   data?.personalInfo?.summary   || '',
+    },
+    experience: (Array.isArray(data?.experience) ? data.experience : []).map(e => ({
+      id:        e.id        || crypto.randomUUID(),
+      company:   e.company   || '',
+      position:  e.position  || '',
+      startDate: e.startDate || '',
+      endDate:   e.endDate   || '',
+      current:   Boolean(e.current),
+      location:  e.location  || '',
+      bullets:   Array.isArray(e.bullets) ? e.bullets.map(String).filter(Boolean) : [''],
+    })),
+    education: (Array.isArray(data?.education) ? data.education : []).map(e => ({
+      id:           e.id           || crypto.randomUUID(),
+      school:       e.school       || '',
+      degree:       e.degree       || '',
+      field:        e.field        || '',
+      startDate:    e.startDate    || '',
+      endDate:      e.endDate      || '',
+      gpa:          e.gpa          || '',
+      achievements: e.achievements || '',
+    })),
+    skills: (Array.isArray(data?.skills) ? data.skills : []).map(s => ({
+      id:       s.id       || crypto.randomUUID(),
+      category: s.category || '',
+      items:    Array.isArray(s.items) ? s.items.map(String) : (s.items ? [String(s.items)] : []),
+    })),
+    projects: (Array.isArray(data?.projects) ? data.projects : []).map(p => ({
+      id:           p.id           || crypto.randomUUID(),
+      name:         p.name         || '',
+      description:  p.description  || '',
+      technologies: p.technologies || '',
+      liveLink:     p.liveLink     || '',
+      githubLink:   p.githubLink   || '',
+    })),
+    certifications: (Array.isArray(data?.certifications) ? data.certifications : []).map(c => ({
+      id:     c.id     || crypto.randomUUID(),
+      name:   c.name   || '',
+      issuer: c.issuer || '',
+      date:   c.date   || '',
+      link:   c.link   || '',
+    })),
+  };
+}
+
 export function hasApiKey() {
   return Boolean(import.meta.env.VITE_GROQ_API_KEY);
 }
@@ -173,8 +232,18 @@ export async function applyInterviewAnswers(resumeData, answers) {
   try {
     parsed = JSON.parse(raw);
   } catch {
-    throw new Error('Failed to apply interview answers. Please try again.');
+    // AI returned bad JSON — return original data unchanged
+    return resumeData;
   }
 
-  return parsed;
+  // Validate the AI result then deep-merge so we never lose existing data
+  const validated = validateParsedData(parsed);
+  return {
+    personalInfo: { ...(resumeData.personalInfo || {}), ...validated.personalInfo },
+    experience:     validated.experience.length     > 0 ? validated.experience     : (resumeData.experience     || []),
+    education:      validated.education.length      > 0 ? validated.education      : (resumeData.education      || []),
+    skills:         validated.skills.length         > 0 ? validated.skills         : (resumeData.skills         || []),
+    projects:       validated.projects.length       > 0 ? validated.projects       : (resumeData.projects       || []),
+    certifications: validated.certifications.length > 0 ? validated.certifications : (resumeData.certifications || []),
+  };
 }
