@@ -10,14 +10,14 @@ import { TEMPLATES, FONT_SCALES } from '../components/Preview/ResumePreview';
 export default function PreviewPage() {
   const printContentRef = useRef(null);
   const { resumeData } = useResume();
-  const { selectedTemplate, fontSize } = resumeData.settings;
-  const { personalInfo } = resumeData;
+  const { selectedTemplate, fontSize } = resumeData?.settings ?? {};
+  const personalInfo = resumeData?.personalInfo ?? {};
 
   const [isDownloading, setDownloading] = useState(false);
 
   const { Component } = TEMPLATES.find(t => t.id === selectedTemplate) ?? TEMPLATES[0];
   const contentScale  = FONT_SCALES[fontSize] ?? 1.0;
-  const filename      = buildFilename(personalInfo.fullName);
+  const filename      = buildFilename(personalInfo.fullName ?? '');
 
   const handlePrint = useReactToPrint({
     contentRef: printContentRef,
