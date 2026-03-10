@@ -317,54 +317,73 @@ export function ResumeProvider({ children }) {
 
   // ── Import from upload ───────────────────────────────────────────────────────
   // Merges parsed upload data, generating fresh IDs for every array item.
+  // If parsed arrays are empty, keeps the existing data so we never blank out.
   const importResumeData = useCallback((parsedData) => {
-    setResumeData(prev => ({
-      ...prev,
-      personalInfo: {
-        ...initialResumeData.personalInfo,
-        ...(parsedData.personalInfo || {}),
-      },
-      experience: (parsedData.experience || []).map(e => ({
-        id: generateId(),
-        company: e.company || '',
-        position: e.position || '',
-        startDate: e.startDate || '',
-        endDate: e.endDate || '',
-        current: e.current || false,
-        location: e.location || '',
-        bullets: Array.isArray(e.bullets) && e.bullets.length ? e.bullets : [''],
-      })),
-      education: (parsedData.education || []).map(e => ({
-        id: generateId(),
-        school: e.school || '',
-        degree: e.degree || '',
-        field: e.field || '',
-        startDate: e.startDate || '',
-        endDate: e.endDate || '',
-        gpa: e.gpa || '',
-        achievements: e.achievements || '',
-      })),
-      skills: (parsedData.skills || []).map(s => ({
-        id: generateId(),
-        category: s.category || '',
-        items: Array.isArray(s.items) ? s.items : [],
-      })),
-      projects: (parsedData.projects || []).map(p => ({
-        id: generateId(),
-        name: p.name || '',
-        description: p.description || '',
-        technologies: p.technologies || '',
-        liveLink: p.liveLink || '',
-        githubLink: p.githubLink || '',
-      })),
-      certifications: (parsedData.certifications || []).map(c => ({
-        id: generateId(),
-        name: c.name || '',
-        issuer: c.issuer || '',
-        date: c.date || '',
-        link: c.link || '',
-      })),
-    }));
+    setResumeData(prev => {
+      const merged = {
+        personalInfo: {
+          ...(prev?.personalInfo || initialResumeData.personalInfo),
+          ...(parsedData?.personalInfo || {}),
+        },
+        experience: ((parsedData?.experience?.length > 0)
+          ? parsedData.experience
+          : (prev?.experience || [])
+        ).map(exp => ({
+          id:        exp.id        || generateId(),
+          company:   exp.company   || '',
+          position:  exp.position  || '',
+          startDate: exp.startDate || '',
+          endDate:   exp.endDate   || '',
+          current:   exp.current   || false,
+          location:  exp.location  || '',
+          bullets:   Array.isArray(exp.bullets) && exp.bullets.length ? exp.bullets.map(String) : [''],
+        })),
+        education: ((parsedData?.education?.length > 0)
+          ? parsedData.education
+          : (prev?.education || [])
+        ).map(edu => ({
+          id:           edu.id           || generateId(),
+          school:       edu.school       || '',
+          degree:       edu.degree       || '',
+          field:        edu.field        || '',
+          startDate:    edu.startDate    || '',
+          endDate:      edu.endDate      || '',
+          gpa:          edu.gpa          || '',
+          achievements: edu.achievements || '',
+        })),
+        skills: ((parsedData?.skills?.length > 0)
+          ? parsedData.skills
+          : (prev?.skills || [])
+        ).map(sk => ({
+          id:       sk.id       || generateId(),
+          category: sk.category || '',
+          items:    Array.isArray(sk.items) ? sk.items.map(String) : [],
+        })),
+        projects: ((parsedData?.projects?.length > 0)
+          ? parsedData.projects
+          : (prev?.projects || [])
+        ).map(pr => ({
+          id:           pr.id           || generateId(),
+          name:         pr.name         || '',
+          description:  pr.description  || '',
+          technologies: pr.technologies || '',
+          liveLink:     pr.liveLink     || '',
+          githubLink:   pr.githubLink   || '',
+        })),
+        certifications: ((parsedData?.certifications?.length > 0)
+          ? parsedData.certifications
+          : (prev?.certifications || [])
+        ).map(c => ({
+          id:     c.id     || generateId(),
+          name:   c.name   || '',
+          issuer: c.issuer || '',
+          date:   c.date   || '',
+          link:   c.link   || '',
+        })),
+        settings: { ...(prev?.settings || initialResumeData.settings), ...(parsedData?.settings || {}) },
+      };
+      return merged;
+    });
   }, []);
 
   // Replace full resume data (used after AI interview answers are applied).

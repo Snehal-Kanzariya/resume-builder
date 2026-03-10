@@ -1,14 +1,14 @@
-import { useRef, useState } from 'react';
+import { Suspense, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useReactToPrint } from 'react-to-print';
 import { ArrowLeft, Printer, Download, Loader2, FileText } from 'lucide-react';
 import { useResume } from '../context/ResumeContext';
-import { downloadPDF, buildFilename, PRINT_PAGE_STYLE } from '../utils/pdfExport';
+import { downloadResumePDF, buildFilename } from '../utils/pdfExport';
 import A4Container from '../components/Preview/A4Container';
 import { TEMPLATES, FONT_SCALES } from '../components/Preview/ResumePreview';
 
+const PRINT_TARGET_ID = 'resume-print-area-preview';
+
 export default function PreviewPage() {
-  const printContentRef = useRef(null);
   const { resumeData } = useResume();
   const { selectedTemplate, fontSize } = resumeData?.settings ?? {};
   const personalInfo = resumeData?.personalInfo ?? {};
@@ -19,16 +19,14 @@ export default function PreviewPage() {
   const contentScale  = FONT_SCALES[fontSize] ?? 1.0;
   const filename      = buildFilename(personalInfo.fullName ?? '');
 
-  const handlePrint = useReactToPrint({
-    contentRef: printContentRef,
-    documentTitle: filename.replace('.pdf', ''),
-    pageStyle: PRINT_PAGE_STYLE,
-  });
+  function handlePrint() {
+    window.print();
+  }
 
   async function handleDownload() {
     setDownloading(true);
     try {
-      await downloadPDF(printContentRef.current, filename);
+      await downloadResumePDF(PRINT_TARGET_ID, filename);
     } catch (err) {
       console.error('PDF download failed:', err);
     } finally {
@@ -95,16 +93,19 @@ export default function PreviewPage() {
         </div>
       </main>
 
-      {/* Hidden full-res print target */}
+      {/* Hidden full-res print target — no CSS transforms, exact A4 px */}
       <div
         style={{ position: 'fixed', left: '-9999px', top: 0, width: '794px', zIndex: -1 }}
         aria-hidden="true"
       >
         <div
-          ref={printContentRef}
+          id={PRINT_TARGET_ID}
+          className="print-area"
           style={{ width: '794px', height: '1123px', backgroundColor: '#ffffff', overflow: 'hidden' }}
         >
-          <Component />
+          <Suspense fallback={null}>
+            <Component />
+          </Suspense>
         </div>
       </div>
     </div>
