@@ -34,7 +34,7 @@ export default function ExecutiveTemplate() {
   const urlParts     = [p.linkedin, p.portfolio, p.github].filter(Boolean).join('   ·   ');
 
   return (
-    <div style={{ fontFamily: "'DM Sans', sans-serif", height: '100%', display: 'flex', flexDirection: 'column', lineHeight: 1.5 }}>
+    <div style={{ fontFamily: "'DM Sans', sans-serif", display: 'flex', flexDirection: 'column', lineHeight: 1.5 }}>
 
       {/* ── HEADER ──────────────────────────────────────────────────────────── */}
       <div style={{
@@ -51,18 +51,18 @@ export default function ExecutiveTemplate() {
           {p.fullName || 'Your Name'}
         </h1>
         {p.jobTitle && (
-          <p style={{ fontSize: 11.5, color: accent, fontWeight: 600, letterSpacing: 1.5, marginBottom: 10 }}>
+          <p style={{ fontSize: 19, color: '#fff', fontWeight: 500, letterSpacing: 1, marginBottom: 10 }}>
             {p.jobTitle}
           </p>
         )}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {contactParts && <p style={{ fontSize: 9, color: 'rgba(255,255,255,0.55)', letterSpacing: 0.5 }}>{contactParts}</p>}
+          {contactParts && <p style={{ fontSize: 9, color: 'rgba(255,255,255,0.82)', letterSpacing: 0.5 }}>{contactParts}</p>}
           {urlParts     && <p style={{ fontSize: 9, color: accent, opacity: 0.85 }}>{urlParts}</p>}
         </div>
       </div>
 
       {/* ── BODY ────────────────────────────────────────────────────────────── */}
-      <div style={{ flex: 1, padding: '24px 40px', overflowY: 'hidden', backgroundColor: '#fff' }}>
+      <div style={{ padding: '24px 40px', backgroundColor: '#fff' }}>
 
         {p.summary && (
           <div style={{ marginBottom: 18, borderLeft: `3px solid ${accent}`, paddingLeft: 14 }}>

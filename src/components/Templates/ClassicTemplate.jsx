@@ -45,7 +45,6 @@ export default function ClassicTemplate() {
       fontFamily: "'DM Sans', sans-serif",
       fontSize: 10.5, color: '#1e293b',
       padding: '40px 44px', lineHeight: 1.5,
-      height: '100%', overflowY: 'hidden',
     }}>
 
       {/* ── HEADER ─────────────────────────────────────────────────────────── */}

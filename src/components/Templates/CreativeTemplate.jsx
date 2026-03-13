@@ -61,7 +61,7 @@ export default function CreativeTemplate() {
   const contactParts = [p.email, p.phone, p.location].filter(Boolean);
 
   return (
-    <div style={{ fontFamily: "'DM Sans', sans-serif", height: '100%', display: 'flex', flexDirection: 'column', lineHeight: 1.45 }}>
+    <div style={{ fontFamily: "'DM Sans', sans-serif", display: 'flex', flexDirection: 'column', lineHeight: 1.45 }}>
 
       {/* ── HEADER BANNER ──────────────────────────────────────────────────── */}
       <div style={{ background: headerBg, padding: '24px 30px', color: '#fff', flexShrink: 0 }}>
@@ -93,13 +93,13 @@ export default function CreativeTemplate() {
       </div>
 
       {/* ── BODY ───────────────────────────────────────────────────────────── */}
-      <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+      <div style={{ display: 'flex' }}>
 
         {/* LEFT: skills + certifications */}
         <div style={{
           width: '33%', backgroundColor: '#0f172a', color: '#fff',
           padding: '20px 16px', display: 'flex', flexDirection: 'column',
-          gap: 16, flexShrink: 0, overflowY: 'hidden',
+          gap: 16, flexShrink: 0,
         }}>
 
           {/* Skills */}
@@ -149,7 +149,7 @@ export default function CreativeTemplate() {
         {/* RIGHT: experience + education + projects */}
         <div style={{
           flex: 1, padding: '20px 22px',
-          display: 'flex', flexDirection: 'column', overflow: 'hidden',
+          display: 'flex', flexDirection: 'column',
         }}>
 
           {/* Experience */}

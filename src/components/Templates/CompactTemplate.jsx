@@ -38,7 +38,7 @@ export default function CompactTemplate() {
   const urlLine     = [p.linkedin, p.portfolio, p.github].filter(Boolean).join(' · ');
 
   return (
-    <div style={{ fontFamily: "'DM Sans', sans-serif", height: '100%', display: 'flex', flexDirection: 'column', lineHeight: 1.4 }}>
+    <div style={{ fontFamily: "'DM Sans', sans-serif", display: 'flex', flexDirection: 'column', lineHeight: 1.4 }}>
 
       {/* ── HEADER (full width, compact) ─────────────────────────────────────── */}
       <div style={{ padding: '18px 20px 12px', borderBottom: `2.5px solid ${accent}`, backgroundColor: '#fff' }}>
@@ -62,13 +62,13 @@ export default function CompactTemplate() {
       </div>
 
       {/* ── TWO COLUMN BODY ──────────────────────────────────────────────────── */}
-      <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+      <div style={{ display: 'flex' }}>
 
         {/* LEFT SIDEBAR — 32% */}
         <div style={{
           width: '32%', padding: '14px 14px', flexShrink: 0,
           borderRight: '1px solid #e2e8f0', display: 'flex',
-          flexDirection: 'column', gap: 14, overflowY: 'hidden',
+          flexDirection: 'column', gap: 14,
           backgroundColor: '#f8fafc',
         }}>
 
@@ -134,7 +134,7 @@ export default function CompactTemplate() {
         </div>
 
         {/* RIGHT MAIN — 68% */}
-        <div style={{ flex: 1, padding: '14px 18px', overflowY: 'hidden', display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div style={{ flex: 1, padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: 12 }}>
 
           {experience.length > 0 && (
             <div>

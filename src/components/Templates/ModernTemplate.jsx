@@ -57,13 +57,13 @@ export default function ModernTemplate() {
   ].filter(c => c.val);
 
   return (
-    <div style={{ fontFamily: "'DM Sans', sans-serif", height: '100%', display: 'flex', lineHeight: 1.45 }}>
+    <div style={{ fontFamily: "'DM Sans', sans-serif", display: 'flex', lineHeight: 1.45 }}>
 
       {/* ── LEFT SIDEBAR ──────────────────────────────────────────────────── */}
       <div style={{
         width: '30%', backgroundColor: accent, color: '#fff',
         padding: '30px 16px', display: 'flex', flexDirection: 'column',
-        gap: 14, flexShrink: 0, overflowY: 'hidden',
+        gap: 14, flexShrink: 0,
       }}>
 
         {/* Name + title */}
@@ -132,7 +132,7 @@ export default function ModernTemplate() {
       {/* ── RIGHT MAIN ────────────────────────────────────────────────────── */}
       <div style={{
         flex: 1, padding: '30px 22px',
-        display: 'flex', flexDirection: 'column', overflow: 'hidden',
+        display: 'flex', flexDirection: 'column',
       }}>
 
         {/* Summary */}
