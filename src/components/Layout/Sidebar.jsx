@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { User, Briefcase, GraduationCap, Code2, FolderOpen, Award, ChevronRight, RotateCcw, FlaskConical, Upload } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { User, Briefcase, GraduationCap, Code2, FolderOpen, Award, ChevronRight, RotateCcw, FlaskConical, Upload, Plus, LayoutTemplate } from 'lucide-react';
 import { useResume } from '../../context/ResumeContext';
 import { useToast } from '../../context/ToastContext';
 import { sampleData } from '../../data/sampleData';
@@ -22,10 +22,13 @@ function completionDot(resumeData, section) {
   return (resumeData?.[section.dataKey]?.length ?? 0) > 0;
 }
 
-export default function Sidebar({ activeSection, onSectionChange, onImportResume }) {
-  const { resumeData, resetResume, loadSampleData } = useResume();
+export default function Sidebar({ activeSection, onSectionChange, onImportResume, onAddCustomSection }) {
+  const { resumeData, resetResume, loadSampleData, reorderCustomSections } = useResume();
+  const customSections = resumeData?.customSections || [];
   const toast = useToast();
   const [confirmReset, setConfirmReset] = useState(false);
+  const dragIndex = useRef(null);
+  const dragOverIndex = useRef(null);
 
   return (
     <aside className="flex flex-col h-full bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-700 py-4 px-3 gap-1 overflow-y-auto transition-colors">
@@ -81,6 +84,74 @@ export default function Sidebar({ activeSection, onSectionChange, onImportResume
           </button>
         );
       })}
+
+      {/* ── Custom sections ────────────────────────────────────────────── */}
+      {customSections.length > 0 && (
+        <>
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500 px-2 mt-3 mb-1">
+            Custom Sections
+          </p>
+          {customSections.map((cs, idx) => {
+            const sectionKey = `custom-${cs.id}`;
+            const active = activeSection === sectionKey;
+            const hasContent = cs.type === 'bullets'
+              ? cs.items?.some(i => i?.trim())
+              : cs.content?.trim();
+            return (
+              <div
+                key={cs.id}
+                draggable
+                onDragStart={() => { dragIndex.current = idx; }}
+                onDragOver={e => { e.preventDefault(); dragOverIndex.current = idx; }}
+                onDrop={() => {
+                  const from = dragIndex.current;
+                  const to   = dragOverIndex.current;
+                  if (from !== null && to !== null && from !== to) {
+                    reorderCustomSections(from, to);
+                  }
+                  dragIndex.current = null;
+                  dragOverIndex.current = null;
+                }}
+                className="cursor-grab active:cursor-grabbing"
+              >
+                <button
+                  onClick={() => onSectionChange(sectionKey)}
+                  className={`group flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-left transition-all duration-150 ${
+                    active
+                      ? 'bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300'
+                      : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-800 dark:hover:text-slate-200'
+                  }`}
+                >
+                  <span className={`flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-md transition-colors ${
+                    active
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 group-hover:bg-slate-200 dark:group-hover:bg-slate-700'
+                  }`}>
+                    <LayoutTemplate size={13} />
+                  </span>
+                  <span className="flex-1 text-sm font-medium leading-none truncate">
+                    {cs.title || 'Custom Section'}
+                  </span>
+                  <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
+                    hasContent ? 'bg-emerald-400' : 'bg-slate-200 dark:bg-slate-700'
+                  }`} />
+                  {active && <ChevronRight size={14} className="flex-shrink-0 text-blue-400 dark:text-blue-500" />}
+                </button>
+              </div>
+            );
+          })}
+        </>
+      )}
+
+      {/* Add custom section */}
+      {onAddCustomSection && (
+        <button
+          onClick={onAddCustomSection}
+          className="flex items-center gap-2 px-3 py-2 mt-1 rounded-lg text-xs font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition-colors w-full border border-dashed border-blue-200 dark:border-blue-800"
+        >
+          <Plus size={13} /> Add Custom Section
+        </button>
+      )}
 
       <div className="mt-auto pt-4 px-2 flex flex-col gap-2">
         <div className="text-[11px] text-slate-400 dark:text-slate-500 leading-relaxed mb-1">

@@ -65,18 +65,88 @@ export async function downloadPDF(element, filename = 'resume.pdf') {
   pdf.save(filename);
 }
 
-// ── ID-based download (preferred) ─────────────────────────────────────────────
+// ── ID-based multi-page download ──────────────────────────────────────────────
 /**
- * Find an element by ID and download it as a PDF.
- * Falls back to the raw element if ID lookup fails.
+ * Captures the full resume element (no height clipping), splits it into A4
+ * pages, and saves a multi-page PDF.
  *
- * @param {string} elementId  – id attribute of the 794×1123 hidden print div
- * @param {string} fileName   – output filename
+ * @param {string} elementId – id of the hidden print div
+ * @param {string} fileName  – output filename (with or without .pdf)
  */
-export async function downloadResumePDF(elementId, fileName = 'resume.pdf') {
+export async function downloadResumePDF(elementId, fileName) {
   const element = document.getElementById(elementId);
-  if (!element) throw new Error(`downloadResumePDF: element #${elementId} not found`);
-  return downloadPDF(element, fileName);
+  if (!element) throw new Error('Resume element not found');
+
+  const html2canvas = (await import('html2canvas')).default;
+  const { jsPDF } = await import('jspdf');
+
+  // 1. Lift container-level height / overflow constraints.
+  const originalStyle = element.style.cssText;
+  element.style.maxHeight = 'none';
+  element.style.overflow  = 'visible';
+  element.style.height    = 'auto';
+
+  // 2. Every template uses inline overflow:hidden / overflowY:hidden on its
+  //    root and inner column divs (to clip single-page display). Walk the
+  //    entire subtree and temporarily set overflow to visible so html2canvas
+  //    captures the *full* content height for multi-page resumes.
+  const overflowFixes = [];
+  element.querySelectorAll('*').forEach(el => {
+    const s = el.style;
+    if (s.overflow === 'hidden' || s.overflowY === 'hidden' || s.overflowX === 'hidden') {
+      overflowFixes.push({ el, overflow: s.overflow, overflowX: s.overflowX, overflowY: s.overflowY });
+      s.overflow  = 'visible';
+      s.overflowX = 'visible';
+      s.overflowY = 'visible';
+    }
+  });
+
+  // 3. Wait for custom fonts before capturing (prevents font fallback in PDF).
+  await document.fonts.ready;
+
+  const canvas = await html2canvas(element, {
+    scale: 2,
+    useCORS: true,
+    logging: false,
+    backgroundColor: '#ffffff',
+    windowHeight: element.scrollHeight,
+    height: element.scrollHeight,
+    scrollY: 0,
+    scrollX: 0,
+  });
+
+  // 4. Restore everything.
+  element.style.cssText = originalStyle;
+  overflowFixes.forEach(({ el, overflow, overflowX, overflowY }) => {
+    el.style.overflow  = overflow;
+    el.style.overflowX = overflowX;
+    el.style.overflowY = overflowY;
+  });
+
+  const imgData = canvas.toDataURL('image/png');
+  const pdf = new jsPDF('p', 'mm', 'a4');
+  const pdfWidth  = pdf.internal.pageSize.getWidth();  // 210 mm
+  const pdfHeight = pdf.internal.pageSize.getHeight(); // 297 mm
+
+  const imgWidth  = pdfWidth;
+  const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+
+  let heightLeft = imgHeight;
+  let position   = 0;
+
+  // First page
+  pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+  heightLeft -= pdfHeight;
+
+  // Additional pages when content overflows one A4 sheet
+  while (heightLeft > 0) {
+    position -= pdfHeight;
+    pdf.addPage();
+    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+    heightLeft -= pdfHeight;
+  }
+
+  pdf.save(fileName ? fileName.replace(/\.pdf$/i, '') + '.pdf' : 'resume.pdf');
 }
 
 // ── Helper: derive a filename from the resume owner's name ────────────────────

@@ -16,6 +16,7 @@ import EducationForm       from '../components/Forms/EducationForm';
 import SkillsForm          from '../components/Forms/SkillsForm';
 import ProjectsForm        from '../components/Forms/ProjectsForm';
 import CertificationsForm  from '../components/Forms/CertificationsForm';
+import CustomSectionForm   from '../components/Forms/CustomSectionForm';
 import AISuggestions       from '../components/AI/AISuggestions';
 
 const FORM_MAP = {
@@ -88,7 +89,7 @@ export default function Builder() {
   const toast    = useToast();
   const location = useLocation();
   const navigate = useNavigate();
-  const { importResumeData, setFullResumeData, resumeData } = useResume();
+  const { importResumeData, setFullResumeData, resumeData, addCustomSection } = useResume();
 
   // Open interview modal if navigated here from Home upload flow
   useEffect(() => {
@@ -125,6 +126,11 @@ export default function Builder() {
     setParsedResume(null);
     setActiveSection('personal');
     toast('Resume updated with your answers!', 'success', 3000);
+  }
+
+  function handleAddCustomSection() {
+    const id = addCustomSection();
+    setActiveSection(`custom-${id}`);
   }
 
   function handleInterviewViewPreview() {
@@ -199,6 +205,7 @@ export default function Builder() {
             activeSection={activeSection}
             onSectionChange={setActiveSection}
             onImportResume={() => setShowUpload(true)}
+            onAddCustomSection={handleAddCustomSection}
           />
         </div>
 
@@ -219,7 +226,9 @@ export default function Builder() {
               <span>Builder</span>
               <span>›</span>
               <span className="text-slate-600 dark:text-slate-300 font-medium">
-                {SECTIONS.find(s => s.id === activeSection)?.label}
+                {activeSection.startsWith('custom-')
+                  ? (resumeData?.customSections?.find(s => `custom-${s.id}` === activeSection)?.title || 'Custom Section')
+                  : SECTIONS.find(s => s.id === activeSection)?.label}
               </span>
             </div>
 
@@ -251,8 +260,16 @@ export default function Builder() {
           </div>
 
           <div className="max-w-2xl mx-auto">
-            {FORM_MAP[activeSection]}
-            <AISuggestions section={activeSection} />
+            {activeSection.startsWith('custom-')
+              ? <CustomSectionForm
+                  sectionId={activeSection.replace('custom-', '')}
+                  onDeleted={() => setActiveSection('personal')}
+                />
+              : FORM_MAP[activeSection]
+            }
+            {!activeSection.startsWith('custom-') && (
+              <AISuggestions section={activeSection} />
+            )}
           </div>
 
           <div className="max-w-2xl mx-auto mt-8 flex justify-between">

@@ -1,5 +1,6 @@
 import { useResume } from '../../context/ResumeContext';
 import { fmtDate, dateRange } from '../../utils/dateFormat';
+import CustomSections from './CustomSections';
 
 // ── ATS-Friendly: pure text, no graphics, no color blocks ────────────────────
 
@@ -28,7 +29,7 @@ export default function ProfessionalTemplate() {
     skills, projects, certifications,
   } = resumeData;
 
-  const contactLine = [p.email, p.phone, p.location, p.linkedin, p.portfolio]
+  const contactLine = [p.email, p.phone, p.location, p.linkedin, p.portfolio, p.github]
     .filter(Boolean)
     .join('  |  ');
 
@@ -100,6 +101,7 @@ export default function ProfessionalTemplate() {
           ))}
         </div>
       )}
+      <CustomSections afterSection="experience" />
 
       {/* ── EDUCATION ──────────────────────────────────────────────────────── */}
       {education.length > 0 && (
@@ -124,6 +126,7 @@ export default function ProfessionalTemplate() {
           ))}
         </div>
       )}
+      <CustomSections afterSection="education" />
 
       {/* ── SKILLS ─────────────────────────────────────────────────────────── */}
       {skills.length > 0 && (
@@ -145,6 +148,7 @@ export default function ProfessionalTemplate() {
           </div>
         </div>
       )}
+      <CustomSections afterSection="skills" />
 
       {/* ── PROJECTS ───────────────────────────────────────────────────────── */}
       {projects.length > 0 && (
@@ -170,6 +174,7 @@ export default function ProfessionalTemplate() {
           ))}
         </div>
       )}
+      <CustomSections afterSection="projects" />
 
       {/* ── CERTIFICATIONS ─────────────────────────────────────────────────── */}
       {certifications.length > 0 && (
@@ -190,6 +195,7 @@ export default function ProfessionalTemplate() {
           ))}
         </div>
       )}
+      <CustomSections afterSection="certifications" />
     </div>
   );
 }

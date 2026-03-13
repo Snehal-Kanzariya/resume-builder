@@ -1,5 +1,6 @@
 import { useResume } from '../../context/ResumeContext';
 import { fmtDate, dateRange } from '../../utils/dateFormat';
+import CustomSections from './CustomSections';
 
 // ── Bold: massive name, filled color blocks for section headers, high contrast ─
 
@@ -51,9 +52,9 @@ export default function BoldTemplate() {
             <p style={{ fontSize: 9, color: '#374151' }}>
               {[p.email, p.phone, p.location].filter(Boolean).join('  |  ')}
             </p>
-            {(p.linkedin || p.portfolio) && (
+            {(p.linkedin || p.portfolio || p.github) && (
               <p style={{ fontSize: 9, color: accent }}>
-                {[p.linkedin, p.portfolio].filter(Boolean).join('  |  ')}
+                {[p.linkedin, p.portfolio, p.github].filter(Boolean).join('  |  ')}
               </p>
             )}
           </div>
@@ -105,6 +106,7 @@ export default function BoldTemplate() {
               ))}
             </SectionBlock>
           )}
+          <CustomSections afterSection="experience" />
 
           {projects.length > 0 && (
             <SectionBlock title="Projects" accent={accent}>
@@ -120,6 +122,8 @@ export default function BoldTemplate() {
               ))}
             </SectionBlock>
           )}
+          <CustomSections afterSection="projects" />
+          <CustomSections afterSection="certifications" />
         </div>
 
         {/* RIGHT — sidebar (38%) */}

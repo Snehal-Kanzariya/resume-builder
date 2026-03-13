@@ -24,9 +24,12 @@ async function callGroq(sectionData) {
       {
         role: 'system',
         content:
-          'You are an expert resume writer. Significantly improve this resume section. ' +
-          'Use stronger action verbs, add quantified metrics and real numbers, make it more impactful and ATS-friendly. ' +
-          'Make real creative improvements, don\'t just rephrase. ' +
+          'You are an expert resume writer. Improve this resume section. ' +
+          'Use stronger action verbs, clearer language, and more impactful phrasing. ' +
+          'CRITICAL: Do NOT invent, fabricate, or add any numbers, percentages, metrics, dates, ' +
+          'company names, tools, or facts that are not already present in the existing content. ' +
+          'Only rewrite and strengthen the language using information that is already there. ' +
+          'If no metrics exist in the original, do not add any. ' +
           'Return ONLY raw JSON matching the exact input structure. No markdown backticks. No explanation text.',
       },
       {

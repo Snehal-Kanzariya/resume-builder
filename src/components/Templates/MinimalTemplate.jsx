@@ -1,5 +1,6 @@
 import { useResume } from '../../context/ResumeContext';
 import { fmtDate, dateRange } from '../../utils/dateFormat';
+import CustomSections from './CustomSections';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -61,6 +62,7 @@ export default function MinimalTemplate() {
           {p.location && <span style={{ fontSize: 9.5, color: '#475569' }}>{p.location}</span>}
           {p.linkedin && <span style={{ fontSize: 9.5, color: accent   }}>{p.linkedin}</span>}
           {p.portfolio&& <span style={{ fontSize: 9.5, color: accent   }}>{p.portfolio}</span>}
+          {p.github   && <span style={{ fontSize: 9.5, color: accent   }}>{p.github}</span>}
         </div>
       </div>
 
@@ -104,6 +106,7 @@ export default function MinimalTemplate() {
           <Divider />
         </>
       )}
+      <CustomSections afterSection="experience" />
 
       {/* ── EDUCATION ──────────────────────────────────────────────────────── */}
       {education.length > 0 && (
@@ -129,6 +132,7 @@ export default function MinimalTemplate() {
           <Divider />
         </>
       )}
+      <CustomSections afterSection="education" />
 
       {/* ── SKILLS ─────────────────────────────────────────────────────────── */}
       {skills.length > 0 && (
@@ -151,6 +155,7 @@ export default function MinimalTemplate() {
           <Divider />
         </>
       )}
+      <CustomSections afterSection="skills" />
 
       {/* ── PROJECTS ───────────────────────────────────────────────────────── */}
       {projects.length > 0 && (
@@ -175,6 +180,7 @@ export default function MinimalTemplate() {
           <Divider />
         </>
       )}
+      <CustomSections afterSection="projects" />
 
       {/* ── CERTIFICATIONS ─────────────────────────────────────────────────── */}
       {certifications.length > 0 && (
@@ -195,6 +201,7 @@ export default function MinimalTemplate() {
           ))}
         </>
       )}
+      <CustomSections afterSection="certifications" />
     </div>
   );
 }

@@ -9,6 +9,7 @@ const fields = [
   { key: 'location',   label: 'Location',             placeholder: 'San Francisco, CA',         type: 'text' },
   { key: 'linkedin',   label: 'LinkedIn URL',         placeholder: 'linkedin.com/in/username',  type: 'text' },
   { key: 'portfolio',  label: 'Portfolio / Website',  placeholder: 'yoursite.dev',              type: 'text' },
+  { key: 'github',     label: 'GitHub Profile',       placeholder: 'github.com/username',       type: 'text' },
 ];
 
 export default function PersonalInfoForm() {
@@ -22,7 +23,7 @@ export default function PersonalInfoForm() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {fields.map(({ key, label, placeholder, type }) => (
-          <div key={key} className={key === 'portfolio' ? 'sm:col-span-2' : ''}>
+          <div key={key}>
             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{label}</label>
             <input
               type={type}

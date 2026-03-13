@@ -1,6 +1,7 @@
 import { Briefcase, GraduationCap, FolderOpen, Award, Zap, User } from 'lucide-react';
 import { useResume } from '../../context/ResumeContext';
 import { fmtDate, dateRange } from '../../utils/dateFormat';
+import CustomSections from './CustomSections';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -79,6 +80,7 @@ export default function CreativeTemplate() {
             ))}
             {p.linkedin  && <span style={{ fontSize: 9, opacity: 0.75 }}>{p.linkedin}</span>}
             {p.portfolio && <span style={{ fontSize: 9, opacity: 0.75 }}>{p.portfolio}</span>}
+            {p.github    && <span style={{ fontSize: 9, opacity: 0.75 }}>{p.github}</span>}
           </div>
         </div>
 
@@ -175,6 +177,7 @@ export default function CreativeTemplate() {
               ))}
             </RightSection>
           )}
+          <CustomSections afterSection="experience" />
 
           {/* Education */}
           {education.length > 0 && (
@@ -198,6 +201,7 @@ export default function CreativeTemplate() {
               ))}
             </RightSection>
           )}
+          <CustomSections afterSection="education" />
 
           {/* Projects */}
           {projects.length > 0 && (
@@ -220,6 +224,8 @@ export default function CreativeTemplate() {
               ))}
             </RightSection>
           )}
+          <CustomSections afterSection="projects" />
+          <CustomSections afterSection="certifications" />
         </div>
       </div>
     </div>

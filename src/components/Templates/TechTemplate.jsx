@@ -1,5 +1,6 @@
 import { useResume } from '../../context/ResumeContext';
 import { dateRange } from '../../utils/dateFormat';
+import CustomSections from './CustomSections';
 
 // ── Tech: terminal-dark header, monospace section labels, code-badge skills ───
 
@@ -72,6 +73,7 @@ export default function TechTemplate() {
             {p.location && <span style={{ fontFamily: MONO, fontSize: 8.5, color: '#8b949e' }}>{p.location}</span>}
             {p.linkedin && <span style={{ fontFamily: MONO, fontSize: 8.5, color: accent    }}>{p.linkedin}</span>}
             {p.portfolio&& <span style={{ fontFamily: MONO, fontSize: 8.5, color: accent    }}>{p.portfolio}</span>}
+            {p.github   && <span style={{ fontFamily: MONO, fontSize: 8.5, color: accent    }}>{p.github}</span>}
           </div>
         </div>
       </div>
@@ -105,6 +107,7 @@ export default function TechTemplate() {
             </div>
           </div>
         )}
+        <CustomSections afterSection="skills" />
 
         {experience.length > 0 && (
           <div style={{ marginBottom: 18 }}>
@@ -130,6 +133,7 @@ export default function TechTemplate() {
             ))}
           </div>
         )}
+        <CustomSections afterSection="experience" />
 
         {projects.length > 0 && (
           <div style={{ marginBottom: 18 }}>
@@ -150,6 +154,7 @@ export default function TechTemplate() {
             ))}
           </div>
         )}
+        <CustomSections afterSection="projects" />
 
         {education.length > 0 && (
           <div style={{ marginBottom: 18 }}>
@@ -170,6 +175,7 @@ export default function TechTemplate() {
             ))}
           </div>
         )}
+        <CustomSections afterSection="education" />
 
         {certifications.length > 0 && (
           <div>
@@ -183,6 +189,7 @@ export default function TechTemplate() {
             ))}
           </div>
         )}
+        <CustomSections afterSection="certifications" />
       </div>
     </div>
   );

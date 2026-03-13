@@ -1,6 +1,7 @@
-import { Mail, Phone, MapPin, Linkedin, Globe } from 'lucide-react';
+import { Mail, Phone, MapPin, Linkedin, Globe, Github } from 'lucide-react';
 import { useResume } from '../../context/ResumeContext';
 import { fmtDate, dateRange } from '../../utils/dateFormat';
+import CustomSections from './CustomSections';
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
@@ -52,6 +53,7 @@ export default function ModernTemplate() {
     { Icon: MapPin,   val: p.location },
     { Icon: Linkedin, val: p.linkedin },
     { Icon: Globe,    val: p.portfolio },
+    { Icon: Github,   val: p.github },
   ].filter(c => c.val);
 
   return (
@@ -166,6 +168,7 @@ export default function ModernTemplate() {
             ))}
           </MainSection>
         )}
+        <CustomSections afterSection="experience" />
 
         {/* Education */}
         {education.length > 0 && (
@@ -189,6 +192,7 @@ export default function ModernTemplate() {
             ))}
           </MainSection>
         )}
+        <CustomSections afterSection="education" />
 
         {/* Projects */}
         {projects.length > 0 && (
@@ -211,6 +215,8 @@ export default function ModernTemplate() {
             ))}
           </MainSection>
         )}
+        <CustomSections afterSection="projects" />
+        <CustomSections afterSection="certifications" />
       </div>
     </div>
   );
