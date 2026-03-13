@@ -38,7 +38,6 @@ export default function ProfessionalTemplate() {
       fontFamily: "'DM Sans', sans-serif",
       fontSize: 10.5, color: '#0f172a',
       padding: '36px 44px', lineHeight: 1.5,
-      height: '100%', overflowY: 'hidden',
     }}>
 
       {/* ── HEADER ─────────────────────────────────────────────────────────── */}

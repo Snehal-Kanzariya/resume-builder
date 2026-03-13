@@ -36,7 +36,6 @@ export default function MinimalTemplate() {
       fontFamily: "'DM Sans', sans-serif",
       fontSize: 10.5, color: '#1e293b',
       padding: '44px 48px', lineHeight: 1.5,
-      height: '100%', overflowY: 'hidden',
     }}>
 
       {/* ── HEADER ─────────────────────────────────────────────────────────── */}

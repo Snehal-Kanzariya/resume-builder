@@ -32,7 +32,7 @@ export default function ElegantTemplate() {
     .split(' ').slice(0, 2).map(w => w[0] || '').join('').toUpperCase();
 
   return (
-    <div style={{ fontFamily: "'DM Sans', sans-serif", height: '100%', padding: '40px 44px', overflowY: 'hidden', backgroundColor: '#fff', lineHeight: 1.55, position: 'relative' }}>
+    <div style={{ fontFamily: "'DM Sans', sans-serif", padding: '40px 44px', backgroundColor: '#fff', lineHeight: 1.55, position: 'relative' }}>
 
       {/* ── WATERMARK INITIALS ───────────────────────────────────────────────── */}
       {initials && (

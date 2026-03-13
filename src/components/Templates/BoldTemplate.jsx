@@ -28,7 +28,7 @@ export default function BoldTemplate() {
   const accent = settings.accentColor || '#2563eb';
 
   return (
-    <div style={{ fontFamily: "'DM Sans', sans-serif", height: '100%', overflowY: 'hidden', backgroundColor: '#fff', lineHeight: 1.5 }}>
+    <div style={{ fontFamily: "'DM Sans', sans-serif", backgroundColor: '#fff', lineHeight: 1.5 }}>
 
       {/* ── HEADER ──────────────────────────────────────────────────────────── */}
       <div style={{ padding: '28px 32px 20px', borderBottom: `5px solid ${accent}` }}>
@@ -62,10 +62,10 @@ export default function BoldTemplate() {
       </div>
 
       {/* ── BODY ────────────────────────────────────────────────────────────── */}
-      <div style={{ padding: '20px 32px', display: 'flex', gap: 24, overflow: 'hidden' }}>
+      <div style={{ padding: '20px 32px', display: 'flex', gap: 24 }}>
 
         {/* LEFT — main content (62%) */}
-        <div style={{ flex: '0 0 62%', overflowY: 'hidden' }}>
+        <div style={{ flex: '0 0 62%' }}>
 
           {p.summary && (
             <div style={{ marginBottom: 16 }}>
@@ -127,7 +127,7 @@ export default function BoldTemplate() {
         </div>
 
         {/* RIGHT — sidebar (38%) */}
-        <div style={{ flex: '0 0 35%', overflowY: 'hidden' }}>
+        <div style={{ flex: '0 0 35%' }}>
 
           {skills.length > 0 && (
             <SectionBlock title="Skills" accent={accent}>

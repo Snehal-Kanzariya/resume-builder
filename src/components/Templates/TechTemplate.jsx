@@ -41,7 +41,7 @@ export default function TechTemplate() {
   const termBg = '#0d1117';
 
   return (
-    <div style={{ fontFamily: "'DM Sans', sans-serif", height: '100%', display: 'flex', flexDirection: 'column', lineHeight: 1.5 }}>
+    <div style={{ fontFamily: "'DM Sans', sans-serif", display: 'flex', flexDirection: 'column', lineHeight: 1.5 }}>
 
       {/* ── TERMINAL HEADER ──────────────────────────────────────────────────── */}
       <div style={{ backgroundColor: termBg, color: '#c9d1d9', padding: '24px 28px 20px' }}>
@@ -79,7 +79,7 @@ export default function TechTemplate() {
       </div>
 
       {/* ── BODY ────────────────────────────────────────────────────────────── */}
-      <div style={{ flex: 1, padding: '20px 28px', overflowY: 'hidden', backgroundColor: '#fff' }}>
+      <div style={{ padding: '20px 28px', backgroundColor: '#fff' }}>
 
         {p.summary && (
           <div style={{ marginBottom: 18 }}>
