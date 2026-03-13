@@ -1,5 +1,6 @@
 import { useResume } from '../../context/ResumeContext';
 import { fmtDate, dateRange } from '../../utils/dateFormat';
+import CustomSections from './CustomSections';
 
 // ── Executive: dark charcoal header, gold accents, single column ──────────────
 
@@ -30,7 +31,7 @@ export default function ExecutiveTemplate() {
   const dark    = '#1c2333';
 
   const contactParts = [p.email, p.phone, p.location].filter(Boolean).join('   ·   ');
-  const urlParts     = [p.linkedin, p.portfolio].filter(Boolean).join('   ·   ');
+  const urlParts     = [p.linkedin, p.portfolio, p.github].filter(Boolean).join('   ·   ');
 
   return (
     <div style={{ fontFamily: "'DM Sans', sans-serif", height: '100%', display: 'flex', flexDirection: 'column', lineHeight: 1.5 }}>
@@ -96,6 +97,7 @@ export default function ExecutiveTemplate() {
             ))}
           </Section>
         )}
+        <CustomSections afterSection="experience" />
 
         {education.length > 0 && (
           <Section title="Education" accent={accent}>
@@ -116,6 +118,7 @@ export default function ExecutiveTemplate() {
             ))}
           </Section>
         )}
+        <CustomSections afterSection="education" />
 
         {skills.length > 0 && (
           <Section title="Core Competencies" accent={accent}>
@@ -133,6 +136,7 @@ export default function ExecutiveTemplate() {
             </div>
           </Section>
         )}
+        <CustomSections afterSection="skills" />
 
         {projects.length > 0 && (
           <Section title="Key Projects" accent={accent}>
@@ -148,6 +152,7 @@ export default function ExecutiveTemplate() {
             ))}
           </Section>
         )}
+        <CustomSections afterSection="projects" />
 
         {certifications.length > 0 && (
           <Section title="Certifications" accent={accent}>
@@ -162,6 +167,7 @@ export default function ExecutiveTemplate() {
             ))}
           </Section>
         )}
+        <CustomSections afterSection="certifications" />
       </div>
     </div>
   );

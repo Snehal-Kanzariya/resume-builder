@@ -12,6 +12,7 @@ const initialResumeData = {
     location: '',
     linkedin: '',
     portfolio: '',
+    github: '',
     summary: '',
   },
 
@@ -20,10 +21,11 @@ const initialResumeData = {
   skills: [],
   projects: [],
   certifications: [],
+  customSections: [],
 
   settings: {
     selectedTemplate: 'modern',
-    accentColor: '#2563eb',
+    accentColor: '#03153a',
     fontSize: 'medium',
     sectionOrder: ['experience', 'education', 'skills', 'projects', 'certifications'],
   },
@@ -42,6 +44,7 @@ export function ResumeProvider({ children }) {
         ...parsed,
         personalInfo: { ...initialResumeData.personalInfo, ...(parsed.personalInfo || {}) },
         settings: { ...initialResumeData.settings, ...(parsed.settings || {}) },
+        customSections: parsed.customSections || [],
       };
     } catch {
       return initialResumeData;
@@ -343,20 +346,121 @@ export function ResumeProvider({ children }) {
     localStorage.removeItem('resumeData');
   }, []);
 
+  // ── Custom Sections ──────────────────────────────────────────────────────────
+  // Returns the new section's ID so the caller can navigate to it immediately.
+  const reorderCustomSections = useCallback((from, to) => {
+    setResumeData(prev => ({
+      ...prev,
+      customSections: reorderArray(prev.customSections || [], from, to),
+    }));
+  }, []);
+
+  const reorderCustomSectionItems = useCallback((id, from, to) => {
+    setResumeData(prev => ({
+      ...prev,
+      customSections: (prev.customSections || []).map(s => {
+        if (s.id !== id) return s;
+        const items = [...(s.items || [])];
+        const [item] = items.splice(from, 1);
+        items.splice(to, 0, item);
+        return { ...s, items };
+      }),
+    }));
+  }, []);
+
+  const addCustomSection = useCallback(() => {
+    const id = generateId();
+    setResumeData(prev => ({
+      ...prev,
+      customSections: [
+        ...(prev.customSections || []),
+        { id, title: 'Custom Section', type: 'text', content: '', items: [''], afterSection: 'certifications' },
+      ],
+      settings: {
+        ...prev.settings,
+        sectionOrder: [...(prev.settings?.sectionOrder || []), id],
+      },
+    }));
+    return id;
+  }, []);
+
+  const removeCustomSection = useCallback((id) => {
+    setResumeData(prev => ({
+      ...prev,
+      customSections: (prev.customSections || []).filter(s => s.id !== id),
+      settings: {
+        ...prev.settings,
+        sectionOrder: (prev.settings?.sectionOrder || []).filter(k => k !== id),
+      },
+    }));
+  }, []);
+
+  const updateCustomSection = useCallback((id, field, value) => {
+    setResumeData(prev => ({
+      ...prev,
+      customSections: (prev.customSections || []).map(s =>
+        s.id === id ? { ...s, [field]: value } : s
+      ),
+    }));
+  }, []);
+
+  const addCustomSectionItem = useCallback((id) => {
+    setResumeData(prev => ({
+      ...prev,
+      customSections: (prev.customSections || []).map(s =>
+        s.id === id ? { ...s, items: [...(s.items || []), ''] } : s
+      ),
+    }));
+  }, []);
+
+  const updateCustomSectionItem = useCallback((id, index, value) => {
+    setResumeData(prev => ({
+      ...prev,
+      customSections: (prev.customSections || []).map(s => {
+        if (s.id !== id) return s;
+        const items = [...(s.items || [])];
+        items[index] = value;
+        return { ...s, items };
+      }),
+    }));
+  }, []);
+
+  const removeCustomSectionItem = useCallback((id, index) => {
+    setResumeData(prev => ({
+      ...prev,
+      customSections: (prev.customSections || []).map(s => {
+        if (s.id !== id) return s;
+        const items = s.items.filter((_, i) => i !== index);
+        return { ...s, items: items.length ? items : [''] };
+      }),
+    }));
+  }, []);
+
   // ── Import from upload ───────────────────────────────────────────────────────
-  // Merges parsed upload data, generating fresh IDs for every array item.
-  // If parsed arrays are empty, keeps the existing data so we never blank out.
+  // SAFE import: existing non-empty data is NEVER overwritten. The parsed
+  // upload data only fills fields/sections that are currently empty. This
+  // ensures users never lose data they have already entered manually.
   const importResumeData = useCallback((parsedData) => {
     setResumeData(prev => {
-      const merged = {
-        personalInfo: {
-          ...(prev?.personalInfo || initialResumeData.personalInfo),
-          ...(parsedData?.personalInfo || {}),
-        },
-        experience: ((parsedData?.experience?.length > 0)
-          ? parsedData.experience
-          : (prev?.experience || [])
-        ).map(exp => ({
+      // For each personalInfo field: keep existing non-empty value; fill from
+      // upload only when the builder field is empty.
+      const personalInfo = Object.fromEntries(
+        Object.keys(initialResumeData.personalInfo).map(key => {
+          const existing = prev?.personalInfo?.[key];
+          const fromFile = parsedData?.personalInfo?.[key];
+          return [key, existing?.trim?.() ? existing : (fromFile || '')];
+        })
+      );
+
+      // For array sections: keep existing entries if any; use parsed only when
+      // the section is currently empty.
+      const pickArray = (existing, parsed, shape) =>
+        (existing?.length > 0 ? existing : (parsed || [])).map(item => ({ ...shape(item) }));
+
+      return {
+        ...prev,
+        personalInfo,
+        experience: pickArray(prev?.experience, parsedData?.experience, exp => ({
           id:        exp.id        || generateId(),
           company:   exp.company   || '',
           position:  exp.position  || '',
@@ -366,10 +470,7 @@ export function ResumeProvider({ children }) {
           location:  exp.location  || '',
           bullets:   Array.isArray(exp.bullets) && exp.bullets.length ? exp.bullets.map(String) : [''],
         })),
-        education: ((parsedData?.education?.length > 0)
-          ? parsedData.education
-          : (prev?.education || [])
-        ).map(edu => ({
+        education: pickArray(prev?.education, parsedData?.education, edu => ({
           id:           edu.id           || generateId(),
           school:       edu.school       || '',
           degree:       edu.degree       || '',
@@ -379,18 +480,12 @@ export function ResumeProvider({ children }) {
           gpa:          edu.gpa          || '',
           achievements: edu.achievements || '',
         })),
-        skills: ((parsedData?.skills?.length > 0)
-          ? parsedData.skills
-          : (prev?.skills || [])
-        ).map(sk => ({
+        skills: pickArray(prev?.skills, parsedData?.skills, sk => ({
           id:       sk.id       || generateId(),
           category: sk.category || '',
           items:    Array.isArray(sk.items) ? sk.items.map(String) : [],
         })),
-        projects: ((parsedData?.projects?.length > 0)
-          ? parsedData.projects
-          : (prev?.projects || [])
-        ).map(pr => ({
+        projects: pickArray(prev?.projects, parsedData?.projects, pr => ({
           id:           pr.id           || generateId(),
           name:         pr.name         || '',
           description:  pr.description  || '',
@@ -398,19 +493,16 @@ export function ResumeProvider({ children }) {
           liveLink:     pr.liveLink     || '',
           githubLink:   pr.githubLink   || '',
         })),
-        certifications: ((parsedData?.certifications?.length > 0)
-          ? parsedData.certifications
-          : (prev?.certifications || [])
-        ).map(c => ({
+        certifications: pickArray(prev?.certifications, parsedData?.certifications, c => ({
           id:     c.id     || generateId(),
           name:   c.name   || '',
           issuer: c.issuer || '',
           date:   c.date   || '',
           link:   c.link   || '',
         })),
-        settings: { ...(prev?.settings || initialResumeData.settings), ...(parsedData?.settings || {}) },
+        customSections: prev?.customSections || [],
+        settings: prev?.settings || initialResumeData.settings,
       };
-      return merged;
     });
   }, []);
 
@@ -475,6 +567,16 @@ export function ResumeProvider({ children }) {
     reorderProjects,
     reorderCertifications,
     reorderSkillCategory,
+
+    // Custom Sections
+    addCustomSection,
+    removeCustomSection,
+    updateCustomSection,
+    addCustomSectionItem,
+    updateCustomSectionItem,
+    removeCustomSectionItem,
+    reorderCustomSections,
+    reorderCustomSectionItems,
 
     // Utilities
     loadSampleData,

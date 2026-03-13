@@ -1,5 +1,6 @@
 import { useResume } from '../../context/ResumeContext';
 import { fmtDate, dateRange } from '../../utils/dateFormat';
+import CustomSections from './CustomSections';
 
 // ── Compact: 2-col sidebar for skills+edu+certs, main col for exp+projects ────
 
@@ -34,7 +35,7 @@ export default function CompactTemplate() {
   const accent = settings.accentColor || '#2563eb';
 
   const contactLine = [p.email, p.phone, p.location].filter(Boolean).join(' · ');
-  const urlLine     = [p.linkedin, p.portfolio].filter(Boolean).join(' · ');
+  const urlLine     = [p.linkedin, p.portfolio, p.github].filter(Boolean).join(' · ');
 
   return (
     <div style={{ fontFamily: "'DM Sans', sans-serif", height: '100%', display: 'flex', flexDirection: 'column', lineHeight: 1.4 }}>
@@ -160,6 +161,7 @@ export default function CompactTemplate() {
               ))}
             </div>
           )}
+          <CustomSections afterSection="experience" />
 
           {projects.length > 0 && (
             <div>
@@ -180,6 +182,8 @@ export default function CompactTemplate() {
               ))}
             </div>
           )}
+          <CustomSections afterSection="projects" />
+          <CustomSections afterSection="certifications" />
         </div>
       </div>
     </div>

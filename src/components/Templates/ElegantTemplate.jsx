@@ -1,5 +1,6 @@
 import { useResume } from '../../context/ResumeContext';
 import { fmtDate, dateRange } from '../../utils/dateFormat';
+import CustomSections from './CustomSections';
 
 // ── Elegant: ultra-thin name, soft accent, initials watermark, italic details ─
 
@@ -71,7 +72,7 @@ export default function ElegantTemplate() {
 
         {/* Contact line */}
         <p style={{ fontSize: 9, color: '#64748b', letterSpacing: 1 }}>
-          {[p.email, p.phone, p.location, p.linkedin, p.portfolio].filter(Boolean).join('  ·  ')}
+          {[p.email, p.phone, p.location, p.linkedin, p.portfolio, p.github].filter(Boolean).join('  ·  ')}
         </p>
       </div>
 
@@ -113,6 +114,7 @@ export default function ElegantTemplate() {
             ))}
           </Section>
         )}
+        <CustomSections afterSection="experience" />
 
         {education.length > 0 && (
           <Section title="Education" accent={accent}>
@@ -133,6 +135,7 @@ export default function ElegantTemplate() {
             ))}
           </Section>
         )}
+        <CustomSections afterSection="education" />
 
         {skills.length > 0 && (
           <Section title="Skills &amp; Expertise" accent={accent}>
@@ -150,6 +153,7 @@ export default function ElegantTemplate() {
             </div>
           </Section>
         )}
+        <CustomSections afterSection="skills" />
 
         {projects.length > 0 && (
           <Section title="Projects" accent={accent}>
@@ -165,6 +169,7 @@ export default function ElegantTemplate() {
             ))}
           </Section>
         )}
+        <CustomSections afterSection="projects" />
 
         {certifications.length > 0 && (
           <Section title="Certifications" accent={accent}>
@@ -179,6 +184,7 @@ export default function ElegantTemplate() {
             ))}
           </Section>
         )}
+        <CustomSections afterSection="certifications" />
       </div>
     </div>
   );

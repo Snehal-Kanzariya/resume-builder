@@ -32,6 +32,7 @@ src/
 │   │   ├── SkillsForm.jsx          → Skill tags with proficiency level (add/remove)
 │   │   ├── ProjectsForm.jsx        → Project name, description, tech, link (add/remove)
 │   │   ├── CertificationsForm.jsx  → Cert name, issuer, date, link (add/remove)
+│   │   ├── ReferencesForm.jsx      → Reference name, title, company, phone, email, relationship (add/remove)
 │   │   └── CustomSectionForm.jsx   → User-defined section title + content
 │   ├── Preview/
 │   │   ├── ResumePreview.jsx       → Live preview container (renders selected template)
@@ -198,13 +199,17 @@ const initialResumeData = {
 - Right content area (70%) for experience, education, projects
 - Clean sans-serif typography
 - Accent color for headings and dividers
+- GitHub icon + link in sidebar contact section (only if github field is not empty)
+- References page (separate A4 page) mirrors this template's sidebar/accent style when showReferences is ON
 
 ### Classic Template
 - Single column, traditional layout
-- Name centered at top, contact info below
+- Name centered at top, contact info below in a row
 - Clear section dividers with horizontal rules
 - Serif font for headings, sans-serif for body
 - Black and white, minimal color
+- GitHub icon + link in header contact row (only if github field is not empty)
+- References page mirrors classic single-column style when showReferences is ON
 
 ### Minimal Template
 - Maximum whitespace
@@ -212,6 +217,8 @@ const initialResumeData = {
 - Subtle section separators
 - Name top-left, contact top-right
 - Single column, airy spacing
+- GitHub icon + link in header contact area (only if github field is not empty)
+- References page mirrors minimal clean style when showReferences is ON
 
 ### Creative Template
 - Bold accent color blocks
@@ -219,6 +226,8 @@ const initialResumeData = {
 - Skill bars/charts for visual flair
 - Unique section headers with icons
 - Modern, design-focused
+- GitHub icon + link in sidebar contact section (only if github field is not empty)
+- References page mirrors creative accent colors and typography when showReferences is ON
 
 ### Professional Template (ATS-Friendly)
 - Simple, clean single-column
@@ -226,6 +235,8 @@ const initialResumeData = {
 - No graphics/charts (pure text)
 - Machine-readable formatting
 - Times New Roman or similar traditional font
+- GitHub shown as plain text URL in header contact row (only if github field is not empty)
+- References page is plain text, ATS-safe when showReferences is ON
 
 ---
 
@@ -300,6 +311,21 @@ const initialResumeData = {
 16. Final testing + bug fixes
 17. Deploy to Vercel
 - **Git commit + push + deploy**
+
+### Post-Launch Enhancement Sprint
+18. Custom sections: `customSections[]` in context, `CustomSectionForm`, `CustomSections.jsx`, all templates ✓
+19. Upload data integrity: `importResumeData` fills empty fields only, never overwrites ✓
+20. Template empty-section hiding: all sections wrapped in `{data.length > 0 && ...}` ✓
+21. AI enhancement: no fake metrics — system prompt updated ✓
+22. Add `github` field to personalInfo + PersonalInfoForm + all templates
+19. Build ReferencesForm + references data schema + showReferences toggle
+20. Build References Page renderer (design-matched, separate A4 page)
+21. Update PDF export: append references page when showReferences is ON
+22. Multi-page support: remove fixed height, add page-break indicator, page count badge
+23. Add watermark to exported PDFs (pdfExport.js), skip if isPremium
+24. Add `await document.fonts.ready` before html2canvas capture (PDF/preview mismatch fix)
+25. Add `settings.isPremium` + "Upgrade to Pro" CTA near download button
+- **Git commit after each feature**
 
 ---
 
@@ -656,6 +682,315 @@ Entry Card Layout:
 - Two entries: drag works normally
 - Dragging cancelled (drop outside): item returns to original position
 - Preview updates in real-time as items reorder
+
+---
+
+## Upload Data Integrity — No Silent Overwrite
+
+### Rule
+When a user uploads a resume (PDF or DOCX), **existing non-empty data in the builder is never overwritten**. The uploaded resume only fills in fields and sections that are currently empty. This protects users who have already started editing their resume from losing their work.
+
+### Behavior (implemented in `importResumeData`)
+- **personalInfo fields**: If a field (e.g. email, fullName) is already filled in the builder, keep it. Only replace it if it is currently empty.
+- **Array sections** (experience, education, skills, projects, certifications): If the builder already has entries for a section, keep them. Use the uploaded resume's entries only if that section is currently empty.
+- **customSections**: Never overwritten by upload — always kept as-is.
+- **settings**: Always kept from the existing builder state (theme, template, color).
+
+### Why
+Users may have partially filled the builder before uploading, or they may upload to fill in missing sections. Silent replacement would destroy their existing edits.
+
+### If User Wants Full Replacement
+Tell them: "To fully replace your current resume with an uploaded one, click Reset Resume first, then upload."
+
+---
+
+## Template Empty Section Hiding
+
+### Rule
+Templates **never render a section title if that section has no data**. This applies to both built-in sections and custom sections.
+
+### Implementation (already enforced in all templates)
+- `{experience.length > 0 && <Section title="Experience">…</Section>}`
+- `{skills.length > 0 && <Section title="Skills">…</Section>}`
+- `{projects.length > 0 && <Section title="Projects">…</Section>}`
+- `{certifications.length > 0 && <Section title="Certifications">…</Section>}`
+- `{education.length > 0 && <Section title="Education">…</Section>}`
+- Contact fields (email, phone, LinkedIn, GitHub, portfolio): filtered individually — only rendered if non-empty
+- Custom sections: hidden if content/items are all empty
+
+### Why
+When a user uploads a resume that doesn't have certain sections (e.g. no projects), the template must not show an empty "PROJECTS" heading. The rendered resume should look clean with only the sections that actually have content.
+
+---
+
+## AI Enhancement — No Fake Metrics
+
+### Rule
+The AI enhancement feature **must never invent, fabricate, or add numbers, percentages, metrics, dates, company names, tools, or any other facts** that are not already present in the user's existing resume content.
+
+### Implementation (enforced in `aiEnhance.js` system prompt)
+The Groq API system prompt explicitly states:
+> "CRITICAL: Do NOT invent, fabricate, or add any numbers, percentages, metrics, dates, company names, tools, or facts that are not already present in the existing content. Only rewrite and strengthen the language using information that is already there. If no metrics exist in the original, do not add any."
+
+### Why
+Fabricated metrics (e.g. "increased revenue by 30%", "managed team of 15") are dishonest and could cause serious problems for users in interviews. The AI should improve phrasing and clarity, not invent credentials.
+
+### What AI CAN do
+- Rewrite bullets with stronger action verbs
+- Improve sentence structure and clarity
+- Make language more concise and ATS-friendly
+- Reorganize existing content for better impact
+
+### What AI CANNOT do
+- Add any number or percentage not in the original
+- Add skill names or tools not mentioned
+- Add job titles, company names, or dates not in the original
+- Invent quantified achievements
+
+---
+
+## Custom Sections
+
+### Overview
+Users can add unlimited custom sections to their resume — for anything not covered by built-in sections: Volunteer Work, Publications, Awards, Languages, Interests, Open Source Contributions, etc. Each custom section appears in the sidebar, can be edited independently, and renders in the resume template.
+
+### Data Schema (in `ResumeContext.initialResumeData`)
+```javascript
+customSections: [
+  {
+    id: "uuid",
+    title: "Custom Section",   // user-defined section name
+    type: "text",              // "text" (paragraph) | "bullets" (bullet list)
+    content: "",               // used when type === "text"
+    items: [""],               // used when type === "bullets"
+  }
+]
+```
+
+### Settings Integration
+When a custom section is created, its `id` is appended to `settings.sectionOrder`. This allows future drag-to-reorder support for both built-in and custom sections. When a custom section is deleted, its `id` is removed from `sectionOrder`.
+
+### Context Functions
+```javascript
+addCustomSection()               → creates section, appends id to sectionOrder, returns new id
+removeCustomSection(id)          → removes section + removes id from sectionOrder
+updateCustomSection(id, field, value)
+addCustomSectionItem(id)         → appends '' to items[]
+updateCustomSectionItem(id, index, value)
+removeCustomSectionItem(id, index) → keeps at least 1 item
+```
+
+### Sidebar (Sidebar.jsx)
+- Custom sections appear below built-in sections under a "Custom Sections" subheading
+- Each entry shows the LayoutTemplate icon + section title + completion dot (green if has content)
+- "Add Custom Section" button at the bottom (dashed border, blue text)
+- Active custom section is highlighted same as built-in sections
+- `onAddCustomSection` prop: callback to Builder which calls `addCustomSection()` and navigates to the new section
+
+### Builder Routing
+- `activeSection` can be `"custom-{id}"` for custom section forms
+- Builder renders `<CustomSectionForm sectionId={id} onDeleted={() => setActiveSection('personal')} />` for custom sections
+- Breadcrumb shows the custom section's title (not a generic label)
+- Built-in prev/next navigation only moves through built-in SECTIONS array
+
+### CustomSectionForm.jsx
+Form fields:
+1. **Section Title** — text input, placeholder: "e.g. Volunteer Work, Publications, Languages…"
+2. **Content Format toggle** — "Paragraph" | "Bullet List" (Paragraph = textarea, Bullets = dynamic list)
+3. **Content / Bullet Items** — edit area based on selected format
+4. **Remove Section** button with confirmation (navigates back to Personal Info on delete)
+5. Helper text: "This section will appear at the bottom of your resume."
+
+### Template Rendering (CustomSections.jsx)
+- Shared component imported by all 11 templates
+- Reads `customSections` and `accentColor` from `useResume()` context — no props needed
+- Renders only sections that have content (hides empty custom sections)
+- Uses the same section header style as built-in sections (uppercase, accent color, decorative line)
+- Renders bullets as `<ul>` and paragraphs as `<p>` with matching template typography
+- Placement: appended at the bottom of the main content area in each template
+
+### User Flow
+1. User clicks "Add Custom Section" in sidebar → new section created → navigated to its form
+2. User sets a title (e.g. "Volunteer Work") and chooses Paragraph or Bullet List
+3. User types content → live preview updates immediately
+4. Section appears in the sidebar with a completion dot when it has content
+5. User can add multiple custom sections
+6. To delete: click "Remove Section" in the form → confirm → section removed from resume + sidebar
+
+---
+
+## References Page (Separate Document — Industry Standard)
+
+### Overview
+Based on career expert recommendations (Zety, Enhancv, Resume.co, KickResume), references should NOT appear on the main resume. The app generates a separate, design-matched References Page that users can download alongside their resume.
+
+### Why Separate Page?
+- Career experts agree: references waste valuable resume space
+- Employers only check references at the final hiring stage
+- A matching separate page looks more professional
+- Keeps the resume focused on skills, experience, and achievements
+
+### Data Schema (add to ResumeContext initialResumeData)
+```javascript
+references: [
+  {
+    id: "uuid",
+    name: "",
+    title: "",
+    company: "",
+    phone: "",
+    email: "",
+    relationship: "",   // "Direct Manager" | "Colleague" | "Senior Leader" | "Client" | "Professor" | "Other"
+    note: ""            // Optional: brief note on what they can speak to
+  }
+],
+settings: {
+  ...existing,
+  showReferences: false,    // Toggle: include references page in PDF export
+  referencesStyle: "match"  // "match" = mirrors resume template | "simple" = clean standalone
+}
+```
+
+### UI Design
+- New section "References" in Sidebar after Certifications (Users icon)
+- ReferencesForm.jsx in src/components/Forms/
+- Add/remove entries with drag-and-drop reorder
+- Fields: Full Name, Job Title, Company, Phone, Email, Relationship (dropdown), Note (optional textarea)
+- Toggle switch at top of form: "Include References Page" (off by default)
+- Helper text: "Career experts recommend providing references as a separate page, not on your resume. Enable this to generate a matching references page."
+- When toggle is ON: preview shows references as a second page below the resume with a page-break indicator
+
+### References Page Template
+- Header matches selected resume template (same name, contact info, styling, accent color)
+- Page title: "PROFESSIONAL REFERENCES"
+- Each entry shows:
+  - **Name** — Title at Company
+  - Phone | Email
+  - *Relationship: Direct Manager* (italic)
+  - Optional note in smaller text below
+- Layout mirrors the resume template's fonts, colors, and accent style
+- A4 sized page, same dimensions as the resume
+
+### PDF Export Behavior
+- `showReferences` OFF: PDF contains only the resume (1–2 pages)
+- `showReferences` ON: PDF appends the references page as the final page
+- Download button label changes to "Download Resume + References" when ON
+- Secondary button: "Download References Only"
+
+---
+
+## GitHub Profile Link
+
+### Data Schema Update
+```javascript
+personalInfo: {
+  ...existing fields,
+  github: ""    // e.g., "github.com/Snehal-Kanzariya"
+}
+```
+
+### UI
+- Add "GitHub URL" input in PersonalInfoForm.jsx between LinkedIn and Portfolio fields
+- Github icon (lucide-react) as input prefix icon
+- Placeholder: "github.com/username"
+- All 11 templates: show GitHub icon + link in contact/header area alongside LinkedIn and Portfolio
+- Only render if the field is not empty
+- 2-column templates (Modern, Creative, Tech, Bold): show in sidebar contact section
+- Single-column templates: show in header contact row
+
+---
+
+## PDF Download Fix (UI Mismatch)
+
+### Problem
+Downloaded PDF can render differently from the in-app preview due to CSS transform scaling and font loading timing.
+
+### Solution
+1. Use the existing hidden off-screen div (`position: fixed, left: -9999px`) at exact A4 dimensions (794px wide, height auto)
+2. Render the selected template into it with NO CSS transforms or scaling
+3. Await `document.fonts.ready` before capturing to ensure custom fonts are loaded
+4. Capture with `html2canvas` at `scale: 2` — this hidden div is the capture target
+5. Result: PDF matches preview exactly since both render the same template component at the same size
+
+### Implementation Notes (pdfExport.js)
+- `downloadResumePDF(elementId, fileName)` already targets the hidden div by ID
+- Add `await document.fonts.ready` before the `html2canvas` call
+- Pass `windowHeight: element.scrollHeight` and `height: element.scrollHeight` to capture full content
+- Multi-page split: already implemented (canvas sliced into A4 chunks)
+
+---
+
+## Multi-Page Resume Support
+
+### Rules
+- Default: optimize for 1 page
+- If content exceeds 1 A4 page (1123px at 96 dpi), flow naturally to page 2
+- Show page-break indicator: dashed line with "Page 2" label in preview between pages
+- Page count badge in preview toolbar: "1 page" or "2 pages"
+- If content is between 1.0–1.5 pages, show suggestion toast: "Your resume is between pages. Consider trimming to 1 page or filling to 2 pages."
+- PDF export captures full content across all pages (already implemented in pdfExport.js)
+
+### A4Container Updates
+- Remove fixed `height: 1123px` — use `minHeight: 1123px` so short resumes still look right
+- Remove `overflow: hidden` — let content flow past 1 page
+- Render a dashed page-break indicator line at every 1123px interval
+- Each page section has proper padding so content doesn't sit on the divider
+
+---
+
+## Watermark (Free Version Branding)
+
+### Implementation
+- Free version only: small watermark on each exported PDF page (NOT visible in preview)
+- Text: "Built with ResumeAI" — bottom-right corner of every page
+- Style: 8px font, color #B0B0B0
+- Added in `pdfExport.js` after all pages are rendered, before `pdf.save()`
+- Does NOT affect the Print output — only the downloaded PDF file
+
+### Code (pdfExport.js)
+```javascript
+// Add after all pages are added to PDF, before pdf.save()
+if (!isPremium) {
+  const pageCount = pdf.internal.getNumberOfPages();
+  for (let i = 1; i <= pageCount; i++) {
+    pdf.setPage(i);
+    pdf.setFontSize(8);
+    pdf.setTextColor(176, 176, 176);
+    pdf.text('Built with ResumeAI', pdfWidth - 42, pdfHeight - 5);
+  }
+}
+```
+
+### Premium Toggle
+- `settings.isPremium`: false (default)
+- If true: skip watermark entirely
+- Show "Remove watermark — Upgrade to Pro" link near download button
+- Future: Razorpay/Stripe payment integration
+
+---
+
+## Future Features (Roadmap — Do Not Build Now)
+
+### Job URL Resume Optimizer (v2)
+- User pastes a job posting URL
+- App fetches and parses the job description
+- AI compares job requirements vs current resume content
+- Shows "Match Score" percentage
+- AI suggests specific changes: missing keywords, skills to highlight, experience to emphasize
+- Requires: serverless function for URL fetching + advanced AI prompting
+
+### LinkedIn Profile Import (v2)
+- User uploads their LinkedIn PDF export (available from LinkedIn settings → "Save to PDF")
+- Parse using the existing PDF parser
+- Map LinkedIn sections to resume fields automatically
+- Workaround to guide users: "Export your LinkedIn profile as PDF and upload it using the Resume Upload feature"
+
+### Additional Roadmap
+- Resume versioning (save multiple named versions per job application)
+- Cover letter generator (AI generates matching cover letter)
+- ATS score checker (analyze resume against ATS criteria)
+- Resume sharing via unique public link
+- Multi-language resume support
 
 ---
 

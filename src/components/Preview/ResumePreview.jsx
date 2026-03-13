@@ -50,7 +50,7 @@ export const TEMPLATES = [
 export const FONT_SCALES = { small: 0.88, medium: 1.0, large: 1.11 };
 
 const ACCENT_PRESETS = [
-  '#2563eb', '#7c3aed', '#059669', '#dc2626',
+  '#03153a', '#7c3aed', '#059669', '#dc2626',
   '#d97706', '#0891b2', '#db2777', '#1e293b',
 ];
 
@@ -318,7 +318,7 @@ const ResumePreview = forwardRef(function ResumePreview(_props, _externalRef) {
         <div
           id="resume-print-area-builder"
           ref={printContentRef}
-          style={{ width: '794px', height: '1123px', backgroundColor: '#ffffff', overflow: 'hidden' }}
+          style={{ width: '794px', minHeight: '1123px', backgroundColor: '#ffffff' }}
         >
           <Suspense fallback={null}>
             <Component />

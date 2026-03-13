@@ -1,18 +1,19 @@
-import { Suspense, useState } from 'react';
+import { Suspense, useRef, useState } from 'react';
+import { useReactToPrint } from 'react-to-print';
 import { Link } from 'react-router-dom';
 import {
   ArrowLeft, Printer, Download, Loader2, FileText,
   LayoutTemplate, Palette,
 } from 'lucide-react';
 import { useResume } from '../context/ResumeContext';
-import { downloadResumePDF, buildFilename } from '../utils/pdfExport';
+import { downloadResumePDF, buildFilename, PRINT_PAGE_STYLE } from '../utils/pdfExport';
 import A4Container from '../components/Preview/A4Container';
 import { TEMPLATES, FONT_SCALES } from '../components/Preview/ResumePreview';
 
 const PRINT_TARGET_ID = 'resume-print-area-preview';
 
 const ACCENT_PRESETS = [
-  '#2563eb', '#7c3aed', '#059669', '#dc2626',
+  '#03153a', '#7c3aed', '#059669', '#dc2626',
   '#d97706', '#0891b2', '#db2777', '#1e293b',
 ];
 
@@ -22,14 +23,17 @@ export default function PreviewPage() {
   const personalInfo = resumeData?.personalInfo ?? {};
 
   const [isDownloading, setDownloading] = useState(false);
+  const printContentRef = useRef(null);
 
   const { Component } = TEMPLATES.find(t => t.id === selectedTemplate) ?? TEMPLATES[0];
   const contentScale  = FONT_SCALES[fontSize] ?? 1.0;
   const filename      = buildFilename(personalInfo.fullName ?? '');
 
-  function handlePrint() {
-    window.print();
-  }
+  const handlePrint = useReactToPrint({
+    contentRef: printContentRef,
+    documentTitle: filename.replace('.pdf', ''),
+    pageStyle: PRINT_PAGE_STYLE,
+  });
 
   async function handleDownload() {
     setDownloading(true);
@@ -160,8 +164,8 @@ export default function PreviewPage() {
       >
         <div
           id={PRINT_TARGET_ID}
-          className="print-area"
-          style={{ width: '794px', height: '1123px', backgroundColor: '#ffffff', overflow: 'hidden' }}
+          ref={printContentRef}
+          style={{ width: '794px', minHeight: '1123px', backgroundColor: '#ffffff' }}
         >
           <Suspense fallback={null}>
             <Component />

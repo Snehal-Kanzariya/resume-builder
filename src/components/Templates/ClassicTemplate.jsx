@@ -1,5 +1,6 @@
 import { useResume } from '../../context/ResumeContext';
 import { fmtDate, dateRange } from '../../utils/dateFormat';
+import CustomSections from './CustomSections';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -35,7 +36,7 @@ export default function ClassicTemplate() {
 
   const accent = settings.accentColor || '#1e293b';
 
-  const contactLine = [p.email, p.phone, p.location, p.linkedin, p.portfolio]
+  const contactLine = [p.email, p.phone, p.location, p.linkedin, p.portfolio, p.github]
     .filter(Boolean)
     .join('  ·  ');
 
@@ -110,6 +111,7 @@ export default function ClassicTemplate() {
           ))}
         </div>
       )}
+      <CustomSections afterSection="experience" />
 
       {/* ── EDUCATION ──────────────────────────────────────────────────────── */}
       {education.length > 0 && (
@@ -136,6 +138,7 @@ export default function ClassicTemplate() {
           ))}
         </div>
       )}
+      <CustomSections afterSection="education" />
 
       {/* ── SKILLS ─────────────────────────────────────────────────────────── */}
       {skills.length > 0 && (
@@ -155,6 +158,7 @@ export default function ClassicTemplate() {
           ))}
         </div>
       )}
+      <CustomSections afterSection="skills" />
 
       {/* ── PROJECTS ───────────────────────────────────────────────────────── */}
       {projects.length > 0 && (
@@ -182,6 +186,7 @@ export default function ClassicTemplate() {
           ))}
         </div>
       )}
+      <CustomSections afterSection="projects" />
 
       {/* ── CERTIFICATIONS ─────────────────────────────────────────────────── */}
       {certifications.length > 0 && (
@@ -202,6 +207,7 @@ export default function ClassicTemplate() {
           ))}
         </div>
       )}
+      <CustomSections afterSection="certifications" />
     </div>
   );
 }
