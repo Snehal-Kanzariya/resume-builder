@@ -969,28 +969,146 @@ if (!isPremium) {
 
 ---
 
-## Future Features (Roadmap — Do Not Build Now)
+## Coming Soon Feature Teaser (Psychological Trigger Design)
 
-### Job URL Resume Optimizer (v2)
-- User pastes a job posting URL
-- App fetches and parses the job description
-- AI compares job requirements vs current resume content
-- Shows "Match Score" percentage
-- AI suggests specific changes: missing keywords, skills to highlight, experience to emphasize
-- Requires: serverless function for URL fetching + advanced AI prompting
+### Overview
+A single high-impact "Coming Soon" section on the Home page that teases ONLY the next upcoming feature. Creates curiosity, urgency, and a reason for users to return. Updates every ~10 days when a new feature branch merges to main.
 
-### LinkedIn Profile Import (v2)
-- User uploads their LinkedIn PDF export (available from LinkedIn settings → "Save to PDF")
-- Parse using the existing PDF parser
-- Map LinkedIn sections to resume fields automatically
-- Workaround to guide users: "Export your LinkedIn profile as PDF and upload it using the Resume Upload feature"
+### Placement
+- On Home page: between the Template Showcase section and Footer
+- NOT a separate page — embedded directly in the landing page
+- Also show a small "New Feature Coming" floating badge on the Navbar that pulses
 
-### Additional Roadmap
-- Resume versioning (save multiple named versions per job application)
-- Cover letter generator (AI generates matching cover letter)
-- ATS score checker (analyze resume against ATS criteria)
-- Resume sharing via unique public link
-- Multi-language resume support
+### Design Philosophy — Psychological Triggers
+1. **Curiosity Gap**: Show partial info, blur or mask the rest — user wants to know more
+2. **Countdown Timer**: "Launching in X days" creates urgency
+3. **Silhouette/Blur Preview**: Show a blurred screenshot of the feature — just enough to recognize, not enough to understand
+4. **Social Proof**: "247 people waiting for this feature" (counter stored in localStorage, increments on click)
+5. **Notify Me**: "Get notified when this launches" button — stores interest (future: email collection)
+6. **Progress Bar**: Visual build progress "70% complete" — shows momentum
+7. **Mystery Reveal Animation**: Feature name characters reveal one by one on scroll, or typewriter effect
+
+### Component: src/components/ComingSoon/FeatureTeaser.jsx
+
+Layout:
+```
+┌──────────────────────────────────────────────────────────┐
+│  ✦ COMING SOON                              Badge pulses │
+├──────────────────────────────────────────────────────────┤
+│                                                          │
+│  ┌────────────────────┐  ┌────────────────────────────┐ │
+│  │                    │  │                            │ │
+│  │   Blurred Preview  │  │  Feature Title (typewriter)│ │
+│  │   Image/Mockup     │  │                            │ │
+│  │   with glass overlay│  │  Short teaser description  │ │
+│  │   "?"  icon center │  │  that hints but doesn't    │ │
+│  │                    │  │  fully reveal               │ │
+│  │                    │  │                            │ │
+│  └────────────────────┘  │  ████████████░░░ 70%       │ │
+│                          │  Launching in 8 days        │ │
+│                          │                            │ │
+│                          │  🔔 Notify Me  [247 waiting]│ │
+│                          │                            │ │
+│                          └────────────────────────────┘ │
+│                                                          │
+│  ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── │
+│  Previously Shipped: ✅ AI Enhancement ✅ 10 Templates  │
+│  ✅ Resume Upload ✅ PDF Export                          │
+└──────────────────────────────────────────────────────────┘
+```
+
+### Data File: src/data/comingSoonData.js
+```javascript
+export const comingSoonFeature = {
+  // CHANGE THIS WHEN MERGING NEW FEATURE
+  title: "Drag & Drop Reordering",
+  teaser: "Rearrange your resume sections with a simple drag. Your story, your order.",
+  fullDescription: "Drag experience, education, projects — any section — to reorder instantly. Mobile-friendly with arrow buttons.",
+  launchDate: "2026-03-23",  // 10 days from now — update each launch
+  progress: 70,               // Build progress percentage
+  icon: "GripVertical",
+  tags: ["UX", "Builder"],
+  blurPreview: true,           // Show blurred mockup
+  // Teaser hints — shown one per day as countdown progresses
+  dailyHints: [
+    "It involves your hands... 🤚",
+    "Think rearrange, not rewrite ↕️",
+    "Top to bottom, bottom to top 🔄",
+  ]
+};
+
+export const shippedFeatures = [
+  { title: "AI Resume Enhancement", icon: "Sparkles", date: "Mar 2026" },
+  { title: "10 Resume Templates", icon: "Layout", date: "Mar 2026" },
+  { title: "Resume Upload & Parsing", icon: "Upload", date: "Mar 2026" },
+  { title: "PDF Export", icon: "Download", date: "Mar 2026" },
+  { title: "Live Preview", icon: "Eye", date: "Mar 2026" },
+];
+
+// Queue of upcoming features (in order of launch)
+export const upcomingQueue = [
+  "Drag & Drop Reordering",
+  "References Page",
+  "GitHub Profile Link",
+  "Multi-Page Support",
+  "PDF Quality Fix",
+  "Watermark & Pro Version",
+  "Job URL Optimizer",
+  "LinkedIn Import",
+  "ATS Score Checker",
+  "Cover Letter Generator",
+];
+```
+
+### Animations & Effects
+1. **Section Entrance**: Fade-in + slide-up on scroll (IntersectionObserver)
+2. **Title**: Typewriter effect — characters appear one by one (CSS animation)
+3. **Blurred Preview**: CSS backdrop-filter: blur(8px) with glass morphism overlay, "?" icon pulsing in center. On hover: blur reduces slightly (blur(4px)) giving a teaser peek
+4. **Progress Bar**: Animates from 0 to current % on scroll into view (CSS transition 2s ease)
+5. **Countdown**: Numbers tick down smoothly, show days + hours
+6. **Notify Button**: Gentle pulse animation, on click shows confetti-like sparkle effect and text changes to "You'll be notified! ✓"
+7. **Interest Counter**: Number increments with a rolling animation when user clicks Notify Me
+8. **Daily Hint**: Fades in as a tooltip/speech bubble, changes based on how many days until launch
+9. **Shipped Features**: Small horizontal scroll row with checkmark badges, subtle slide-in animation
+10. **Floating Navbar Badge**: Small dot on Navbar that pulses, tooltip on hover shows "New feature in X days"
+
+### Notify Me Behavior
+- On click: store in localStorage `{ notified: true, feature: "title" }`
+- Increment a counter in localStorage: `comingSoon_interest_count`
+- Show updated count with +1 animation
+- Button changes to "You'll be notified! ✓" (disabled state)
+- Future: replace with actual email collection
+
+### Countdown Logic
+- Calculate days remaining from `comingSoonFeature.launchDate`
+- Show "Launching in X days" if > 1 day
+- Show "Launching tomorrow!" if 1 day
+- Show "Launching today! 🎉" if 0 days
+- Show "Just Launched! ✅" if past date (then update comingSoonData.js with next feature)
+
+### Responsive Design
+- Desktop: 2-column (preview left, info right)
+- Mobile: single column (info top, preview bottom, smaller)
+- All animations respect `prefers-reduced-motion`
+
+### How To Launch a New Feature (Process)
+1. Merge the feature branch to main
+2. Update `comingSoonData.js`:
+   - Move current feature title to `shippedFeatures` array
+   - Set next feature from `upcomingQueue` as the new `comingSoonFeature`
+   - Update `launchDate` to +10 days
+   - Update `progress`, `teaser`, `hints`
+3. Commit: `"feat: launch [feature name], tease [next feature]"`
+4. Push — Vercel auto-deploys
+
+### Files
+- `src/components/ComingSoon/FeatureTeaser.jsx` — Main teaser section
+- `src/components/ComingSoon/CountdownTimer.jsx` — Days/hours countdown
+- `src/components/ComingSoon/NotifyButton.jsx` — Notify me with interest counter
+- `src/components/ComingSoon/BlurPreview.jsx` — Blurred feature mockup
+- `src/components/ComingSoon/ShippedBadges.jsx` — Previously shipped features row
+- `src/components/ComingSoon/NavbarBadge.jsx` — Floating pulse badge for navbar
+- `src/data/comingSoonData.js` — Feature data (single source of truth)
 
 ---
 
