@@ -22,7 +22,7 @@ const A4Container = forwardRef(function A4Container(
   const innerRef = useRef(null);
 
   const [scale,         setScale]         = useState(1);
-  const [contentHeight, setContentHeight] = useState(A4_H);
+  const [contentHeight, setContentHeight] = useState(0);
 
   // Merge forwarded print ref with internal measurement ref.
   // printRef is a stable useRef object so the empty dep array is safe.
@@ -50,7 +50,7 @@ const A4Container = forwardRef(function A4Container(
     const el = innerRef.current;
     if (!el) return;
     const update = () => {
-      const h = Math.max(el.scrollHeight, A4_H);
+      const h = el.scrollHeight;
       setContentHeight(prev => (prev === h ? prev : h));
     };
     update();
@@ -74,7 +74,6 @@ const A4Container = forwardRef(function A4Container(
         className="print-area absolute top-0 left-0 bg-white"
         style={{
           width: `${A4_W}px`,
-          minHeight: `${A4_H}px`,
           transform: `scale(${scale})`,
           transformOrigin: 'top left',
           overflowX: 'hidden',
