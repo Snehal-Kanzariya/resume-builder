@@ -15,7 +15,7 @@ export const A4_H = 1123;
  *   ref (forwarded) – points at the 794px-wide inner div (for react-to-print).
  */
 const A4Container = forwardRef(function A4Container(
-  { children, contentScale = 1.0, className = '' },
+  { children, contentScale = 1.0, className = '', id },
   printRef,
 ) {
   const wrapRef  = useRef(null);
@@ -63,6 +63,7 @@ const A4Container = forwardRef(function A4Container(
     /* Outer: reserves exactly (contentHeight × scale) px of layout space */
     <div
       ref={wrapRef}
+      id={id}
       className={`w-full relative ${className}`}
       style={{ height: `${contentHeight * scale}px` }}
     >

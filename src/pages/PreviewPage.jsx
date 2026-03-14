@@ -38,7 +38,7 @@ export default function PreviewPage() {
   async function handleDownload() {
     setDownloading(true);
     try {
-      await downloadResumePDF(PRINT_TARGET_ID, filename);
+      await downloadResumePDF('resume-print-area', personalInfo.fullName ?? '');
     } catch (err) {
       console.error('PDF download failed:', err);
     } finally {
@@ -149,7 +149,7 @@ export default function PreviewPage() {
       {/* ── FULL-SCREEN A4 PREVIEW ────────────────────────────────────────────── */}
       <main className="flex-1 overflow-y-auto py-8 px-4">
         <div className="max-w-[860px] mx-auto">
-          <A4Container contentScale={contentScale}>
+          <A4Container id="resume-print-area" contentScale={contentScale}>
             <Suspense fallback={null}>
               <Component />
             </Suspense>

@@ -65,80 +65,101 @@ export async function downloadPDF(element, filename = 'resume.pdf') {
   pdf.save(filename);
 }
 
-// ── ID-based multi-page download ──────────────────────────────────────────────
+// ── ID-based multi-page download (clone approach) ─────────────────────────────
 /**
- * Captures the full resume element (no height clipping), splits it into A4
- * pages, and saves a multi-page PDF.
+ * Clones the A4Container element identified by `elementId`, strips the
+ * preview-fit scale transform so content renders at native 794 px, then
+ * captures with html2canvas and splits into A4 pages.
  *
- * @param {string} elementId – id of the hidden print div
- * @param {string} fileName  – output filename (with or without .pdf)
+ * Using a clone means the live DOM is never mutated and the result always
+ * matches what the user sees — fonts, colours, spacing — exactly.
+ *
+ * @param {string} elementId – id on A4Container's outermost wrapper
+ * @param {string} fileName  – owner's full name (passed to buildFilename)
  */
 export async function downloadResumePDF(elementId, fileName) {
+  // Fonts first — prevents fallback fonts in the captured canvas.
+  await document.fonts.ready;
+
   const element = document.getElementById(elementId);
   if (!element) throw new Error('Resume element not found');
 
-  const html2canvas = (await import('html2canvas')).default;
-  const { jsPDF } = await import('jspdf');
+  const html2canvasLib = (await import('html2canvas')).default;
+  const { jsPDF }      = await import('jspdf');
 
-  // 1. Lift container-level height / overflow constraints.
-  const originalStyle = element.style.cssText;
-  element.style.maxHeight = 'none';
-  element.style.overflow  = 'visible';
-  element.style.height    = 'auto';
+  // 1. Clone to avoid mutating the live preview.
+  const clone = element.cloneNode(true);
 
-  // 2. Every template uses inline overflow:hidden / overflowY:hidden on its
-  //    root and inner column divs (to clip single-page display). Walk the
-  //    entire subtree and temporarily set overflow to visible so html2canvas
-  //    captures the *full* content height for multi-page resumes.
-  const overflowFixes = [];
-  element.querySelectorAll('*').forEach(el => {
-    const s = el.style;
-    if (s.overflow === 'hidden' || s.overflowY === 'hidden' || s.overflowX === 'hidden') {
-      overflowFixes.push({ el, overflow: s.overflow, overflowX: s.overflowX, overflowY: s.overflowY });
-      s.overflow  = 'visible';
-      s.overflowX = 'visible';
-      s.overflowY = 'visible';
+  // 2. Remove preview-only elements (page break indicators, etc.).
+  clone.querySelectorAll('.no-print').forEach(el => el.remove());
+
+  // 3. Reset the outer wrapper: 794 px wide, no transforms, auto height.
+  clone.style.cssText = `
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    width: 794px;
+    height: auto;
+    transform: none;
+    overflow: visible;
+    background: white;
+  `;
+
+  // 4. Strip the preview-fit scale from the inner .print-area div.
+  //    That transform only exists to shrink/expand the template to fit the
+  //    panel width — it must NOT appear in the PDF.
+  const printArea = clone.querySelector('.print-area');
+  if (printArea) {
+    printArea.style.transform      = 'none';
+    printArea.style.position       = 'relative';
+    printArea.style.top            = 'auto';
+    printArea.style.left           = 'auto';
+    printArea.style.overflowX      = 'visible';
+    printArea.style.boxShadow      = 'none';
+  }
+
+  // 5. Lift overflow:hidden on all descendants so multi-page content is captured.
+  clone.querySelectorAll('*').forEach(el => {
+    if (el.style.overflow === 'hidden' || el.style.overflowY === 'hidden') {
+      el.style.overflow  = 'visible';
+      el.style.overflowY = 'visible';
     }
   });
 
-  // 3. Wait for custom fonts before capturing (prevents font fallback in PDF).
-  await document.fonts.ready;
+  document.body.appendChild(clone);
 
-  const canvas = await html2canvas(element, {
-    scale: 2,
-    useCORS: true,
-    logging: false,
+  // 6. Small delay lets the browser apply styles before capture.
+  await new Promise(r => setTimeout(r, 100));
+
+  const canvas = await html2canvasLib(clone, {
+    scale:       2,             // 2× for sharp output
+    useCORS:     true,
+    allowTaint:  true,
     backgroundColor: '#ffffff',
-    windowHeight: element.scrollHeight,
-    height: element.scrollHeight,
-    scrollY: 0,
-    scrollX: 0,
+    logging:     false,
+    width:       794,
+    height:      clone.scrollHeight,
+    windowWidth: 794,
+    scrollX:     0,
+    scrollY:     0,
   });
 
-  // 4. Restore everything.
-  element.style.cssText = originalStyle;
-  overflowFixes.forEach(({ el, overflow, overflowX, overflowY }) => {
-    el.style.overflow  = overflow;
-    el.style.overflowX = overflowX;
-    el.style.overflowY = overflowY;
-  });
+  document.body.removeChild(clone);
 
-  const imgData = canvas.toDataURL('image/png');
-  const pdf = new jsPDF('p', 'mm', 'a4');
-  const pdfWidth  = pdf.internal.pageSize.getWidth();  // 210 mm
-  const pdfHeight = pdf.internal.pageSize.getHeight(); // 297 mm
-
+  // 7. Build multi-page PDF.
+  const imgData   = canvas.toDataURL('image/png');
+  const pdf       = new jsPDF('p', 'mm', 'a4');
+  const pdfWidth  = pdf.internal.pageSize.getWidth();   // 210 mm
+  const pdfHeight = pdf.internal.pageSize.getHeight();  // 297 mm
   const imgWidth  = pdfWidth;
   const imgHeight = (canvas.height * pdfWidth) / canvas.width;
 
   let heightLeft = imgHeight;
   let position   = 0;
 
-  // First page
   pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
   heightLeft -= pdfHeight;
 
-  // Additional pages when content overflows one A4 sheet
   while (heightLeft > 0) {
     position -= pdfHeight;
     pdf.addPage();
@@ -146,7 +167,7 @@ export async function downloadResumePDF(elementId, fileName) {
     heightLeft -= pdfHeight;
   }
 
-  pdf.save(fileName ? fileName.replace(/\.pdf$/i, '') + '.pdf' : 'resume.pdf');
+  pdf.save(buildFilename(fileName));
 }
 
 // ── Helper: derive a filename from the resume owner's name ────────────────────

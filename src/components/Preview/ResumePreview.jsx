@@ -110,8 +110,8 @@ const ResumePreview = forwardRef(function ResumePreview(_props, _externalRef) {
     setDownloading(true);
     try {
       await downloadResumePDF(
-        'resume-print-area-builder',
-        buildFilename(resumeData?.personalInfo?.fullName ?? ''),
+        'resume-print-area',
+        resumeData?.personalInfo?.fullName ?? '',
       );
       toast('PDF downloaded successfully!', 'success');
     } catch (err) {
@@ -300,7 +300,7 @@ const ResumePreview = forwardRef(function ResumePreview(_props, _externalRef) {
             transition: 'width 0.2s ease',
           }}
         >
-          <A4Container contentScale={contentScale}>
+          <A4Container id="resume-print-area" contentScale={contentScale}>
             <Suspense fallback={<TemplateFallback />}>
               <Component />
             </Suspense>
