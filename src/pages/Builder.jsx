@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { PanelRight, PanelLeft, FileText, Columns2, Upload } from 'lucide-react';
+import { PanelRight, PanelLeft, FileText, Columns2, Upload, Target } from 'lucide-react';
 import ResumePreview from '../components/Preview/ResumePreview';
 import { useToast } from '../context/ToastContext';
 import { useResume } from '../context/ResumeContext';
@@ -9,6 +9,7 @@ import Navbar from '../components/Layout/Navbar';
 import Sidebar, { SECTIONS } from '../components/Layout/Sidebar';
 import ResumeUpload from '../components/Upload/ResumeUpload';
 import AIInterviewModal from '../components/Upload/AIInterviewModal';
+import JobOptimizer from '../components/AI/JobOptimizer';
 
 import PersonalInfoForm    from '../components/Forms/PersonalInfoForm';
 import ExperienceForm      from '../components/Forms/ExperienceForm';
@@ -80,8 +81,10 @@ export default function Builder() {
   const [mobileView, setMobileView]       = useState('form');
   const [splitView, setSplitView]         = useState(false);
   const [splitPos, setSplitPos]           = useState(45);
-  const [showUpload, setShowUpload]       = useState(false);
-  const [showInterview, setShowInterview] = useState(false);
+  const [showUpload,     setShowUpload]     = useState(false);
+  const [showInterview,  setShowInterview]  = useState(false);
+  const [showOptimizer,  setShowOptimizer]  = useState(false);
+  const [jobMatchScore,  setJobMatchScore]  = useState(null);
   const [parsedResume, setParsedResume]   = useState(null);
   const isDragging   = useRef(false);
   const containerRef = useRef(null);
@@ -206,6 +209,8 @@ export default function Builder() {
             onSectionChange={setActiveSection}
             onImportResume={() => setShowUpload(true)}
             onAddCustomSection={handleAddCustomSection}
+            onOpenOptimizer={() => setShowOptimizer(true)}
+            jobMatchScore={jobMatchScore}
           />
         </div>
 
@@ -241,6 +246,16 @@ export default function Builder() {
               >
                 <Upload size={13} />
                 Import Resume
+              </button>
+
+              {/* Optimize for Job */}
+              <button
+                onClick={() => setShowOptimizer(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-950/60 transition-colors"
+                title="Analyze resume against a job description"
+              >
+                <Target size={13} />
+                Optimize for Job
               </button>
 
               {/* Split view toggle */}
@@ -371,6 +386,14 @@ export default function Builder() {
           onUpdate={handleInterviewUpdate}
           onClose={handleInterviewClose}
           onViewPreview={handleInterviewViewPreview}
+        />
+      )}
+
+      {/* Job Optimizer modal */}
+      {showOptimizer && (
+        <JobOptimizer
+          onClose={() => setShowOptimizer(false)}
+          onScoreUpdate={setJobMatchScore}
         />
       )}
     </div>

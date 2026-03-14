@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { User, Briefcase, GraduationCap, Code2, FolderOpen, Award, ChevronRight, RotateCcw, FlaskConical, Upload, Plus, LayoutTemplate } from 'lucide-react';
+import { User, Briefcase, GraduationCap, Code2, FolderOpen, Award, ChevronRight, RotateCcw, FlaskConical, Upload, Plus, LayoutTemplate, Target } from 'lucide-react';
 import { useResume } from '../../context/ResumeContext';
 import { useToast } from '../../context/ToastContext';
 import { sampleData } from '../../data/sampleData';
@@ -22,7 +22,7 @@ function completionDot(resumeData, section) {
   return (resumeData?.[section.dataKey]?.length ?? 0) > 0;
 }
 
-export default function Sidebar({ activeSection, onSectionChange, onImportResume, onAddCustomSection }) {
+export default function Sidebar({ activeSection, onSectionChange, onImportResume, onAddCustomSection, onOpenOptimizer, jobMatchScore }) {
   const { resumeData, resetResume, loadSampleData, reorderCustomSections } = useResume();
   const customSections = resumeData?.customSections || [];
   const toast = useToast();
@@ -158,6 +158,28 @@ export default function Sidebar({ activeSection, onSectionChange, onImportResume
           <span className="inline-block w-1.5 h-1.5 bg-emerald-400 rounded-full mr-1 align-middle" />
           Green dot = section has data
         </div>
+
+        {/* Job Match / Optimizer */}
+        {onOpenOptimizer && (
+          <button
+            onClick={onOpenOptimizer}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 hover:bg-emerald-100 dark:hover:bg-emerald-950/50 transition-colors w-full border border-emerald-200 dark:border-emerald-800"
+          >
+            <Target size={13} />
+            <span className="flex-1 text-left">Job Match</span>
+            {jobMatchScore != null && (
+              <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
+                jobMatchScore >= 70
+                  ? 'bg-emerald-200 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300'
+                  : jobMatchScore >= 50
+                    ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/60 dark:text-amber-300'
+                    : 'bg-red-100 text-red-600 dark:bg-red-900/50 dark:text-red-400'
+              }`}>
+                {jobMatchScore}%
+              </span>
+            )}
+          </button>
+        )}
 
         {/* Load Sample Data */}
         <button
