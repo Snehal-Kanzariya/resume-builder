@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { User, Briefcase, GraduationCap, Code2, FolderOpen, Award, ChevronRight, RotateCcw, FlaskConical, Upload, Plus, LayoutTemplate } from 'lucide-react';
+import { User, Briefcase, GraduationCap, Code2, FolderOpen, Award, ChevronRight, RotateCcw, FlaskConical, Upload, Plus, LayoutTemplate, BarChart3 } from 'lucide-react';
 import { useResume } from '../../context/ResumeContext';
 import { useToast } from '../../context/ToastContext';
 import { sampleData } from '../../data/sampleData';
@@ -22,7 +22,7 @@ function completionDot(resumeData, section) {
   return (resumeData?.[section.dataKey]?.length ?? 0) > 0;
 }
 
-export default function Sidebar({ activeSection, onSectionChange, onImportResume, onAddCustomSection }) {
+export default function Sidebar({ activeSection, onSectionChange, onImportResume, onAddCustomSection, onOpenATS, atsScore }) {
   const { resumeData, resetResume, loadSampleData, reorderCustomSections } = useResume();
   const customSections = resumeData?.customSections || [];
   const toast = useToast();
@@ -158,6 +158,28 @@ export default function Sidebar({ activeSection, onSectionChange, onImportResume
           <span className="inline-block w-1.5 h-1.5 bg-emerald-400 rounded-full mr-1 align-middle" />
           Green dot = section has data
         </div>
+
+        {/* ATS Score */}
+        {onOpenATS && (
+          <button
+            onClick={onOpenATS}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30 hover:bg-blue-100 dark:hover:bg-blue-950/50 transition-colors w-full border border-blue-200 dark:border-blue-800"
+          >
+            <BarChart3 size={13} />
+            <span className="flex-1 text-left">ATS Score</span>
+            {atsScore != null && (
+              <span className={`text-[10px] font-bold w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${
+                atsScore >= 80
+                  ? 'bg-emerald-500 text-white'
+                  : atsScore >= 60
+                    ? 'bg-amber-500 text-white'
+                    : 'bg-red-500 text-white'
+              }`}>
+                {atsScore}
+              </span>
+            )}
+          </button>
+        )}
 
         {/* Load Sample Data */}
         <button

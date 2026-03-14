@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { PanelRight, PanelLeft, FileText, Columns2, Upload } from 'lucide-react';
+import { PanelRight, PanelLeft, FileText, Columns2, Upload, BarChart3 } from 'lucide-react';
 import ResumePreview from '../components/Preview/ResumePreview';
 import { useToast } from '../context/ToastContext';
 import { useResume } from '../context/ResumeContext';
@@ -18,6 +18,8 @@ import ProjectsForm        from '../components/Forms/ProjectsForm';
 import CertificationsForm  from '../components/Forms/CertificationsForm';
 import CustomSectionForm   from '../components/Forms/CustomSectionForm';
 import AISuggestions       from '../components/AI/AISuggestions';
+import ATSPanel            from '../components/AI/ATSPanel';
+import { checkATSScore }  from '../utils/atsChecker';
 
 const FORM_MAP = {
   personal:       <PersonalInfoForm />,
@@ -80,8 +82,10 @@ export default function Builder() {
   const [mobileView, setMobileView]       = useState('form');
   const [splitView, setSplitView]         = useState(false);
   const [splitPos, setSplitPos]           = useState(45);
-  const [showUpload, setShowUpload]       = useState(false);
+  const [showUpload,    setShowUpload]    = useState(false);
   const [showInterview, setShowInterview] = useState(false);
+  const [showATS,       setShowATS]       = useState(false);
+  const [atsScore,      setAtsScore]      = useState(null);
   const [parsedResume, setParsedResume]   = useState(null);
   const isDragging   = useRef(false);
   const containerRef = useRef(null);
@@ -206,6 +210,8 @@ export default function Builder() {
             onSectionChange={setActiveSection}
             onImportResume={() => setShowUpload(true)}
             onAddCustomSection={handleAddCustomSection}
+            onOpenATS={() => { setShowATS(true); setAtsScore(checkATSScore(resumeData).score); }}
+            atsScore={atsScore}
           />
         </div>
 
@@ -241,6 +247,16 @@ export default function Builder() {
               >
                 <Upload size={13} />
                 Import Resume
+              </button>
+
+              {/* ATS Score */}
+              <button
+                onClick={() => { setShowATS(true); setAtsScore(checkATSScore(resumeData).score); }}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-300 dark:hover:border-blue-700 transition-colors"
+                title="Check ATS compatibility score"
+              >
+                <BarChart3 size={13} />
+                ATS Score
               </button>
 
               {/* Split view toggle */}
@@ -373,6 +389,9 @@ export default function Builder() {
           onViewPreview={handleInterviewViewPreview}
         />
       )}
+
+      {/* ATS Score panel */}
+      {showATS && <ATSPanel onClose={() => setShowATS(false)} />}
     </div>
   );
 }
