@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { User, Briefcase, GraduationCap, Code2, FolderOpen, Award, ChevronRight, RotateCcw, FlaskConical, Upload, Plus, LayoutTemplate } from 'lucide-react';
+import { User, Briefcase, GraduationCap, Code2, FolderOpen, Award, Users, ChevronRight, RotateCcw, FlaskConical, Upload, Plus, LayoutTemplate } from 'lucide-react';
 import { useResume } from '../../context/ResumeContext';
 import { useToast } from '../../context/ToastContext';
 import { sampleData } from '../../data/sampleData';
@@ -11,6 +11,7 @@ export const SECTIONS = [
   { id: 'skills',         label: 'Skills',           icon: Code2,         dataKey: 'skills' },
   { id: 'projects',       label: 'Projects',         icon: FolderOpen,    dataKey: 'projects' },
   { id: 'certifications', label: 'Certifications',   icon: Award,         dataKey: 'certifications' },
+  { id: 'references',     label: 'References',       icon: Users,         dataKey: 'references' },
 ];
 
 function completionDot(resumeData, section) {

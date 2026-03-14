@@ -65,6 +65,66 @@ export async function downloadPDF(element, filename = 'resume.pdf') {
   pdf.save(filename);
 }
 
+// ── Shared: capture a full-height element as canvas ───────────────────────────
+async function captureElement(element, html2canvasLib) {
+  const originalStyle = element.style.cssText;
+  element.style.maxHeight = 'none';
+  element.style.overflow  = 'visible';
+  element.style.height    = 'auto';
+
+  const overflowFixes = [];
+  element.querySelectorAll('*').forEach(el => {
+    const s = el.style;
+    if (s.overflow === 'hidden' || s.overflowY === 'hidden' || s.overflowX === 'hidden') {
+      overflowFixes.push({ el, overflow: s.overflow, overflowX: s.overflowX, overflowY: s.overflowY });
+      s.overflow  = 'visible';
+      s.overflowX = 'visible';
+      s.overflowY = 'visible';
+    }
+  });
+
+  const canvas = await html2canvasLib(element, {
+    scale: 2,
+    useCORS: true,
+    logging: false,
+    backgroundColor: '#ffffff',
+    windowHeight: element.scrollHeight,
+    height: element.scrollHeight,
+    scrollY: 0,
+    scrollX: 0,
+  });
+
+  element.style.cssText = originalStyle;
+  overflowFixes.forEach(({ el, overflow, overflowX, overflowY }) => {
+    el.style.overflow  = overflow;
+    el.style.overflowX = overflowX;
+    el.style.overflowY = overflowY;
+  });
+
+  return canvas;
+}
+
+// ── Shared: add a canvas as multi-page content in an existing jsPDF ───────────
+function addCanvasToPDF(pdf, canvas, pdfWidth, pdfHeight, isFirstPage = true) {
+  const imgData   = canvas.toDataURL('image/png');
+  const imgWidth  = pdfWidth;
+  const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+
+  let heightLeft = imgHeight;
+  let position   = 0;
+
+  if (!isFirstPage) pdf.addPage();
+  pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+  heightLeft -= pdfHeight;
+
+  while (heightLeft > 0) {
+    position -= pdfHeight;
+    pdf.addPage();
+    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+    heightLeft -= pdfHeight;
+  }
+}
+
 // ── ID-based multi-page download ──────────────────────────────────────────────
 /**
  * Captures the full resume element (no height clipping), splits it into A4
@@ -77,74 +137,56 @@ export async function downloadResumePDF(elementId, fileName) {
   const element = document.getElementById(elementId);
   if (!element) throw new Error('Resume element not found');
 
-  const html2canvas = (await import('html2canvas')).default;
+  const html2canvasLib = (await import('html2canvas')).default;
   const { jsPDF } = await import('jspdf');
 
-  // 1. Lift container-level height / overflow constraints.
-  const originalStyle = element.style.cssText;
-  element.style.maxHeight = 'none';
-  element.style.overflow  = 'visible';
-  element.style.height    = 'auto';
-
-  // 2. Every template uses inline overflow:hidden / overflowY:hidden on its
-  //    root and inner column divs (to clip single-page display). Walk the
-  //    entire subtree and temporarily set overflow to visible so html2canvas
-  //    captures the *full* content height for multi-page resumes.
-  const overflowFixes = [];
-  element.querySelectorAll('*').forEach(el => {
-    const s = el.style;
-    if (s.overflow === 'hidden' || s.overflowY === 'hidden' || s.overflowX === 'hidden') {
-      overflowFixes.push({ el, overflow: s.overflow, overflowX: s.overflowX, overflowY: s.overflowY });
-      s.overflow  = 'visible';
-      s.overflowX = 'visible';
-      s.overflowY = 'visible';
-    }
-  });
-
-  // 3. Wait for custom fonts before capturing (prevents font fallback in PDF).
   await document.fonts.ready;
 
-  const canvas = await html2canvas(element, {
-    scale: 2,
-    useCORS: true,
-    logging: false,
-    backgroundColor: '#ffffff',
-    windowHeight: element.scrollHeight,
-    height: element.scrollHeight,
-    scrollY: 0,
-    scrollX: 0,
-  });
+  const canvas = await captureElement(element, html2canvasLib);
 
-  // 4. Restore everything.
-  element.style.cssText = originalStyle;
-  overflowFixes.forEach(({ el, overflow, overflowX, overflowY }) => {
-    el.style.overflow  = overflow;
-    el.style.overflowX = overflowX;
-    el.style.overflowY = overflowY;
-  });
+  const pdf       = new jsPDF('p', 'mm', 'a4');
+  const pdfWidth  = pdf.internal.pageSize.getWidth();
+  const pdfHeight = pdf.internal.pageSize.getHeight();
 
-  const imgData = canvas.toDataURL('image/png');
-  const pdf = new jsPDF('p', 'mm', 'a4');
-  const pdfWidth  = pdf.internal.pageSize.getWidth();  // 210 mm
-  const pdfHeight = pdf.internal.pageSize.getHeight(); // 297 mm
+  addCanvasToPDF(pdf, canvas, pdfWidth, pdfHeight, true);
 
-  const imgWidth  = pdfWidth;
-  const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+  pdf.save(fileName ? fileName.replace(/\.pdf$/i, '') + '.pdf' : 'resume.pdf');
+}
 
-  let heightLeft = imgHeight;
-  let position   = 0;
+// ── ID-based download with separate references page ───────────────────────────
+/**
+ * Captures resume + references elements separately, combines them into one PDF.
+ * References always start on a fresh page after the resume pages.
+ *
+ * @param {string} resumeElementId – id of the hidden resume print div
+ * @param {string} refsElementId   – id of the hidden references print div
+ * @param {string} fileName        – output filename (with or without .pdf)
+ */
+export async function downloadResumePDFWithRefs(resumeElementId, refsElementId, fileName) {
+  const resumeEl = document.getElementById(resumeElementId);
+  const refsEl   = document.getElementById(refsElementId);
+  if (!resumeEl) throw new Error('Resume element not found');
+  if (!refsEl)   throw new Error('References element not found');
 
-  // First page
-  pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-  heightLeft -= pdfHeight;
+  const html2canvasLib = (await import('html2canvas')).default;
+  const { jsPDF } = await import('jspdf');
 
-  // Additional pages when content overflows one A4 sheet
-  while (heightLeft > 0) {
-    position -= pdfHeight;
-    pdf.addPage();
-    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-    heightLeft -= pdfHeight;
-  }
+  await document.fonts.ready;
+
+  const [resumeCanvas, refsCanvas] = await Promise.all([
+    captureElement(resumeEl, html2canvasLib),
+    captureElement(refsEl,   html2canvasLib),
+  ]);
+
+  const pdf       = new jsPDF('p', 'mm', 'a4');
+  const pdfWidth  = pdf.internal.pageSize.getWidth();
+  const pdfHeight = pdf.internal.pageSize.getHeight();
+
+  // Resume pages (first page already added by jsPDF constructor)
+  addCanvasToPDF(pdf, resumeCanvas, pdfWidth, pdfHeight, true);
+
+  // References page — always starts on a clean new page
+  addCanvasToPDF(pdf, refsCanvas, pdfWidth, pdfHeight, false);
 
   pdf.save(fileName ? fileName.replace(/\.pdf$/i, '') + '.pdf' : 'resume.pdf');
 }

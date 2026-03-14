@@ -6,7 +6,8 @@ import {
   LayoutTemplate, Palette,
 } from 'lucide-react';
 import { useResume } from '../context/ResumeContext';
-import { downloadResumePDF, buildFilename, PRINT_PAGE_STYLE } from '../utils/pdfExport';
+import { downloadResumePDF, downloadResumePDFWithRefs, buildFilename, PRINT_PAGE_STYLE } from '../utils/pdfExport';
+import ReferencesPageTemplate from '../components/Templates/ReferencesPageTemplate';
 import A4Container from '../components/Preview/A4Container';
 import { TEMPLATES, FONT_SCALES } from '../components/Preview/ResumePreview';
 
@@ -28,6 +29,7 @@ export default function PreviewPage() {
   const { Component } = TEMPLATES.find(t => t.id === selectedTemplate) ?? TEMPLATES[0];
   const contentScale  = FONT_SCALES[fontSize] ?? 1.0;
   const filename      = buildFilename(personalInfo.fullName ?? '');
+  const showRefs = resumeData?.settings?.showReferences && (resumeData?.references?.length ?? 0) > 0;
 
   const handlePrint = useReactToPrint({
     contentRef: printContentRef,
@@ -38,7 +40,11 @@ export default function PreviewPage() {
   async function handleDownload() {
     setDownloading(true);
     try {
-      await downloadResumePDF(PRINT_TARGET_ID, filename);
+      if (showRefs) {
+        await downloadResumePDFWithRefs(PRINT_TARGET_ID, 'references-print-area-preview', filename);
+      } else {
+        await downloadResumePDF(PRINT_TARGET_ID, filename);
+      }
     } catch (err) {
       console.error('PDF download failed:', err);
     } finally {
@@ -86,7 +92,7 @@ export default function PreviewPage() {
         >
           {isDownloading
             ? <><Loader2 size={15} className="animate-spin" /><span className="hidden sm:inline">Generating…</span></>
-            : <><Download size={15} /><span className="hidden sm:inline">Download PDF</span></>
+            : <><Download size={15} /><span className="hidden sm:inline">{showRefs ? 'Download Resume + References' : 'Download PDF'}</span></>
           }
         </button>
       </header>
@@ -154,6 +160,23 @@ export default function PreviewPage() {
               <Component />
             </Suspense>
           </A4Container>
+
+          {showRefs && (
+            <>
+              {/* Page break indicator */}
+              <div className="flex items-center gap-3 my-4">
+                <div className="flex-1 border-t-2 border-dashed border-slate-300 dark:border-slate-600" />
+                <span className="text-[11px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500 flex-shrink-0">
+                  Page Break — References
+                </span>
+                <div className="flex-1 border-t-2 border-dashed border-slate-300 dark:border-slate-600" />
+              </div>
+
+              <A4Container contentScale={contentScale}>
+                <ReferencesPageTemplate />
+              </A4Container>
+            </>
+          )}
         </div>
       </main>
 
@@ -172,6 +195,21 @@ export default function PreviewPage() {
           </Suspense>
         </div>
       </div>
+
+      {/* Hidden references print target */}
+      {showRefs && (
+        <div
+          style={{ position: 'fixed', left: '-9999px', top: 0, width: '794px', zIndex: -1 }}
+          aria-hidden="true"
+        >
+          <div
+            id="references-print-area-preview"
+            style={{ width: '794px', minHeight: '1123px', backgroundColor: '#ffffff' }}
+          >
+            <ReferencesPageTemplate />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

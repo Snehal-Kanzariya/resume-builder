@@ -11,6 +11,8 @@ import { sampleData } from '../../data/sampleData';
 import { downloadResumePDF, buildFilename, PRINT_PAGE_STYLE } from '../../utils/pdfExport';
 import AICompareView from '../AI/AICompareView';
 import A4Container from './A4Container';
+import ReferencesPageTemplate from '../Templates/ReferencesPageTemplate';
+import { downloadResumePDFWithRefs } from '../../utils/pdfExport';
 
 // Lazy-load all 10 templates to split the main bundle
 const ModernTemplate       = lazy(() => import('../Templates/ModernTemplate'));
@@ -97,6 +99,7 @@ const ResumePreview = forwardRef(function ResumePreview(_props, _externalRef) {
 
   const { Component } = TEMPLATES.find(t => t.id === selectedTemplate) ?? TEMPLATES[0];
   const contentScale  = FONT_SCALES[fontSize] ?? 1.0;
+  const showRefs = resumeData?.settings?.showReferences && (resumeData?.references?.length ?? 0) > 0;
 
   // ── react-to-print (primary — selectable text, exact colours) ────────────
   const handlePrint = useReactToPrint({
@@ -109,10 +112,16 @@ const ResumePreview = forwardRef(function ResumePreview(_props, _externalRef) {
   async function handleDownload() {
     setDownloading(true);
     try {
-      await downloadResumePDF(
-        'resume-print-area-builder',
-        buildFilename(resumeData?.personalInfo?.fullName ?? ''),
-      );
+      const filename = buildFilename(resumeData?.personalInfo?.fullName ?? '');
+      if (showRefs) {
+        await downloadResumePDFWithRefs(
+          'resume-print-area-builder',
+          'references-print-area-builder',
+          filename,
+        );
+      } else {
+        await downloadResumePDF('resume-print-area-builder', filename);
+      }
       toast('PDF downloaded successfully!', 'success');
     } catch (err) {
       console.error('PDF export failed:', err);
@@ -254,7 +263,7 @@ const ResumePreview = forwardRef(function ResumePreview(_props, _externalRef) {
           >
             {isDownloading
               ? <><Loader2 size={13} className="animate-spin" /> Generating…</>
-              : <><Download size={13} /> Download PDF</>
+              : <><Download size={13} /> {showRefs ? 'Download Resume + References' : 'Download PDF'}</>
             }
           </button>
         </div>
@@ -305,6 +314,23 @@ const ResumePreview = forwardRef(function ResumePreview(_props, _externalRef) {
               <Component />
             </Suspense>
           </A4Container>
+
+          {showRefs && (
+            <>
+              {/* Page break indicator */}
+              <div className="flex items-center gap-3 my-3 px-2">
+                <div className="flex-1 border-t-2 border-dashed border-slate-300 dark:border-slate-600" />
+                <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500 flex-shrink-0">
+                  Page Break — References
+                </span>
+                <div className="flex-1 border-t-2 border-dashed border-slate-300 dark:border-slate-600" />
+              </div>
+
+              <A4Container contentScale={contentScale}>
+                <ReferencesPageTemplate />
+              </A4Container>
+            </>
+          )}
         </div>
       </div>
 
@@ -325,6 +351,21 @@ const ResumePreview = forwardRef(function ResumePreview(_props, _externalRef) {
           </Suspense>
         </div>
       </div>
+
+      {/* ── HIDDEN REFERENCES PRINT TARGET ──────────────────────────────────── */}
+      {showRefs && (
+        <div
+          style={{ position: 'fixed', left: '-9999px', top: 0, width: '794px', zIndex: -1 }}
+          aria-hidden="true"
+        >
+          <div
+            id="references-print-area-builder"
+            style={{ width: '794px', minHeight: '1123px', backgroundColor: '#ffffff' }}
+          >
+            <ReferencesPageTemplate />
+          </div>
+        </div>
+      )}
 
       {/* ── AI COMPARE MODAL ─────────────────────────────────────────────────── */}
       {showCompare && aiResumeData && (

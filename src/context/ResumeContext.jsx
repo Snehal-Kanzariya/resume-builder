@@ -22,12 +22,14 @@ const initialResumeData = {
   projects: [],
   certifications: [],
   customSections: [],
+  references: [],
 
   settings: {
     selectedTemplate: 'modern',
     accentColor: '#03153a',
     fontSize: 'medium',
     sectionOrder: ['experience', 'education', 'skills', 'projects', 'certifications'],
+    showReferences: false,
   },
 };
 
@@ -45,6 +47,7 @@ export function ResumeProvider({ children }) {
         personalInfo: { ...initialResumeData.personalInfo, ...(parsed.personalInfo || {}) },
         settings: { ...initialResumeData.settings, ...(parsed.settings || {}) },
         customSections: parsed.customSections || [],
+      references: parsed.references || [],
       };
     } catch {
       return initialResumeData;
@@ -285,6 +288,46 @@ export function ResumeProvider({ children }) {
         c.id === id ? { ...c, [field]: value } : c
       ),
     }));
+  }, []);
+
+  // ── References ───────────────────────────────────────────────────────────────
+  const addReference = useCallback(() => {
+    setResumeData(prev => ({
+      ...prev,
+      references: [
+        ...(prev.references || []),
+        {
+          id: generateId(),
+          name: '',
+          title: '',
+          company: '',
+          phone: '',
+          email: '',
+          relationship: '',
+          note: '',
+        },
+      ],
+    }));
+  }, []);
+
+  const removeReference = useCallback((id) => {
+    setResumeData(prev => ({
+      ...prev,
+      references: (prev.references || []).filter(r => r.id !== id),
+    }));
+  }, []);
+
+  const updateReference = useCallback((id, field, value) => {
+    setResumeData(prev => ({
+      ...prev,
+      references: (prev.references || []).map(r =>
+        r.id === id ? { ...r, [field]: value } : r
+      ),
+    }));
+  }, []);
+
+  const reorderReferences = useCallback((from, to) => {
+    setResumeData(prev => ({ ...prev, references: reorderArray(prev.references || [], from, to) }));
   }, []);
 
   // ── Reorder helpers ──────────────────────────────────────────────────────────
@@ -556,6 +599,12 @@ export function ResumeProvider({ children }) {
     addCertification,
     removeCertification,
     updateCertification,
+
+    // References
+    addReference,
+    removeReference,
+    updateReference,
+    reorderReferences,
 
     // Settings
     updateSettings,
