@@ -1,9 +1,10 @@
 import { useState, useRef, useCallback } from 'react';
-import { Upload, FileText, FileType2, AlertCircle, X, CheckCircle, Sparkles, PenLine } from 'lucide-react';
+import { Upload, FileText, FileType2, AlertCircle, X, CheckCircle, Sparkles, PenLine, Linkedin } from 'lucide-react';
 import { extractTextFromPDF } from '../../utils/pdfParser';
 import { extractTextFromDOCX } from '../../utils/docxParser';
 import { parseResumeText, hasApiKey } from '../../utils/resumeParser';
 import ResumeParsingStatus from './ResumeParsingStatus';
+import LinkedInImport from './LinkedInImport';
 
 const MAX_SIZE_MB = 5;
 const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
@@ -36,6 +37,7 @@ function buildSummary(parsed) {
 // onGoToBuilder(parsed) — user wants to go straight to builder
 // onEnhanceWithAI(parsed) — user wants AI interview first
 export default function ResumeUpload({ onGoToBuilder, onEnhanceWithAI, onClose }) {
+  const [activeTab, setActiveTab]   = useState('file');  // 'file' | 'linkedin'
   const [status, setStatus]         = useState('idle');
   const [error, setError]           = useState('');
   const [dragOver, setDragOver]     = useState(false);
@@ -112,15 +114,47 @@ export default function ResumeUpload({ onGoToBuilder, onEnhanceWithAI, onClose }
       )}
 
       <div className="p-6">
-        <div className="flex items-center gap-3 mb-5">
+        <div className="flex items-center gap-3 mb-4">
           <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-950 flex items-center justify-center">
             <Upload size={20} className="text-blue-600 dark:text-blue-400" />
           </div>
           <div>
-            <h3 className="font-bold text-slate-800 dark:text-slate-100 text-base">Upload Your Resume</h3>
-            <p className="text-slate-500 dark:text-slate-400 text-xs">AI will extract and fill your forms automatically</p>
+            <h3 className="font-bold text-slate-800 dark:text-slate-100 text-base">Import Your Resume</h3>
+            <p className="text-slate-500 dark:text-slate-400 text-xs">Upload a file or import from LinkedIn</p>
           </div>
         </div>
+
+        {/* Tab bar */}
+        <div className="flex rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden mb-5 text-xs font-semibold">
+          <button
+            onClick={() => setActiveTab('file')}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2 transition-colors ${
+              activeTab === 'file'
+                ? 'bg-blue-600 text-white'
+                : 'bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700'
+            }`}
+          >
+            <FileText size={13} /> Upload File
+          </button>
+          <button
+            onClick={() => setActiveTab('linkedin')}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2 border-l border-slate-200 dark:border-slate-700 transition-colors ${
+              activeTab === 'linkedin'
+                ? 'bg-blue-600 text-white'
+                : 'bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700'
+            }`}
+          >
+            <Linkedin size={13} /> LinkedIn Import
+          </button>
+        </div>
+
+        {/* LinkedIn tab */}
+        {activeTab === 'linkedin' && (
+          <LinkedInImport onSuccess={data => onGoToBuilder?.(data)} />
+        )}
+
+        {/* File upload tab — everything below is the original file upload UI */}
+        {activeTab === 'file' && (<>
 
         {/* No API key warning */}
         {noKey && (
@@ -272,6 +306,7 @@ export default function ResumeUpload({ onGoToBuilder, onEnhanceWithAI, onClose }
             Try again
           </button>
         )}
+        </>)}
       </div>
     </div>
   );
