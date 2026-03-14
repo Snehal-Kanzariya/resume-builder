@@ -4,8 +4,9 @@ import { ThemeProvider } from './context/ThemeContext';
 import { ToastProvider } from './context/ToastContext';
 import Home          from './pages/Home';
 import Builder       from './pages/Builder';
-import TemplatesPage from './pages/TemplatesPage';
-import PreviewPage   from './pages/PreviewPage';
+import TemplatesPage   from './pages/TemplatesPage';
+import PreviewPage     from './pages/PreviewPage';
+import CoverLetterPage from './pages/CoverLetterPage';
 
 export default function App() {
   return (
@@ -14,10 +15,11 @@ export default function App() {
         <BrowserRouter>
           <ResumeProvider>
             <Routes>
-              <Route path="/"          element={<Home />} />
-              <Route path="/builder"   element={<Builder />} />
-              <Route path="/templates" element={<TemplatesPage />} />
-              <Route path="/preview"   element={<PreviewPage />} />
+              <Route path="/"             element={<Home />} />
+              <Route path="/builder"      element={<Builder />} />
+              <Route path="/templates"    element={<TemplatesPage />} />
+              <Route path="/preview"      element={<PreviewPage />} />
+              <Route path="/cover-letter" element={<CoverLetterPage />} />
             </Routes>
           </ResumeProvider>
         </BrowserRouter>

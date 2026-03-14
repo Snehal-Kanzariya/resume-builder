@@ -4,9 +4,10 @@ import { FileText, Download, LayoutTemplate, Eye, Sun, Moon, Menu, X } from 'luc
 import { useTheme } from '../../context/ThemeContext';
 
 const navLinks = [
-  { to: '/',          label: 'Home' },
-  { to: '/templates', label: 'Templates', icon: LayoutTemplate },
-  { to: '/preview',   label: 'Preview',   icon: Eye },
+  { to: '/',             label: 'Home' },
+  { to: '/templates',    label: 'Templates',   icon: LayoutTemplate },
+  { to: '/cover-letter', label: 'Cover Letter', icon: FileText },
+  { to: '/preview',      label: 'Preview',      icon: Eye },
 ];
 
 export default function Navbar() {
