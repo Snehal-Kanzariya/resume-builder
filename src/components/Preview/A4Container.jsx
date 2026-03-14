@@ -10,12 +10,13 @@ export const A4_H = 1123;
  * overflows, and the outer wrapper height is updated to match.
  *
  * Props:
- *   contentScale  – multiply all template content (font-size effect). Default 1.0.
- *   className     – extra classes on the outer wrapper.
- *   ref (forwarded) – points at the 794px-wide inner div (for react-to-print).
+ *   contentScale     – multiply all template content (font-size effect). Default 1.0.
+ *   className        – extra classes on the outer wrapper.
+ *   onContentHeight  – callback(pixels) fired whenever the inner content height changes.
+ *   ref (forwarded)  – points at the 794px-wide inner div (for react-to-print).
  */
 const A4Container = forwardRef(function A4Container(
-  { children, contentScale = 1.0, className = '' },
+  { children, contentScale = 1.0, className = '', onContentHeight },
   printRef,
 ) {
   const wrapRef  = useRef(null);
@@ -25,7 +26,6 @@ const A4Container = forwardRef(function A4Container(
   const [contentHeight, setContentHeight] = useState(0);
 
   // Merge forwarded print ref with internal measurement ref.
-  // printRef is a stable useRef object so the empty dep array is safe.
   const setInnerRefs = useCallback((el) => {
     innerRef.current = el;
     if (!printRef) return;
@@ -33,7 +33,7 @@ const A4Container = forwardRef(function A4Container(
     else printRef.current = el;
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Scale = container width / A4_W (unchanged)
+  // Scale = container width / A4_W
   useEffect(() => {
     const el = wrapRef.current;
     if (!el) return;
@@ -44,8 +44,7 @@ const A4Container = forwardRef(function A4Container(
     return () => ro.disconnect();
   }, []);
 
-  // Track the inner box's actual rendered height so the outer wrapper always
-  // reserves the correct amount of space for the scaled content.
+  // Track inner box height so the outer wrapper reserves correct space.
   useEffect(() => {
     const el = innerRef.current;
     if (!el) return;
@@ -59,6 +58,19 @@ const A4Container = forwardRef(function A4Container(
     return () => ro.disconnect();
   }, []);
 
+  // Notify parent of content height changes.
+  // onContentHeight intentionally omitted from deps — callers pass stable setters.
+  useEffect(() => {
+    if (onContentHeight) onContentHeight(contentHeight);
+  }, [contentHeight]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Page break indicator positions (only for pages that actually have content).
+  const pageBreakPositions = [];
+  for (let n = 1; n <= 5; n++) {
+    if (contentHeight > n * A4_H) pageBreakPositions.push(n * A4_H);
+    else break;
+  }
+
   return (
     /* Outer: reserves exactly (contentHeight × scale) px of layout space */
     <div
@@ -66,9 +78,7 @@ const A4Container = forwardRef(function A4Container(
       className={`w-full relative ${className}`}
       style={{ height: `${contentHeight * scale}px` }}
     >
-      {/* A4 box — 794px wide, min-height 1 page, grows with content.
-          overflow-x:hidden prevents the font-scale trick from bleeding
-          horizontally; vertical overflow is intentionally unrestricted. */}
+      {/* A4 box — 794px wide, grows with content. */}
       <div
         ref={setInnerRefs}
         className="print-area absolute top-0 left-0 bg-white"
@@ -80,10 +90,7 @@ const A4Container = forwardRef(function A4Container(
           boxShadow: '0 2px 24px rgba(0,0,0,0.13)',
         }}
       >
-        {/* Content scaler — applies font-size multiplier.
-            Width is widened by 1/contentScale then visually scaled back,
-            making everything appear at contentScale × normal size.
-            Horizontal clip prevents the wider layout box from bleeding out. */}
+        {/* Content scaler — applies font-size multiplier. */}
         <div
           style={{
             width: `${100 / contentScale}%`,
@@ -94,6 +101,51 @@ const A4Container = forwardRef(function A4Container(
         >
           {children}
         </div>
+
+        {/* ── Page break indicators (preview-only, hidden in PDF via no-print) ── */}
+        {pageBreakPositions.map(pos => (
+          <div
+            key={pos}
+            className="no-print"
+            style={{
+              position: 'absolute',
+              top: `${pos}px`,
+              left: 0,
+              width: '100%',
+              pointerEvents: 'none',
+              zIndex: 10,
+            }}
+          >
+            {/* Dashed rule */}
+            <div style={{ position: 'relative', height: 0 }}>
+              <div style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                borderTop: '2px dashed #cbd5e1',
+              }} />
+              {/* Page label pill */}
+              <div style={{
+                position: 'absolute',
+                top: '-9px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                background: '#f8fafc',
+                border: '1px solid #e2e8f0',
+                color: '#94a3b8',
+                fontSize: '9px',
+                fontWeight: '700',
+                letterSpacing: '0.8px',
+                padding: '1px 10px',
+                borderRadius: '20px',
+                whiteSpace: 'nowrap',
+              }}>
+                — Page {pos / A4_H + 1} —
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

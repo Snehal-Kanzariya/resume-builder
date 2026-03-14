@@ -101,7 +101,12 @@ export async function downloadResumePDF(elementId, fileName) {
     }
   });
 
-  // 3. Wait for custom fonts before capturing (prevents font fallback in PDF).
+  // 3. Hide preview-only elements (page break indicators) so they don't appear in PDF.
+  const noPrintEls = element.querySelectorAll('.no-print');
+  const noPrintDisplay = [];
+  noPrintEls.forEach(el => { noPrintDisplay.push(el.style.display); el.style.display = 'none'; });
+
+  // 4. Wait for custom fonts before capturing (prevents font fallback in PDF).
   await document.fonts.ready;
 
   const canvas = await html2canvas(element, {
@@ -115,7 +120,8 @@ export async function downloadResumePDF(elementId, fileName) {
     scrollX: 0,
   });
 
-  // 4. Restore everything.
+  // 5. Restore everything.
+  noPrintEls.forEach((el, i) => { el.style.display = noPrintDisplay[i]; });
   element.style.cssText = originalStyle;
   overflowFixes.forEach(({ el, overflow, overflowX, overflowY }) => {
     el.style.overflow  = overflow;

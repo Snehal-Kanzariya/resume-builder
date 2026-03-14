@@ -28,6 +28,7 @@ const initialResumeData = {
     accentColor: '#03153a',
     fontSize: 'medium',
     sectionOrder: ['experience', 'education', 'skills', 'projects', 'certifications'],
+    pageLimit: null,   // null = no limit; future: 1 = warn when content overflows 1 page
   },
 };
 

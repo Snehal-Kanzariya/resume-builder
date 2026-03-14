@@ -3,11 +3,11 @@ import { useReactToPrint } from 'react-to-print';
 import { Link } from 'react-router-dom';
 import {
   ArrowLeft, Printer, Download, Loader2, FileText,
-  LayoutTemplate, Palette,
+  LayoutTemplate, Palette, X,
 } from 'lucide-react';
 import { useResume } from '../context/ResumeContext';
 import { downloadResumePDF, buildFilename, PRINT_PAGE_STYLE } from '../utils/pdfExport';
-import A4Container from '../components/Preview/A4Container';
+import A4Container, { A4_H } from '../components/Preview/A4Container';
 import { TEMPLATES, FONT_SCALES } from '../components/Preview/ResumePreview';
 
 const PRINT_TARGET_ID = 'resume-print-area-preview';
@@ -22,12 +22,17 @@ export default function PreviewPage() {
   const { selectedTemplate, accentColor, fontSize } = resumeData?.settings ?? {};
   const personalInfo = resumeData?.personalInfo ?? {};
 
-  const [isDownloading, setDownloading] = useState(false);
+  const [isDownloading,   setDownloading]      = useState(false);
+  const [contentHeightPx, setContentHeightPx]  = useState(0);
+  const [tipDismissed,    setTipDismissed]      = useState(false);
   const printContentRef = useRef(null);
 
   const { Component } = TEMPLATES.find(t => t.id === selectedTemplate) ?? TEMPLATES[0];
-  const contentScale  = FONT_SCALES[fontSize] ?? 1.0;
-  const filename      = buildFilename(personalInfo.fullName ?? '');
+  const contentScale   = FONT_SCALES[fontSize] ?? 1.0;
+  const filename       = buildFilename(personalInfo.fullName ?? '');
+
+  const pageCount      = contentHeightPx > 0 ? Math.max(1, Math.ceil(contentHeightPx / A4_H)) : 1;
+  const isBetweenPages = contentHeightPx > A4_H && contentHeightPx < A4_H * 1.3;
 
   const handlePrint = useReactToPrint({
     contentRef: printContentRef,
@@ -141,15 +146,48 @@ export default function PreviewPage() {
           </div>
         </div>
 
-        <span className="ml-auto text-[10px] text-slate-400 dark:text-slate-500 hidden sm:block capitalize">
-          {selectedTemplate} template
-        </span>
+        <div className="ml-auto flex items-center gap-2 flex-shrink-0">
+          {/* Page count badge */}
+          <span
+            className={`flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+              pageCount >= 3
+                ? 'bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400'
+                : pageCount === 2
+                  ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400'
+                  : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'
+            }`}
+            title="Current page count"
+          >
+            <FileText size={10} />
+            {pageCount} {pageCount === 1 ? 'page' : 'pages'}
+          </span>
+
+          <span className="text-[10px] text-slate-400 dark:text-slate-500 hidden sm:block capitalize">
+            {selectedTemplate} template
+          </span>
+        </div>
       </div>
+
+      {/* Between-pages tip */}
+      {isBetweenPages && !tipDismissed && (
+        <div className="flex-shrink-0 flex items-center gap-2 px-5 py-1.5 bg-amber-50 dark:bg-amber-950/30 border-b border-amber-200 dark:border-amber-800">
+          <span className="flex-1 text-xs text-amber-700 dark:text-amber-400 leading-snug">
+            Your resume spans 1–2 pages. Consider trimming to 1 page or adding content to fill 2 full pages.
+          </span>
+          <button
+            onClick={() => setTipDismissed(true)}
+            className="flex-shrink-0 text-amber-500 hover:text-amber-700 dark:hover:text-amber-300 transition-colors"
+            title="Dismiss"
+          >
+            <X size={14} />
+          </button>
+        </div>
+      )}
 
       {/* ── FULL-SCREEN A4 PREVIEW ────────────────────────────────────────────── */}
       <main className="flex-1 overflow-y-auto py-8 px-4">
         <div className="max-w-[860px] mx-auto">
-          <A4Container contentScale={contentScale}>
+          <A4Container contentScale={contentScale} onContentHeight={setContentHeightPx}>
             <Suspense fallback={null}>
               <Component />
             </Suspense>

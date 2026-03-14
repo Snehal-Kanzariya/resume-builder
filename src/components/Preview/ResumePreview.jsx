@@ -3,14 +3,14 @@ import { useReactToPrint } from 'react-to-print';
 import {
   LayoutTemplate, Palette, ZoomIn,
   Type, FlaskConical, Check,
-  Printer, Download, Loader2, Sparkles, GitCompare,
+  Printer, Download, Loader2, Sparkles, GitCompare, X, FileText,
 } from 'lucide-react';
 import { useResume } from '../../context/ResumeContext';
 import { useToast } from '../../context/ToastContext';
 import { sampleData } from '../../data/sampleData';
 import { downloadResumePDF, buildFilename, PRINT_PAGE_STYLE } from '../../utils/pdfExport';
 import AICompareView from '../AI/AICompareView';
-import A4Container from './A4Container';
+import A4Container, { A4_H } from './A4Container';
 
 // Lazy-load all 10 templates to split the main bundle
 const ModernTemplate       = lazy(() => import('../Templates/ModernTemplate'));
@@ -90,13 +90,18 @@ const ResumePreview = forwardRef(function ResumePreview(_props, _externalRef) {
   const toast = useToast();
   const { selectedTemplate, accentColor, fontSize } = resumeData?.settings ?? {};
 
-  const [zoom,          setZoom]       = useState('fit');
-  const [sampleLoaded,  setSample]     = useState(false);
-  const [isDownloading, setDownloading] = useState(false);
-  const [showCompare,    setShowCompare]  = useState(false);
+  const [zoom,            setZoom]         = useState('fit');
+  const [sampleLoaded,    setSample]       = useState(false);
+  const [isDownloading,   setDownloading]  = useState(false);
+  const [showCompare,     setShowCompare]  = useState(false);
+  const [contentHeightPx, setContentHeightPx] = useState(0);
+  const [tipDismissed,    setTipDismissed] = useState(false);
 
   const { Component } = TEMPLATES.find(t => t.id === selectedTemplate) ?? TEMPLATES[0];
   const contentScale  = FONT_SCALES[fontSize] ?? 1.0;
+
+  const pageCount      = contentHeightPx > 0 ? Math.max(1, Math.ceil(contentHeightPx / A4_H)) : 1;
+  const isBetweenPages = contentHeightPx > A4_H && contentHeightPx < A4_H * 1.3;
 
   // ── react-to-print (primary — selectable text, exact colours) ────────────
   const handlePrint = useReactToPrint({
@@ -257,7 +262,40 @@ const ResumePreview = forwardRef(function ResumePreview(_props, _externalRef) {
               : <><Download size={13} /> Download PDF</>
             }
           </button>
+
+          <Sep />
+
+          {/* Page count badge */}
+          <span
+            className={`flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full flex-shrink-0 ${
+              pageCount >= 3
+                ? 'bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400'
+                : pageCount === 2
+                  ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400'
+                  : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'
+            }`}
+            title="Current page count"
+          >
+            <FileText size={10} />
+            {pageCount} {pageCount === 1 ? 'page' : 'pages'}
+          </span>
         </div>
+
+        {/* Between-pages tip */}
+        {isBetweenPages && !tipDismissed && (
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-amber-50 dark:bg-amber-950/30 border-t border-amber-200 dark:border-amber-800">
+            <span className="flex-1 text-[11px] text-amber-700 dark:text-amber-400 leading-snug">
+              Your resume spans 1–2 pages. Consider trimming to 1 page or adding content to fill 2 full pages.
+            </span>
+            <button
+              onClick={() => setTipDismissed(true)}
+              className="flex-shrink-0 text-amber-500 hover:text-amber-700 dark:hover:text-amber-300 transition-colors"
+              title="Dismiss"
+            >
+              <X size={13} />
+            </button>
+          </div>
+        )}
 
         {/* Row 3 — Compare Versions (shown only when AI data is ready) */}
         {aiResumeData && (
@@ -300,7 +338,7 @@ const ResumePreview = forwardRef(function ResumePreview(_props, _externalRef) {
             transition: 'width 0.2s ease',
           }}
         >
-          <A4Container contentScale={contentScale}>
+          <A4Container contentScale={contentScale} onContentHeight={setContentHeightPx}>
             <Suspense fallback={<TemplateFallback />}>
               <Component />
             </Suspense>
