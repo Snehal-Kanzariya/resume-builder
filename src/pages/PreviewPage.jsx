@@ -23,7 +23,10 @@ export default function PreviewPage() {
   const personalInfo = resumeData?.personalInfo ?? {};
 
   const [isDownloading, setDownloading] = useState(false);
+  const [showProModal,  setShowProModal] = useState(false);
   const printContentRef = useRef(null);
+
+  const isPremium = JSON.parse(localStorage.getItem('resumeai_premium') || 'false');
 
   const { Component } = TEMPLATES.find(t => t.id === selectedTemplate) ?? TEMPLATES[0];
   const contentScale  = FONT_SCALES[fontSize] ?? 1.0;
@@ -146,6 +149,21 @@ export default function PreviewPage() {
         </span>
       </div>
 
+      {/* ── ROW 3: Watermark notice (free version only) ───────────────────────── */}
+      {!isPremium && (
+        <div className="flex-shrink-0 bg-amber-50 dark:bg-amber-950/30 border-b border-amber-100 dark:border-amber-900/40 px-5 py-1.5 flex items-center gap-2 transition-colors">
+          <span className="text-[11px] text-amber-700 dark:text-amber-400">
+            Free version includes a ResumeAI watermark on downloaded PDFs
+          </span>
+          <button
+            onClick={() => setShowProModal(true)}
+            className="ml-auto text-[11px] font-semibold text-blue-600 hover:text-blue-700 transition-colors flex-shrink-0"
+          >
+            Remove Watermark →
+          </button>
+        </div>
+      )}
+
       {/* ── FULL-SCREEN A4 PREVIEW ────────────────────────────────────────────── */}
       <main className="flex-1 overflow-y-auto py-8 px-4">
         <div className="max-w-[860px] mx-auto">
@@ -172,6 +190,33 @@ export default function PreviewPage() {
           </Suspense>
         </div>
       </div>
+
+      {/* ── PRO COMING SOON MODAL ────────────────────────────────────────────── */}
+      {showProModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+          onClick={() => setShowProModal(false)}
+        >
+          <div
+            className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-2xl p-8 max-w-sm w-full mx-4 text-center"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="text-4xl mb-3">👑</div>
+            <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-2">
+              Pro Version Coming Soon
+            </h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">
+              Upgrade to Pro to remove the watermark and unlock premium features. You'll be the first to know when it launches!
+            </p>
+            <button
+              onClick={() => setShowProModal(false)}
+              className="w-full py-2.5 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm font-semibold hover:opacity-90 transition-opacity"
+            >
+              Got it, dismiss
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

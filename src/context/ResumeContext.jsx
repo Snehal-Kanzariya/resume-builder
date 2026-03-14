@@ -28,6 +28,7 @@ const initialResumeData = {
     accentColor: '#03153a',
     fontSize: 'medium',
     sectionOrder: ['experience', 'education', 'skills', 'projects', 'certifications'],
+    isPremium: false,
   },
 };
 

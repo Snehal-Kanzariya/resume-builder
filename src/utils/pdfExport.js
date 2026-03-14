@@ -146,6 +146,18 @@ export async function downloadResumePDF(elementId, fileName) {
     heightLeft -= pdfHeight;
   }
 
+  // Add watermark to free version (skipped when resumeai_premium = true in localStorage)
+  const isPremium = JSON.parse(localStorage.getItem('resumeai_premium') || 'false');
+  if (!isPremium) {
+    const pageCount = pdf.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      pdf.setPage(i);
+      pdf.setFontSize(8);
+      pdf.setTextColor(176, 176, 176);
+      pdf.text('Built with ResumeAI', pdfWidth - 42, pdfHeight - 5);
+    }
+  }
+
   pdf.save(fileName ? fileName.replace(/\.pdf$/i, '') + '.pdf' : 'resume.pdf');
 }
 

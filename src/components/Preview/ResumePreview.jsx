@@ -93,7 +93,10 @@ const ResumePreview = forwardRef(function ResumePreview(_props, _externalRef) {
   const [zoom,          setZoom]       = useState('fit');
   const [sampleLoaded,  setSample]     = useState(false);
   const [isDownloading, setDownloading] = useState(false);
-  const [showCompare,    setShowCompare]  = useState(false);
+  const [showCompare,   setShowCompare] = useState(false);
+  const [showProModal,  setShowProModal] = useState(false);
+
+  const isPremium = JSON.parse(localStorage.getItem('resumeai_premium') || 'false');
 
   const { Component } = TEMPLATES.find(t => t.id === selectedTemplate) ?? TEMPLATES[0];
   const contentScale  = FONT_SCALES[fontSize] ?? 1.0;
@@ -259,7 +262,22 @@ const ResumePreview = forwardRef(function ResumePreview(_props, _externalRef) {
           </button>
         </div>
 
-        {/* Row 3 — Compare Versions (shown only when AI data is ready) */}
+        {/* Row 3 — Watermark notice (free version only) */}
+        {!isPremium && (
+          <div className="flex items-center gap-1.5 px-3 py-1 border-t border-slate-100 dark:border-slate-700/50 flex-wrap">
+            <span className="text-[10px] text-slate-400 dark:text-slate-500">
+              Free version includes ResumeAI watermark
+            </span>
+            <button
+              onClick={() => setShowProModal(true)}
+              className="text-[10px] font-medium text-blue-500 hover:text-blue-600 transition-colors"
+            >
+              Remove Watermark →
+            </button>
+          </div>
+        )}
+
+        {/* Row 4 — Compare Versions (shown only when AI data is ready) */}
         {aiResumeData && (
           <div className="flex items-center gap-2 px-3 py-1.5 border-t border-purple-100 bg-purple-50 flex-wrap">
             <button
@@ -329,6 +347,33 @@ const ResumePreview = forwardRef(function ResumePreview(_props, _externalRef) {
       {/* ── AI COMPARE MODAL ─────────────────────────────────────────────────── */}
       {showCompare && aiResumeData && (
         <AICompareView onClose={() => setShowCompare(false)} />
+      )}
+
+      {/* ── PRO COMING SOON MODAL ────────────────────────────────────────────── */}
+      {showProModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+          onClick={() => setShowProModal(false)}
+        >
+          <div
+            className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-2xl p-8 max-w-sm w-full mx-4 text-center"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="text-4xl mb-3">👑</div>
+            <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-2">
+              Pro Version Coming Soon
+            </h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">
+              Upgrade to Pro to remove the watermark and unlock premium features. You'll be the first to know when it launches!
+            </p>
+            <button
+              onClick={() => setShowProModal(false)}
+              className="w-full py-2.5 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm font-semibold hover:opacity-90 transition-opacity"
+            >
+              Got it, dismiss
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );
