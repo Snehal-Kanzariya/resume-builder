@@ -19,7 +19,7 @@ function SideLabel({ title, accent }) {
 
 function MainLabel({ title, accent }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 8 }}>
+    <div className="resume-section-header" style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 8 }}>
       <span style={{ fontSize: 7.5, fontWeight: 800, letterSpacing: 2.5, textTransform: 'uppercase', color: accent, whiteSpace: 'nowrap' }}>
         {title}
       </span>
@@ -140,14 +140,14 @@ export default function CompactTemplate() {
             <div>
               <MainLabel title="Experience" accent={accent} />
               {experience.map(exp => (
-                <div key={exp.id} style={{ marginBottom: 10 }}>
+                <div key={exp.id} className="resume-entry" style={{ marginBottom: 10, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                     <span style={{ fontSize: 10.5, fontWeight: 700, color: '#0f172a' }}>{exp.position}</span>
                     <span style={{ fontSize: 8, color: '#9ca3af', flexShrink: 0, marginLeft: 6 }}>
                       {dateRange(exp.startDate, exp.endDate, exp.current)}
                     </span>
                   </div>
-                  <p style={{ fontSize: 9, color: accent, fontWeight: 600, marginBottom: 3 }}>
+                  <p style={{ fontSize: 9, color: accent, fontWeight: 600, marginTop: 0, marginBottom: 3 }}>
                     {exp.company}{exp.location ? ` · ${exp.location}` : ''}
                   </p>
                   {exp.bullets.filter(b => b.trim()).length > 0 && (
@@ -167,7 +167,7 @@ export default function CompactTemplate() {
             <div>
               <MainLabel title="Projects" accent={accent} />
               {projects.map(proj => (
-                <div key={proj.id} style={{ marginBottom: 8 }}>
+                <div key={proj.id} className="resume-entry" style={{ marginBottom: 8, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                     <span style={{ fontSize: 10, fontWeight: 700, color: '#0f172a' }}>{proj.name}</span>
                     {proj.liveLink && <span style={{ fontSize: 8, color: accent }}>{proj.liveLink}</span>}

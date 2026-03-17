@@ -94,6 +94,7 @@ const ResumePreview = forwardRef(function ResumePreview(_props, _externalRef) {
   const [sampleLoaded,  setSample]     = useState(false);
   const [isDownloading, setDownloading] = useState(false);
   const [showCompare,    setShowCompare]  = useState(false);
+  const [pageCount,     setPageCount]  = useState(1);
 
   const { Component } = TEMPLATES.find(t => t.id === selectedTemplate) ?? TEMPLATES[0];
   const contentScale  = FONT_SCALES[fontSize] ?? 1.0;
@@ -257,6 +258,17 @@ const ResumePreview = forwardRef(function ResumePreview(_props, _externalRef) {
               : <><Download size={13} /> Download PDF</>
             }
           </button>
+
+          {/* Page count badge */}
+          <span className={`ml-auto flex-shrink-0 text-[10px] font-medium px-2 py-0.5 rounded-full ${
+            pageCount >= 3
+              ? 'bg-amber-100 text-amber-700'
+              : pageCount === 2
+                ? 'bg-blue-100 text-blue-700'
+                : 'bg-slate-100 text-slate-500'
+          }`}>
+            {pageCount} {pageCount === 1 ? 'page' : 'pages'}
+          </span>
         </div>
 
         {/* Row 3 — Compare Versions (shown only when AI data is ready) */}
@@ -300,7 +312,7 @@ const ResumePreview = forwardRef(function ResumePreview(_props, _externalRef) {
             transition: 'width 0.2s ease',
           }}
         >
-          <A4Container contentScale={contentScale}>
+          <A4Container contentScale={contentScale} onPageCountChange={setPageCount}>
             <Suspense fallback={<TemplateFallback />}>
               <Component />
             </Suspense>
@@ -318,7 +330,7 @@ const ResumePreview = forwardRef(function ResumePreview(_props, _externalRef) {
         <div
           id="resume-print-area-builder"
           ref={printContentRef}
-          style={{ width: '794px', minHeight: '1123px', backgroundColor: '#ffffff' }}
+          style={{ width: '794px', backgroundColor: '#ffffff' }}
         >
           <Suspense fallback={null}>
             <Component />

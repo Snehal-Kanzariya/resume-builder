@@ -8,7 +8,7 @@ import CustomSections from './CustomSections';
 function RightSection({ title, icon: Icon, accent, children }) {
   return (
     <div style={{ marginBottom: 16 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 9 }}>
+      <div className="resume-section-header" style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 9 }}>
         <span style={{
           width: 20, height: 20, borderRadius: '50%',
           backgroundColor: accent, display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -93,7 +93,7 @@ export default function CreativeTemplate() {
       </div>
 
       {/* ── BODY ───────────────────────────────────────────────────────────── */}
-      <div style={{ display: 'flex' }}>
+      <div style={{ display: 'flex', alignItems: 'stretch' }}>
 
         {/* LEFT: skills + certifications */}
         <div style={{
@@ -156,14 +156,14 @@ export default function CreativeTemplate() {
           {experience.length > 0 && (
             <RightSection title="Experience" icon={Briefcase} accent={accent}>
               {experience.map(exp => (
-                <div key={exp.id} style={{ marginBottom: 11 }}>
+                <div key={exp.id} className="resume-entry" style={{ marginBottom: 11 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                     <span style={{ fontSize: 11, fontWeight: 700, color: '#0f172a' }}>{exp.position}</span>
                     <span style={{ fontSize: 8.5, color: '#94a3b8', flexShrink: 0, marginLeft: 8 }}>
                       {dateRange(exp.startDate, exp.endDate, exp.current)}
                     </span>
                   </div>
-                  <p style={{ fontSize: 9.5, color: accent, fontWeight: 600, marginBottom: 4 }}>
+                  <p style={{ fontSize: 9.5, color: accent, fontWeight: 600, marginTop: 0, marginBottom: 4 }}>
                     {exp.company}{exp.location ? `  ·  ${exp.location}` : ''}
                   </p>
                   {exp.bullets.filter(b => b.trim()).length > 0 && (
@@ -183,7 +183,7 @@ export default function CreativeTemplate() {
           {education.length > 0 && (
             <RightSection title="Education" icon={GraduationCap} accent={accent}>
               {education.map(edu => (
-                <div key={edu.id} style={{ marginBottom: 9 }}>
+                <div key={edu.id} className="resume-entry" style={{ marginBottom: 9 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                     <span style={{ fontSize: 11, fontWeight: 700, color: '#0f172a' }}>{edu.school}</span>
                     <span style={{ fontSize: 8.5, color: '#94a3b8' }}>
@@ -207,7 +207,7 @@ export default function CreativeTemplate() {
           {projects.length > 0 && (
             <RightSection title="Projects" icon={FolderOpen} accent={accent}>
               {projects.map(proj => (
-                <div key={proj.id} style={{ marginBottom: 9 }}>
+                <div key={proj.id} className="resume-entry" style={{ marginBottom: 9 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                     <span style={{ fontSize: 10.5, fontWeight: 700, color: '#0f172a' }}>{proj.name}</span>
                     {proj.liveLink && (

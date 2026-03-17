@@ -23,6 +23,7 @@ export default function PreviewPage() {
   const personalInfo = resumeData?.personalInfo ?? {};
 
   const [isDownloading, setDownloading] = useState(false);
+  const [pageCount,     setPageCount]   = useState(1);
   const printContentRef = useRef(null);
 
   const { Component } = TEMPLATES.find(t => t.id === selectedTemplate) ?? TEMPLATES[0];
@@ -67,6 +68,16 @@ export default function PreviewPage() {
             {personalInfo.fullName || 'Untitled Resume'}
           </span>
         </div>
+
+        <span className={`flex-shrink-0 text-[10px] font-medium px-2 py-0.5 rounded-full ${
+          pageCount >= 3
+            ? 'bg-amber-100 text-amber-700'
+            : pageCount === 2
+              ? 'bg-blue-100 text-blue-700'
+              : 'bg-slate-100 text-slate-500'
+        }`}>
+          {pageCount} {pageCount === 1 ? 'page' : 'pages'}
+        </span>
 
         <div className="flex-1" />
 
@@ -149,7 +160,7 @@ export default function PreviewPage() {
       {/* ── FULL-SCREEN A4 PREVIEW ────────────────────────────────────────────── */}
       <main className="flex-1 overflow-y-auto py-8 px-4">
         <div className="max-w-[860px] mx-auto">
-          <A4Container contentScale={contentScale}>
+          <A4Container contentScale={contentScale} onPageCountChange={setPageCount}>
             <Suspense fallback={null}>
               <Component />
             </Suspense>
@@ -165,7 +176,7 @@ export default function PreviewPage() {
         <div
           id={PRINT_TARGET_ID}
           ref={printContentRef}
-          style={{ width: '794px', minHeight: '1123px', backgroundColor: '#ffffff' }}
+          style={{ width: '794px', backgroundColor: '#ffffff' }}
         >
           <Suspense fallback={null}>
             <Component />
