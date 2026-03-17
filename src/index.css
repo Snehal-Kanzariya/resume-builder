@@ -90,6 +90,7 @@ body {
 /* ── Page-break helpers (also injected into react-to-print iframe via PRINT_PAGE_STYLE) ── */
 .resume-entry { break-inside: avoid; page-break-inside: avoid; }
 .resume-section-header { break-after: avoid; page-break-after: avoid; }
+.resume-section { break-inside: avoid; page-break-inside: avoid; }
 
 /* ── Print CSS ───────────────────────────────────────────────────────────────── */
 @media print {

@@ -7,7 +7,7 @@ import CustomSections from './CustomSections';
 
 function RightSection({ title, icon: Icon, accent, children }) {
   return (
-    <div style={{ marginBottom: 16 }}>
+    <div className="resume-section" style={{ marginBottom: 16 }}>
       <div className="resume-section-header" style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 9 }}>
         <span style={{
           width: 20, height: 20, borderRadius: '50%',

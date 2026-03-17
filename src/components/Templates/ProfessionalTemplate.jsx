@@ -61,7 +61,7 @@ export default function ProfessionalTemplate() {
 
       {/* ── SUMMARY ────────────────────────────────────────────────────────── */}
       {p.summary && (
-        <div style={{ marginBottom: 14, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
+        <div className="resume-section" style={{ marginBottom: 14, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
           <SectionHeader title="Professional Summary" />
           <p style={{ fontSize: 10, lineHeight: 1.7, color: '#1e293b', marginTop: 6 }}>
             {p.summary}
@@ -71,7 +71,7 @@ export default function ProfessionalTemplate() {
 
       {/* ── EXPERIENCE ─────────────────────────────────────────────────────── */}
       {experience.length > 0 && (
-        <div style={{ marginBottom: 14 }}>
+        <div className="resume-section" style={{ marginBottom: 14 }}>
           <SectionHeader title="Professional Experience" />
           {experience.map(exp => (
             <div key={exp.id} className="resume-entry" style={{ marginTop: 10, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
@@ -104,7 +104,7 @@ export default function ProfessionalTemplate() {
 
       {/* ── EDUCATION ──────────────────────────────────────────────────────── */}
       {education.length > 0 && (
-        <div style={{ marginBottom: 14 }}>
+        <div className="resume-section" style={{ marginBottom: 14 }}>
           <SectionHeader title="Education" />
           {education.map(edu => (
             <div key={edu.id} className="resume-entry" style={{ marginTop: 8, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
@@ -129,7 +129,7 @@ export default function ProfessionalTemplate() {
 
       {/* ── SKILLS ─────────────────────────────────────────────────────────── */}
       {skills.length > 0 && (
-        <div style={{ marginBottom: 14, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
+        <div className="resume-section" style={{ marginBottom: 14, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
           <SectionHeader title="Skills" />
           <div style={{ marginTop: 6, display: 'flex', flexDirection: 'column', gap: 4 }}>
             {skills.map(cat => (
@@ -151,7 +151,7 @@ export default function ProfessionalTemplate() {
 
       {/* ── PROJECTS ───────────────────────────────────────────────────────── */}
       {projects.length > 0 && (
-        <div style={{ marginBottom: 14 }}>
+        <div className="resume-section" style={{ marginBottom: 14 }}>
           <SectionHeader title="Projects" />
           {projects.map(proj => (
             <div key={proj.id} className="resume-entry" style={{ marginTop: 8, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
@@ -177,7 +177,7 @@ export default function ProfessionalTemplate() {
 
       {/* ── CERTIFICATIONS ─────────────────────────────────────────────────── */}
       {certifications.length > 0 && (
-        <div style={{ marginBottom: 14 }}>
+        <div className="resume-section" style={{ marginBottom: 14 }}>
           <SectionHeader title="Certifications" />
           {certifications.map(cert => (
             <div key={cert.id} style={{ marginTop: 6, display: 'flex', justifyContent: 'space-between', breakInside: 'avoid', pageBreakInside: 'avoid' }}>

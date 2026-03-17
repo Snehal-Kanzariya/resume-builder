@@ -77,7 +77,7 @@ export default function MinimalTemplate() {
 
       {/* ── EXPERIENCE ─────────────────────────────────────────────────────── */}
       {experience.length > 0 && (
-        <>
+        <div className="resume-section">
           <SectionHeader title="Experience" accent={accent} />
           {experience.map((exp, idx) => (
             <div key={exp.id} className="resume-entry" style={{ marginBottom: idx < experience.length - 1 ? 13 : 0, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
@@ -103,13 +103,13 @@ export default function MinimalTemplate() {
             </div>
           ))}
           <Divider />
-        </>
+        </div>
       )}
       <CustomSections afterSection="experience" />
 
       {/* ── EDUCATION ──────────────────────────────────────────────────────── */}
       {education.length > 0 && (
-        <>
+        <div className="resume-section">
           <SectionHeader title="Education" accent={accent} />
           {education.map((edu, idx) => (
             <div key={edu.id} className="resume-entry" style={{ marginBottom: idx < education.length - 1 ? 10 : 0, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
@@ -129,13 +129,13 @@ export default function MinimalTemplate() {
             </div>
           ))}
           <Divider />
-        </>
+        </div>
       )}
       <CustomSections afterSection="education" />
 
       {/* ── SKILLS ─────────────────────────────────────────────────────────── */}
       {skills.length > 0 && (
-        <>
+        <div className="resume-section">
           <SectionHeader title="Skills" accent={accent} />
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
             {skills.map(cat => (
@@ -152,13 +152,13 @@ export default function MinimalTemplate() {
             ))}
           </div>
           <Divider />
-        </>
+        </div>
       )}
       <CustomSections afterSection="skills" />
 
       {/* ── PROJECTS ───────────────────────────────────────────────────────── */}
       {projects.length > 0 && (
-        <>
+        <div className="resume-section">
           <SectionHeader title="Projects" accent={accent} />
           {projects.map((proj, idx) => (
             <div key={proj.id} className="resume-entry" style={{ marginBottom: idx < projects.length - 1 ? 11 : 0, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
@@ -177,13 +177,13 @@ export default function MinimalTemplate() {
             </div>
           ))}
           <Divider />
-        </>
+        </div>
       )}
       <CustomSections afterSection="projects" />
 
       {/* ── CERTIFICATIONS ─────────────────────────────────────────────────── */}
       {certifications.length > 0 && (
-        <>
+        <div className="resume-section">
           <SectionHeader title="Certifications" accent={accent} />
           {certifications.map(cert => (
             <div key={cert.id} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
@@ -198,7 +198,7 @@ export default function MinimalTemplate() {
               )}
             </div>
           ))}
-        </>
+        </div>
       )}
       <CustomSections afterSection="certifications" />
     </div>

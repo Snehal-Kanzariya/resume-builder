@@ -43,6 +43,7 @@ export const PRINT_PAGE_STYLE = `
   .no-print { display: none !important; }
   .resume-entry { break-inside: avoid; page-break-inside: avoid; }
   .resume-section-header { break-after: avoid; page-break-after: avoid; }
+  .resume-section { break-inside: avoid; page-break-inside: avoid; }
 `;
 
 // ── html2canvas + jsPDF fallback ──────────────────────────────────────────────

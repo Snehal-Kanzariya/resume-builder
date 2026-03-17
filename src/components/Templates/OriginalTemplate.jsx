@@ -147,7 +147,7 @@ export default function OriginalTemplate() {
   function ExperienceSection() {
     if (!experience.length) return null;
     return (
-      <div style={{ marginBottom: 16 }}>
+      <div className="resume-section" style={{ marginBottom: 16 }}>
         <SectionTitle title="Experience" />
         {experience.map(exp => (
           <div key={exp.id} className="resume-entry" style={{ marginBottom: 11 }}>
@@ -176,7 +176,7 @@ export default function OriginalTemplate() {
   function EducationSection() {
     if (!education.length) return null;
     return (
-      <div style={{ marginBottom: 16 }}>
+      <div className="resume-section" style={{ marginBottom: 16 }}>
         <SectionTitle title="Education" />
         {education.map(edu => (
           <div key={edu.id} className="resume-entry" style={{ marginBottom: 9 }}>
@@ -200,7 +200,7 @@ export default function OriginalTemplate() {
   function ProjectsSection() {
     if (!projects.length) return null;
     return (
-      <div style={{ marginBottom: 16 }}>
+      <div className="resume-section" style={{ marginBottom: 16 }}>
         <SectionTitle title="Projects" />
         {projects.map(proj => (
           <div key={proj.id} className="resume-entry" style={{ marginBottom: 9 }}>
@@ -221,7 +221,7 @@ export default function OriginalTemplate() {
     if (inline) {
       // Compact inline variant for single-column
       return (
-        <div style={{ marginBottom: 16 }}>
+        <div className="resume-section" style={{ marginBottom: 16 }}>
           <SectionTitle title="Skills" />
           {skills.map(cat => (
             <div key={cat.id} style={{ display: 'flex', gap: 8, marginBottom: 4 }}>
@@ -236,7 +236,7 @@ export default function OriginalTemplate() {
     }
     // Sidebar / block variant
     return (
-      <div style={{ marginBottom: 14 }}>
+      <div className="resume-section" style={{ marginBottom: 14 }}>
         <SideTitle title="Skills" />
         {skills.map(cat => (
           <div key={cat.id} style={{ marginBottom: 9 }}>
@@ -269,7 +269,7 @@ export default function OriginalTemplate() {
     if (!certifications.length) return null;
     if (inline) {
       return (
-        <div style={{ marginBottom: 16 }}>
+        <div className="resume-section" style={{ marginBottom: 16 }}>
           <SectionTitle title="Certifications" />
           {certifications.map(cert => (
             <div key={cert.id} className="resume-entry" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
@@ -284,7 +284,7 @@ export default function OriginalTemplate() {
       );
     }
     return (
-      <div style={{ marginBottom: 14 }}>
+      <div className="resume-section" style={{ marginBottom: 14 }}>
         <SideTitle title="Certifications" />
         {certifications.map(cert => (
           <div key={cert.id} style={{ marginBottom: 8 }}>
@@ -301,7 +301,7 @@ export default function OriginalTemplate() {
   function SummarySection() {
     if (!p.summary) return null;
     return (
-      <div style={{ marginBottom: 16 }}>
+      <div className="resume-section" style={{ marginBottom: 16 }}>
         <SectionTitle title="Summary" />
         <p style={{ fontSize: 10, lineHeight: 1.75, color: '#374151', fontFamily: font }}>{p.summary}</p>
       </div>

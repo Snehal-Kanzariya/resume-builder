@@ -82,14 +82,14 @@ export default function TechTemplate() {
       <div style={{ padding: '20px 28px 0', backgroundColor: '#fff' }}>
 
         {p.summary && (
-          <div style={{ marginBottom: 16 }}>
+          <div className="resume-section" style={{ marginBottom: 16 }}>
             <TermHeader title="// about" accent={accent} />
             <p style={{ fontSize: 10, lineHeight: 1.75, color: '#374151', paddingLeft: 16 }}>{p.summary}</p>
           </div>
         )}
 
         {skills.length > 0 && (
-          <div style={{ marginBottom: 16, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
+          <div className="resume-section" style={{ marginBottom: 16, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
             <TermHeader title="// tech_stack" accent={accent} />
             <div style={{ paddingLeft: 16, display: 'flex', flexDirection: 'column', gap: 6 }}>
               {skills.map(cat => (
@@ -110,7 +110,7 @@ export default function TechTemplate() {
         <CustomSections afterSection="skills" />
 
         {experience.length > 0 && (
-          <div style={{ marginBottom: 16 }}>
+          <div className="resume-section" style={{ marginBottom: 16 }}>
             <TermHeader title="// experience" accent={accent} />
             {experience.map(exp => (
               <div key={exp.id} className="resume-entry" style={{ marginBottom: 12, paddingLeft: 16, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
@@ -136,7 +136,7 @@ export default function TechTemplate() {
         <CustomSections afterSection="experience" />
 
         {projects.length > 0 && (
-          <div style={{ marginBottom: 16 }}>
+          <div className="resume-section" style={{ marginBottom: 16 }}>
             <TermHeader title="// projects" accent={accent} />
             {projects.map(proj => (
               <div key={proj.id} className="resume-entry" style={{ marginBottom: 9, paddingLeft: 16, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
@@ -157,7 +157,7 @@ export default function TechTemplate() {
         <CustomSections afterSection="projects" />
 
         {education.length > 0 && (
-          <div style={{ marginBottom: 16 }}>
+          <div className="resume-section" style={{ marginBottom: 16 }}>
             <TermHeader title="// education" accent={accent} />
             {education.map(edu => (
               <div key={edu.id} className="resume-entry" style={{ marginBottom: 8, paddingLeft: 16, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
@@ -178,7 +178,7 @@ export default function TechTemplate() {
         <CustomSections afterSection="education" />
 
         {certifications.length > 0 && (
-          <div>
+          <div className="resume-section">
             <TermHeader title="// certifications" accent={accent} />
             {certifications.map(cert => (
               <div key={cert.id} style={{ paddingLeft: 16, marginBottom: 5, display: 'flex', justifyContent: 'space-between', breakInside: 'avoid', pageBreakInside: 'avoid' }}>
