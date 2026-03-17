@@ -1212,6 +1212,103 @@ In `src/utils/resumeParser.js` — Update the `parseResumeText` prompt to also r
 
 ---
 
+## Resume Content Preservation & Condense Feature
+
+### Core Principle
+When a user uploads a resume, ALL original text is preserved EXACTLY as written — word for word, no summarization, no shortening. Condensing is always optional and user-initiated.
+
+### Parser Rules (src/utils/resumeParser.js)
+- Groq API prompt explicitly instructs: "Do NOT summarize, shorten, paraphrase, or omit ANY content"
+- max_tokens: 4096 (handles 2-3 page resumes without truncation)
+- temperature: 0.1 (faithful extraction, not creative rewriting)
+- Every bullet point, metric, tech stack line, summary word preserved verbatim
+- PDF parser (pdfParser.js) extracts ALL pages with page separators
+
+### Condense with AI (Optional — User Initiated Only)
+
+#### Overview
+Users can OPTIONALLY condense specific sections of their resume using AI. This is a CTA, not automatic. Original text is always preserved until user explicitly accepts the condensed version.
+
+#### Component: src/components/AI/CondenseButton.jsx
+- Small subtle link-style button: "✂️ Condense with AI"
+- Icon: Scissors from lucide-react
+- Color: muted gray, accent on hover
+- NOT a prominent button — subtle and optional
+
+#### Condense Flow
+1. User clicks "✂ Condense with AI" next to a section
+2. Button shows loading spinner + "Condensing…"
+3. Groq API called with prompt: "Shorten this resume [section] to be more concise. Keep all key facts, metrics, impact. Reduce word count by 30-40%. Keep action verbs and numbers. Return ONLY condensed text."
+4. Shows comparison panel:
+   - Original text (gray background, label "Original")
+   - Condensed text (green highlight, label "Condensed — saves X words")
+5. Two action buttons: "Use Condensed" | "Keep Original"
+6. "Use Condensed" → replaces text in context
+7. "Keep Original" → dismisses comparison, no changes
+8. Rate limit: 4 second delay before API call
+
+#### Placement
+| Location | Button Label | What It Condenses |
+|----------|-------------|-------------------|
+| PersonalInfoForm.jsx | Below summary textarea, next to char count | Professional summary text |
+| ExperienceForm.jsx | Below each job's bullets | All bullets for that job entry |
+| ProjectsForm.jsx | Below each project description | Project description text |
+
+#### NOT Added To (already short content)
+- Skills section
+- Education dates/GPA
+- Certifications
+- Contact information
+
+#### Bullet Array Handling
+- ExperienceForm passes `entry.bullets` (string[]) as `text` prop
+- CondenseButton joins bullets with `\n` before sending to Groq
+- On accept, splits condensed text back into bullet array on `\n` boundaries, strips leading `- ` / `• ` markers
+- Calls `updateExperience(id, 'bullets', bullets)` to replace the whole array
+
+#### Global Condense Option (Future)
+- Button in Builder toolbar: "Condense Resume" with Scissors icon
+- On click: confirmation dialog explaining what will happen
+- Processes sequentially: summary → experience 1 → experience 2 → ... (4s delay between each)
+- Shows progress: "Condensing summary... Condensing experience 1 of 3..."
+- After completion: each section shows original vs condensed comparison
+- User accepts/rejects per section individually
+
+### Groq API Config for Parsing
+```javascript
+{
+  model: "llama-3.3-70b-versatile",
+  max_tokens: 4096,        // NOT 1024 — long resumes need more tokens
+  temperature: 0.1,         // Faithful extraction, not creative
+  messages: [
+    { role: "system", content: "Extract ALL text EXACTLY as written..." },
+    { role: "user", content: extractedResumeText }
+  ]
+}
+```
+
+### Groq API Config for Condensing
+```javascript
+{
+  model: "llama-3.3-70b-versatile",
+  max_tokens: 1024,
+  temperature: 0.3,
+  messages: [
+    { role: "system", content: "Shorten this resume [section]..." },
+    { role: "user", content: sectionText }
+  ]
+}
+```
+
+### Status: Implemented ✓
+- resumeParser.js: verbatim-preservation prompt, max_tokens 4096, temperature 0.1
+- CondenseButton.jsx: created with loading / comparison / accept / dismiss states
+- PersonalInfoForm.jsx: Condense button beside character count below summary
+- ExperienceForm.jsx: Condense bullets link beside "Add bullet point"
+- ProjectsForm.jsx: Condense link below project description textarea
+
+---
+
 ## Deployment Checklist
 - [ ] All 5 templates render correctly
 - [ ] PDF download works (text selectable, not blurry)
