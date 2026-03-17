@@ -1,6 +1,7 @@
 import { Plus, Trash2, ExternalLink, Github, GripVertical, ArrowUp, ArrowDown } from 'lucide-react';
 import { useResume } from '../../context/ResumeContext';
 import SectionAIPanel from '../AI/SectionAIPanel';
+import CondenseButton from '../AI/CondenseButton';
 import { useDragReorder } from '../../hooks/useDragReorder';
 
 function ProjectCard({
@@ -94,6 +95,11 @@ function ProjectCard({
           onChange={e => update('description', e.target.value)}
           placeholder="Briefly describe what the project does, the problem it solves, and your role..."
           className="input-field resize-none"
+        />
+        <CondenseButton
+          text={entry.description}
+          sectionName="project description"
+          onCondensed={v => update('description', v)}
         />
       </div>
 
