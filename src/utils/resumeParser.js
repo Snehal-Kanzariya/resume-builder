@@ -113,7 +113,8 @@ const SCHEMA = `{
   "education": [{"school":"","degree":"","field":"","startDate":"","endDate":"","gpa":""}],
   "skills": [{"category":"","items":[""]}],
   "projects": [{"name":"","description":"","technologies":"","liveLink":"","githubLink":""}],
-  "certifications": [{"name":"","issuer":"","date":""}]
+  "certifications": [{"name":"","issuer":"","date":""}],
+  "styleMetadata": {"fontFamily":"sans-serif","layout":"single-column","headerStyle":"simple","colorScheme":"minimal"}
 }`;
 
 /**
@@ -132,6 +133,11 @@ export async function parseResumeText(text) {
         `For dates use format like "Jan 2023". ` +
         `For the bullets array in experience, extract each bullet point as a separate string. ` +
         `For skills, group into logical categories (e.g. "Languages", "Frameworks", "Tools"). ` +
+        `Also analyze the apparent visual style of this resume and populate the styleMetadata field: ` +
+        `fontFamily must be one of: serif (traditional serif fonts), sans-serif (modern clean fonts), monospace (code-style fonts). ` +
+        `layout must be one of: single-column (all content in one column), two-column (sidebar + main column). ` +
+        `headerStyle must be one of: simple (left-aligned plain header), centered (name centered at top), bold-header (large bold name with strong divider), dark-header (dark background header bar with white text). ` +
+        `colorScheme must be one of: minimal (black and white, very little color), blue-accent (blue or colored headings/lines), dark (dark sidebar or header background), colorful (bright accent colors). ` +
         `Do not include any explanation or markdown. Return raw JSON only.`,
     },
     {

@@ -12,7 +12,8 @@ import { downloadResumePDF, buildFilename, PRINT_PAGE_STYLE } from '../../utils/
 import AICompareView from '../AI/AICompareView';
 import A4Container from './A4Container';
 
-// Lazy-load all 10 templates to split the main bundle
+// Lazy-load all 11 templates to split the main bundle
+const OriginalTemplate     = lazy(() => import('../Templates/OriginalTemplate'));
 const ModernTemplate       = lazy(() => import('../Templates/ModernTemplate'));
 const ClassicTemplate      = lazy(() => import('../Templates/ClassicTemplate'));
 const MinimalTemplate      = lazy(() => import('../Templates/MinimalTemplate'));
@@ -34,6 +35,7 @@ function TemplateFallback() {
 
 // ── Config ────────────────────────────────────────────────────────────────────
 
+// Base templates (always available)
 export const TEMPLATES = [
   { id: 'modern',       label: 'Modern',       Component: ModernTemplate },
   { id: 'classic',      label: 'Classic',      Component: ClassicTemplate },
@@ -46,6 +48,9 @@ export const TEMPLATES = [
   { id: 'elegant',      label: 'Elegant',      Component: ElegantTemplate },
   { id: 'bold',         label: 'Bold',         Component: BoldTemplate },
 ];
+
+// Original template entry (only shown when a resume has been uploaded)
+export const ORIGINAL_TEMPLATE = { id: 'original', label: 'Original (uploaded style)', Component: OriginalTemplate };
 
 export const FONT_SCALES = { small: 0.88, medium: 1.0, large: 1.11 };
 
@@ -86,7 +91,7 @@ const ResumePreview = forwardRef(function ResumePreview(_props, _externalRef) {
   // Hidden full-res print target (794×1123, no CSS transforms)
   const printContentRef = useRef(null);
 
-  const { resumeData, updateSettings, loadSampleData, aiResumeData } = useResume();
+  const { resumeData, updateSettings, loadSampleData, aiResumeData, uploadedResumeStyle } = useResume();
   const toast = useToast();
   const { selectedTemplate, accentColor, fontSize } = resumeData?.settings ?? {};
 
@@ -96,7 +101,12 @@ const ResumePreview = forwardRef(function ResumePreview(_props, _externalRef) {
   const [showCompare,    setShowCompare]  = useState(false);
   const [pageCount,     setPageCount]  = useState(1);
 
-  const { Component } = TEMPLATES.find(t => t.id === selectedTemplate) ?? TEMPLATES[0];
+  // Prepend Original template when a resume has been uploaded
+  const allTemplates = uploadedResumeStyle?.isUploaded
+    ? [ORIGINAL_TEMPLATE, ...TEMPLATES]
+    : TEMPLATES;
+
+  const { Component } = allTemplates.find(t => t.id === selectedTemplate) ?? allTemplates[0];
   const contentScale  = FONT_SCALES[fontSize] ?? 1.0;
 
   // ── react-to-print (primary — selectable text, exact colours) ────────────
@@ -146,7 +156,7 @@ const ResumePreview = forwardRef(function ResumePreview(_props, _externalRef) {
               onChange={e => updateSettings('selectedTemplate', e.target.value)}
               className="text-xs font-medium text-slate-700 dark:text-slate-200 bg-transparent border-none outline-none cursor-pointer dark:bg-slate-900"
             >
-              {TEMPLATES.map(t => <option key={t.id} value={t.id}>{t.label}</option>)}
+              {allTemplates.map(t => <option key={t.id} value={t.id}>{t.label}</option>)}
             </select>
           </div>
 
