@@ -22,7 +22,7 @@ function SidebarSection({ title, children }) {
 function MainSection({ title, accent, children }) {
   return (
     <div style={{ marginBottom: 15 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 9 }}>
+      <div className="resume-section-header" style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 9 }}>
         <span style={{
           fontSize: 9, fontWeight: 800, letterSpacing: 2.2,
           textTransform: 'uppercase', color: accent, whiteSpace: 'nowrap',
@@ -57,7 +57,7 @@ export default function ModernTemplate() {
   ].filter(c => c.val);
 
   return (
-    <div style={{ fontFamily: "'DM Sans', sans-serif", display: 'flex', lineHeight: 1.45 }}>
+    <div style={{ fontFamily: "'DM Sans', sans-serif", display: 'flex', alignItems: 'stretch', lineHeight: 1.45 }}>
 
       {/* ── LEFT SIDEBAR ──────────────────────────────────────────────────── */}
       <div style={{
@@ -146,7 +146,7 @@ export default function ModernTemplate() {
         {experience.length > 0 && (
           <MainSection title="Work Experience" accent={accent}>
             {experience.map(exp => (
-              <div key={exp.id} style={{ marginBottom: 12 }}>
+              <div key={exp.id} className="resume-entry" style={{ marginBottom: 12 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                   <span style={{ fontSize: 11.5, fontWeight: 700, color: '#111827' }}>{exp.position}</span>
                   <span style={{ fontSize: 9, color: '#9ca3af', flexShrink: 0, marginLeft: 8 }}>
@@ -158,7 +158,7 @@ export default function ModernTemplate() {
                   {exp.location && <span style={{ fontSize: 9, color: '#9ca3af' }}>{exp.location}</span>}
                 </div>
                 {exp.bullets.filter(b => b.trim()).length > 0 && (
-                  <ul style={{ paddingLeft: 14, margin: '3px 0 0', listStyle: 'disc' }}>
+                  <ul style={{ paddingLeft: 14, marginTop: 3, marginBottom: 0, listStyle: 'disc' }}>
                     {exp.bullets.filter(b => b.trim()).map((b, i) => (
                       <li key={i} style={{ fontSize: 9.5, lineHeight: 1.6, color: '#374151', marginBottom: 1.5 }}>{b}</li>
                     ))}
@@ -174,7 +174,7 @@ export default function ModernTemplate() {
         {education.length > 0 && (
           <MainSection title="Education" accent={accent}>
             {education.map(edu => (
-              <div key={edu.id} style={{ marginBottom: 9 }}>
+              <div key={edu.id} className="resume-entry" style={{ marginBottom: 9 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                   <span style={{ fontSize: 11, fontWeight: 700, color: '#111827' }}>{edu.school}</span>
                   <span style={{ fontSize: 9, color: '#9ca3af', flexShrink: 0, marginLeft: 8 }}>
@@ -198,7 +198,7 @@ export default function ModernTemplate() {
         {projects.length > 0 && (
           <MainSection title="Projects" accent={accent}>
             {projects.map(proj => (
-              <div key={proj.id} style={{ marginBottom: 10 }}>
+              <div key={proj.id} className="resume-entry" style={{ marginBottom: 10 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                   <span style={{ fontSize: 11, fontWeight: 700, color: '#111827' }}>{proj.name}</span>
                   {proj.liveLink && (
