@@ -6,8 +6,8 @@ import CustomSections from './CustomSections';
 
 function Section({ title, accent, children }) {
   return (
-    <div style={{ marginBottom: 16 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 9 }}>
+    <div className="resume-section" style={{ marginBottom: 14 }}>
+      <div className="resume-section-header" style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 9 }}>
         <div style={{ width: 24, height: 1, backgroundColor: accent, opacity: 0.5 }} />
         <p style={{
           fontSize: 8, fontWeight: 600, letterSpacing: 4,
@@ -32,7 +32,7 @@ export default function ElegantTemplate() {
     .split(' ').slice(0, 2).map(w => w[0] || '').join('').toUpperCase();
 
   return (
-    <div style={{ fontFamily: "'DM Sans', sans-serif", padding: '40px 44px', backgroundColor: '#fff', lineHeight: 1.55, position: 'relative' }}>
+    <div style={{ fontFamily: "'DM Sans', sans-serif", padding: '40px 44px 0', backgroundColor: '#fff', lineHeight: 1.55, position: 'relative' }}>
 
       {/* ── WATERMARK INITIALS ───────────────────────────────────────────────── */}
       {initials && (
@@ -80,7 +80,7 @@ export default function ElegantTemplate() {
       <div style={{ position: 'relative', zIndex: 1 }}>
 
         {p.summary && (
-          <div style={{ textAlign: 'center', marginBottom: 18 }}>
+          <div style={{ textAlign: 'center', marginBottom: 16 }}>
             <p style={{ fontSize: 10, lineHeight: 1.85, color: '#475569', fontStyle: 'italic', maxWidth: 480, margin: '0 auto' }}>
               &ldquo;{p.summary}&rdquo;
             </p>
@@ -90,14 +90,14 @@ export default function ElegantTemplate() {
         {experience.length > 0 && (
           <Section title="Experience" accent={accent}>
             {experience.map(exp => (
-              <div key={exp.id} style={{ marginBottom: 13 }}>
+              <div key={exp.id} className="resume-entry" style={{ marginBottom: 12, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                   <span style={{ fontSize: 11, fontWeight: 600, color: '#0f172a', fontFamily: "'Merriweather', serif" }}>{exp.position}</span>
                   <span style={{ fontSize: 8.5, color: '#94a3b8', fontStyle: 'italic', flexShrink: 0, marginLeft: 8 }}>
                     {dateRange(exp.startDate, exp.endDate, exp.current)}
                   </span>
                 </div>
-                <p style={{ fontSize: 9.5, color: accent, fontStyle: 'italic', marginBottom: 5 }}>
+                <p style={{ fontSize: 9.5, color: accent, fontStyle: 'italic', marginTop: 0, marginBottom: 5 }}>
                   {exp.company}{exp.location ? ` · ${exp.location}` : ''}
                 </p>
                 {exp.bullets.filter(b => b.trim()).length > 0 && (
@@ -119,7 +119,7 @@ export default function ElegantTemplate() {
         {education.length > 0 && (
           <Section title="Education" accent={accent}>
             {education.map(edu => (
-              <div key={edu.id} style={{ marginBottom: 9 }}>
+              <div key={edu.id} className="resume-entry" style={{ marginBottom: 9, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                   <span style={{ fontSize: 11, fontWeight: 600, color: '#0f172a', fontFamily: "'Merriweather', serif" }}>{edu.school}</span>
                   <span style={{ fontSize: 8.5, color: '#94a3b8', fontStyle: 'italic', flexShrink: 0, marginLeft: 8 }}>
@@ -158,7 +158,7 @@ export default function ElegantTemplate() {
         {projects.length > 0 && (
           <Section title="Projects" accent={accent}>
             {projects.map(proj => (
-              <div key={proj.id} style={{ marginBottom: 9 }}>
+              <div key={proj.id} className="resume-entry" style={{ marginBottom: 9, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                   <span style={{ fontSize: 11, fontWeight: 600, color: '#0f172a', fontFamily: "'Merriweather', serif" }}>{proj.name}</span>
                   {proj.liveLink && <span style={{ fontSize: 8.5, color: accent, fontStyle: 'italic' }}>{proj.liveLink}</span>}
@@ -174,7 +174,7 @@ export default function ElegantTemplate() {
         {certifications.length > 0 && (
           <Section title="Certifications" accent={accent}>
             {certifications.map(cert => (
-              <div key={cert.id} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+              <div key={cert.id} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
                 <div>
                   <span style={{ fontSize: 10.5, fontWeight: 600, color: '#0f172a' }}>{cert.name}</span>
                   {cert.issuer && <span style={{ fontSize: 10, color: '#64748b', fontStyle: 'italic' }}> · {cert.issuer}</span>}

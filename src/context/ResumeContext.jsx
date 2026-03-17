@@ -51,6 +51,16 @@ export function ResumeProvider({ children }) {
     }
   });
 
+  // ── Uploaded resume style metadata ───────────────────────────────────────
+  const [uploadedResumeStyle, setUploadedResumeStyle] = useState({
+    isUploaded: false,
+    fontFamily: 'sans-serif',
+    layout: 'single-column',
+    headerStyle: 'simple',
+    colorScheme: 'minimal',
+    sectionOrder: ['summary', 'experience', 'education', 'skills', 'projects', 'certifications'],
+  });
+
   // ── AI state ─────────────────────────────────────────────────────────────
   const [aiResumeData, setAiResumeData] = useState(null);
 
@@ -343,6 +353,14 @@ export function ResumeProvider({ children }) {
 
   const resetResume = useCallback(() => {
     setResumeData(initialResumeData);
+    setUploadedResumeStyle({
+      isUploaded: false,
+      fontFamily: 'sans-serif',
+      layout: 'single-column',
+      headerStyle: 'simple',
+      colorScheme: 'minimal',
+      sectionOrder: ['summary', 'experience', 'education', 'skills', 'projects', 'certifications'],
+    });
     localStorage.removeItem('resumeData');
   }, []);
 
@@ -441,6 +459,20 @@ export function ResumeProvider({ children }) {
   // upload data only fills fields/sections that are currently empty. This
   // ensures users never lose data they have already entered manually.
   const importResumeData = useCallback((parsedData) => {
+    // If style metadata was extracted from the upload, store it and switch to Original template
+    if (parsedData?.styleMetadata) {
+      const meta = parsedData.styleMetadata;
+      setUploadedResumeStyle({
+        isUploaded: true,
+        fontFamily:  ['serif', 'sans-serif', 'monospace'].includes(meta.fontFamily)  ? meta.fontFamily  : 'sans-serif',
+        layout:      ['single-column', 'two-column'].includes(meta.layout)           ? meta.layout      : 'single-column',
+        headerStyle: ['simple', 'bold-header', 'dark-header', 'centered'].includes(meta.headerStyle) ? meta.headerStyle : 'simple',
+        colorScheme: ['minimal', 'blue-accent', 'dark', 'colorful'].includes(meta.colorScheme)       ? meta.colorScheme : 'minimal',
+        sectionOrder: Array.isArray(meta.sectionOrder) ? meta.sectionOrder
+          : ['summary', 'experience', 'education', 'skills', 'projects', 'certifications'],
+      });
+    }
+
     setResumeData(prev => {
       // For each personalInfo field: keep existing non-empty value; fill from
       // upload only when the builder field is empty.
@@ -501,7 +533,11 @@ export function ResumeProvider({ children }) {
           link:   c.link   || '',
         })),
         customSections: prev?.customSections || [],
-        settings: prev?.settings || initialResumeData.settings,
+        settings: {
+          ...(prev?.settings || initialResumeData.settings),
+          // Auto-switch to Original template when upload includes style metadata
+          ...(parsedData?.styleMetadata ? { selectedTemplate: 'original' } : {}),
+        },
       };
     });
   }, []);
@@ -591,6 +627,10 @@ export function ResumeProvider({ children }) {
     acceptAllAi,
     mergeAiSections,
     clearAiData,
+
+    // Uploaded resume style
+    uploadedResumeStyle,
+    setUploadedResumeStyle,
   };
 
   return (

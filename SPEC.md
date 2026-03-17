@@ -920,21 +920,57 @@ Downloaded PDF can render differently from the in-app preview due to CSS transfo
 
 ---
 
-## Multi-Page Resume Support
+## Multi-Page Preview Fix (Updated)
 
-### Rules
-- Default: optimize for 1 page
-- If content exceeds 1 A4 page (1123px at 96 dpi), flow naturally to page 2
-- Show page-break indicator: dashed line with "Page 2" label in preview between pages
-- Page count badge in preview toolbar: "1 page" or "2 pages"
-- If content is between 1.0–1.5 pages, show suggestion toast: "Your resume is between pages. Consider trimming to 1 page or filling to 2 pages."
-- PDF export captures full content across all pages (already implemented in pdfExport.js)
+### Problem
+The builder preview does not clearly separate pages visually. Content flows continuously without clear page boundaries.
 
-### A4Container Updates
-- Remove fixed `height: 1123px` — use `minHeight: 1123px` so short resumes still look right
-- Remove `overflow: hidden` — let content flow past 1 page
-- Render a dashed page-break indicator line at every 1123px interval
-- Each page section has proper padding so content doesn't sit on the divider
+### Solution — Visual Page Separation
+Instead of just a dashed line, show actual separated page "sheets":
+```
+┌─────────────────────────┐
+│                         │
+│   Page 1 Content        │
+│                         │
+│                         │
+│               Page 1 of 2│
+└─────────────────────────┘
+     ↕ 24px gap
+┌─────────────────────────┐
+│                         │
+│   Page 2 Content        │
+│                         │
+│                         │
+│               Page 2 of 2│
+└─────────────────────────┘
+```
+
+### Implementation
+A4Container.jsx should:
+- Measure content height with ResizeObserver
+- Calculate page count: `Math.ceil(contentHeight / 1123)`
+- Render content inside a single continuous div (no splitting), overlaid with dark separator bars at each A4_H boundary
+- Each separator bar is 16px tall, dark background, centered "page X" label
+- Separator bars use `className="no-print"` so they don't appear in PDF/print output
+- Export `pageCount` via `onPageCountChange` callback prop
+- Page count badge in toolbar: gray for 1 page, blue for 2 pages, amber for 3+ pages
+
+### CSS Classes (index.css + PRINT_PAGE_STYLE)
+- `.resume-entry { break-inside: avoid; page-break-inside: avoid; }` — prevents entries splitting across pages
+- `.resume-section-header { break-after: avoid; page-break-after: avoid; }` — keeps header with first entry
+- `.no-print { display: none !important; }` — hides separators in print/PDF output
+
+### For PDF Export
+- The visual page separators are hidden via `.no-print` before html2canvas capture
+- `downloadResumePDF` temporarily hides `.no-print` elements, captures, then restores
+- PDF uses continuous content approach with jsPDF page splitting
+- Result: clean PDF pages without any visual artifacts from the preview overlay
+
+### Status: Implemented ✓
+- A4Container.jsx rewritten with overlay separator bars
+- All 10 templates have `className="resume-entry"` on entry divs and `className="resume-section-header"` on section title elements
+- pdfExport.js hides `.no-print` elements before capture
+- ResumePreview.jsx and PreviewPage.jsx show page count badge
 
 ---
 
@@ -1109,6 +1145,167 @@ export const upcomingQueue = [
 - `src/components/ComingSoon/ShippedBadges.jsx` — Previously shipped features row
 - `src/components/ComingSoon/NavbarBadge.jsx` — Floating pulse badge for navbar
 - `src/data/comingSoonData.js` — Feature data (single source of truth)
+
+---
+
+## Original Theme Template (Preserve Uploaded Resume Style)
+
+### Overview
+When a user uploads an existing resume, the app should offer an "Original" template option that preserves the uploaded resume's visual style as closely as possible — no forced template override. This only appears when a resume has been uploaded.
+
+### How It Works
+1. User uploads a PDF/DOCX resume
+2. During AI parsing, also extract style metadata: font style (serif/sans-serif/monospace), layout type (single-column/two-column), color scheme (dark header/light/colorful/minimal), and overall feel
+3. Store this metadata in ResumeContext as `uploadedResumeStyle`
+4. A new "Original" template renders the resume using these extracted style cues
+5. "Original" auto-selects when resume is uploaded
+6. User can switch to any other template anytime, or stay with Original
+
+### Data Schema Addition (ResumeContext)
+```javascript
+uploadedResumeStyle: {
+  isUploaded: false,
+  fontFamily: "serif",           // serif | sans-serif | monospace
+  layout: "single-column",       // single-column | two-column
+  headerStyle: "simple",         // simple | bold-header | dark-header | centered
+  colorScheme: "minimal",        // minimal | blue-accent | dark | colorful
+  hasPhoto: false,
+  sectionOrder: ["summary", "experience", "education", "skills", "projects", "certifications"]
+}
+```
+
+### AI Parsing Enhancement
+In `src/utils/resumeParser.js` — Update the `parseResumeText` prompt to also return style metadata:
+- Add to prompt: "Also analyze the visual style of this resume and return a styleMetadata object with: fontFamily (serif/sans-serif/monospace based on the text formatting), layout (single-column or two-column), headerStyle (simple/bold-header/dark-header/centered), colorScheme (minimal/blue-accent/dark/colorful). Include this as a 'styleMetadata' field in your JSON response."
+
+### Original Template (`src/components/Templates/OriginalTemplate.jsx`)
+- Reads `uploadedResumeStyle` from context
+- Renders resume adapting to the detected style:
+  - If `fontFamily` is `"serif"` → use Merriweather/Georgia
+  - If `fontFamily` is `"sans-serif"` → use Inter/DM Sans
+  - If `fontFamily` is `"monospace"` → use JetBrains Mono/monospace
+  - If `layout` is `"two-column"` → render 2-column with 30% sidebar
+  - If `layout` is `"single-column"` → render single column
+  - If `headerStyle` is `"dark-header"` → dark background header with white text
+  - If `headerStyle` is `"centered"` → center-aligned name and contact
+  - If `headerStyle` is `"bold-header"` → large bold name with line separator
+  - If `colorScheme` is `"minimal"` → black and white, thin lines
+  - If `colorScheme` is `"blue-accent"` → blue headings and lines
+  - If `colorScheme` is `"dark"` → dark sidebar or header
+- Respects the `sectionOrder` from the uploaded resume
+- Falls back to Professional template style if metadata is incomplete
+
+### Template Selector Update
+- Add "Original" as template option ONLY when `uploadedResumeStyle.isUploaded` is `true`
+- Position it first in the dropdown when available
+- Show a label: "Original (matches your uploaded resume)"
+- Template key: `"original"` in `settings.selectedTemplate`
+- When no resume is uploaded, this option is hidden from dropdown and TemplatesPage
+
+### UI Flow
+1. Upload resume → parsing completes
+2. Template auto-switches to "Original"
+3. User sees their resume rendered in a style matching their uploaded version
+4. Dropdown shows: Original (matches your upload) | Modern | Classic | ... etc
+5. User can freely switch templates
+6. If user resets resume, "Original" option disappears
+
+---
+
+## Resume Content Preservation & Condense Feature
+
+### Core Principle
+When a user uploads a resume, ALL original text is preserved EXACTLY as written — word for word, no summarization, no shortening. Condensing is always optional and user-initiated.
+
+### Parser Rules (src/utils/resumeParser.js)
+- Groq API prompt explicitly instructs: "Do NOT summarize, shorten, paraphrase, or omit ANY content"
+- max_tokens: 4096 (handles 2-3 page resumes without truncation)
+- temperature: 0.1 (faithful extraction, not creative rewriting)
+- Every bullet point, metric, tech stack line, summary word preserved verbatim
+- PDF parser (pdfParser.js) extracts ALL pages with page separators
+
+### Condense with AI (Optional — User Initiated Only)
+
+#### Overview
+Users can OPTIONALLY condense specific sections of their resume using AI. This is a CTA, not automatic. Original text is always preserved until user explicitly accepts the condensed version.
+
+#### Component: src/components/AI/CondenseButton.jsx
+- Small subtle link-style button: "✂️ Condense with AI"
+- Icon: Scissors from lucide-react
+- Color: muted gray, accent on hover
+- NOT a prominent button — subtle and optional
+
+#### Condense Flow
+1. User clicks "✂ Condense with AI" next to a section
+2. Button shows loading spinner + "Condensing…"
+3. Groq API called with prompt: "Shorten this resume [section] to be more concise. Keep all key facts, metrics, impact. Reduce word count by 30-40%. Keep action verbs and numbers. Return ONLY condensed text."
+4. Shows comparison panel:
+   - Original text (gray background, label "Original")
+   - Condensed text (green highlight, label "Condensed — saves X words")
+5. Two action buttons: "Use Condensed" | "Keep Original"
+6. "Use Condensed" → replaces text in context
+7. "Keep Original" → dismisses comparison, no changes
+8. Rate limit: 4 second delay before API call
+
+#### Placement
+| Location | Button Label | What It Condenses |
+|----------|-------------|-------------------|
+| PersonalInfoForm.jsx | Below summary textarea, next to char count | Professional summary text |
+| ExperienceForm.jsx | Below each job's bullets | All bullets for that job entry |
+| ProjectsForm.jsx | Below each project description | Project description text |
+
+#### NOT Added To (already short content)
+- Skills section
+- Education dates/GPA
+- Certifications
+- Contact information
+
+#### Bullet Array Handling
+- ExperienceForm passes `entry.bullets` (string[]) as `text` prop
+- CondenseButton joins bullets with `\n` before sending to Groq
+- On accept, splits condensed text back into bullet array on `\n` boundaries, strips leading `- ` / `• ` markers
+- Calls `updateExperience(id, 'bullets', bullets)` to replace the whole array
+
+#### Global Condense Option (Future)
+- Button in Builder toolbar: "Condense Resume" with Scissors icon
+- On click: confirmation dialog explaining what will happen
+- Processes sequentially: summary → experience 1 → experience 2 → ... (4s delay between each)
+- Shows progress: "Condensing summary... Condensing experience 1 of 3..."
+- After completion: each section shows original vs condensed comparison
+- User accepts/rejects per section individually
+
+### Groq API Config for Parsing
+```javascript
+{
+  model: "llama-3.3-70b-versatile",
+  max_tokens: 4096,        // NOT 1024 — long resumes need more tokens
+  temperature: 0.1,         // Faithful extraction, not creative
+  messages: [
+    { role: "system", content: "Extract ALL text EXACTLY as written..." },
+    { role: "user", content: extractedResumeText }
+  ]
+}
+```
+
+### Groq API Config for Condensing
+```javascript
+{
+  model: "llama-3.3-70b-versatile",
+  max_tokens: 1024,
+  temperature: 0.3,
+  messages: [
+    { role: "system", content: "Shorten this resume [section]..." },
+    { role: "user", content: sectionText }
+  ]
+}
+```
+
+### Status: Implemented ✓
+- resumeParser.js: verbatim-preservation prompt, max_tokens 4096, temperature 0.1
+- CondenseButton.jsx: created with loading / comparison / accept / dismiss states
+- PersonalInfoForm.jsx: Condense button beside character count below summary
+- ExperienceForm.jsx: Condense bullets link beside "Add bullet point"
+- ProjectsForm.jsx: Condense link below project description textarea
 
 ---
 

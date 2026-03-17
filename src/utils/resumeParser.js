@@ -81,7 +81,7 @@ async function callGroq(messages, maxTokens = 2048) {
   const body = JSON.stringify({
     model: MODEL,
     messages,
-    temperature: 0.3,
+    temperature: 0.1,
     max_tokens: maxTokens,
   });
 
@@ -113,7 +113,8 @@ const SCHEMA = `{
   "education": [{"school":"","degree":"","field":"","startDate":"","endDate":"","gpa":""}],
   "skills": [{"category":"","items":[""]}],
   "projects": [{"name":"","description":"","technologies":"","liveLink":"","githubLink":""}],
-  "certifications": [{"name":"","issuer":"","date":""}]
+  "certifications": [{"name":"","issuer":"","date":""}],
+  "styleMetadata": {"fontFamily":"sans-serif","layout":"single-column","headerStyle":"simple","colorScheme":"minimal"}
 }`;
 
 /**
@@ -126,13 +127,24 @@ export async function parseResumeText(text) {
     {
       role: 'system',
       content:
-        `You are a resume parser. Extract structured data from the resume text provided. ` +
-        `Return ONLY valid JSON matching this exact schema: ${SCHEMA}. ` +
-        `Fill every field you can find. Use empty string for missing text fields and false for missing boolean fields. ` +
-        `For dates use format like "Jan 2023". ` +
-        `For the bullets array in experience, extract each bullet point as a separate string. ` +
-        `For skills, group into logical categories (e.g. "Languages", "Frameworks", "Tools"). ` +
-        `Do not include any explanation or markdown. Return raw JSON only.`,
+        `You are a resume parser. Extract ALL text EXACTLY as written — do NOT summarize, shorten, paraphrase, or omit ANY content. Every word, number, metric must be preserved verbatim.\n\n` +
+        `Rules:\n` +
+        `- Copy professional summary EXACTLY word for word\n` +
+        `- Copy EVERY bullet point EXACTLY as written under each job\n` +
+        `- If a job has a tech stack line, include it as the first bullet\n` +
+        `- Extract ALL skills with the same category groupings as in the resume\n` +
+        `- Extract ALL education entries with GPA, achievements, and any notes\n` +
+        `- Extract ALL projects with their full descriptions\n` +
+        `- Extract ALL certifications\n` +
+        `- Do NOT combine, merge, or summarize anything\n` +
+        `- Preserve exact dates, numbers, percentages, company names\n` +
+        `- CRITICAL: Do not leave anything out\n\n` +
+        `Also analyze the apparent visual style and populate styleMetadata: ` +
+        `fontFamily must be one of: serif, sans-serif, monospace. ` +
+        `layout must be one of: single-column, two-column. ` +
+        `headerStyle must be one of: simple, centered, bold-header, dark-header. ` +
+        `colorScheme must be one of: minimal, blue-accent, dark, colorful. ` +
+        `Return ONLY valid JSON matching this exact schema: ${SCHEMA}. No markdown, no explanation.`,
     },
     {
       role: 'user',
@@ -140,7 +152,7 @@ export async function parseResumeText(text) {
     },
   ];
 
-  let raw = stripFences(await callGroq(messages, 2048));
+  let raw = stripFences(await callGroq(messages, 4096));
 
   let parsed;
   try {
@@ -148,7 +160,7 @@ export async function parseResumeText(text) {
   } catch {
     // Retry once after 4 second delay
     await wait(4000);
-    raw = stripFences(await callGroq(messages, 2048));
+    raw = stripFences(await callGroq(messages, 4096));
     try {
       parsed = JSON.parse(raw);
     } catch {

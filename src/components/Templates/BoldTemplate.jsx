@@ -6,8 +6,8 @@ import CustomSections from './CustomSections';
 
 function SectionBlock({ title, accent, children }) {
   return (
-    <div style={{ marginBottom: 16 }}>
-      <div style={{
+    <div className="resume-section" style={{ marginBottom: 16 }}>
+      <div className="resume-section-header" style={{
         backgroundColor: accent, color: '#fff',
         padding: '4px 14px', marginBottom: 10,
         display: 'inline-block',
@@ -62,7 +62,7 @@ export default function BoldTemplate() {
       </div>
 
       {/* ── BODY ────────────────────────────────────────────────────────────── */}
-      <div style={{ padding: '20px 32px', display: 'flex', gap: 24 }}>
+      <div style={{ padding: '20px 32px 0', display: 'flex', gap: 24, alignItems: 'stretch' }}>
 
         {/* LEFT — main content (62%) */}
         <div style={{ flex: '0 0 62%' }}>
@@ -85,14 +85,14 @@ export default function BoldTemplate() {
           {experience.length > 0 && (
             <SectionBlock title="Experience" accent={accent}>
               {experience.map(exp => (
-                <div key={exp.id} style={{ marginBottom: 13 }}>
+                <div key={exp.id} className="resume-entry" style={{ marginBottom: 13, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                     <span style={{ fontSize: 12, fontWeight: 800, color: '#0f172a' }}>{exp.position}</span>
                     <span style={{ fontSize: 9, color: '#9ca3af', flexShrink: 0, marginLeft: 8 }}>
                       {dateRange(exp.startDate, exp.endDate, exp.current)}
                     </span>
                   </div>
-                  <p style={{ fontSize: 10, color: accent, fontWeight: 700, marginBottom: 5 }}>
+                  <p style={{ fontSize: 10, color: accent, fontWeight: 700, marginTop: 0, marginBottom: 5 }}>
                     {exp.company}{exp.location ? ` · ${exp.location}` : ''}
                   </p>
                   {exp.bullets.filter(b => b.trim()).length > 0 && (
@@ -111,7 +111,7 @@ export default function BoldTemplate() {
           {projects.length > 0 && (
             <SectionBlock title="Projects" accent={accent}>
               {projects.map(proj => (
-                <div key={proj.id} style={{ marginBottom: 9 }}>
+                <div key={proj.id} className="resume-entry" style={{ marginBottom: 9, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                     <span style={{ fontSize: 11, fontWeight: 800, color: '#0f172a' }}>{proj.name}</span>
                     {proj.liveLink && <span style={{ fontSize: 8.5, color: accent }}>{proj.liveLink}</span>}

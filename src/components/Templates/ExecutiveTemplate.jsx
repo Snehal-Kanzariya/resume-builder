@@ -6,8 +6,8 @@ import CustomSections from './CustomSections';
 
 function Section({ title, accent, children }) {
   return (
-    <div style={{ marginBottom: 18 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+    <div className="resume-section" style={{ marginBottom: 16 }}>
+      <div className="resume-section-header" style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
         <h2 style={{
           fontSize: 9, fontWeight: 700, letterSpacing: 3.5,
           textTransform: 'uppercase', color: accent,
@@ -62,10 +62,10 @@ export default function ExecutiveTemplate() {
       </div>
 
       {/* ── BODY ────────────────────────────────────────────────────────────── */}
-      <div style={{ padding: '24px 40px', backgroundColor: '#fff' }}>
+      <div style={{ padding: '24px 40px 0', backgroundColor: '#fff' }}>
 
         {p.summary && (
-          <div style={{ marginBottom: 18, borderLeft: `3px solid ${accent}`, paddingLeft: 14 }}>
+          <div style={{ marginBottom: 16, borderLeft: `3px solid ${accent}`, paddingLeft: 14 }}>
             <p style={{ fontSize: 10, lineHeight: 1.8, color: '#374151', fontStyle: 'italic' }}>{p.summary}</p>
           </div>
         )}
@@ -73,14 +73,14 @@ export default function ExecutiveTemplate() {
         {experience.length > 0 && (
           <Section title="Professional Experience" accent={accent}>
             {experience.map(exp => (
-              <div key={exp.id} style={{ marginBottom: 14 }}>
+              <div key={exp.id} className="resume-entry" style={{ marginBottom: 12, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                   <span style={{ fontSize: 11.5, fontWeight: 700, color: dark }}>{exp.position}</span>
                   <span style={{ fontSize: 9, color: '#9ca3af', flexShrink: 0, marginLeft: 8 }}>
                     {dateRange(exp.startDate, exp.endDate, exp.current)}
                   </span>
                 </div>
-                <p style={{ fontSize: 10, color: accent, fontWeight: 600, marginBottom: 5 }}>
+                <p style={{ fontSize: 10, color: accent, fontWeight: 600, marginTop: 0, marginBottom: 5 }}>
                   {exp.company}{exp.location ? `  ·  ${exp.location}` : ''}
                 </p>
                 {exp.bullets.filter(b => b.trim()).length > 0 && (
@@ -102,7 +102,7 @@ export default function ExecutiveTemplate() {
         {education.length > 0 && (
           <Section title="Education" accent={accent}>
             {education.map(edu => (
-              <div key={edu.id} style={{ marginBottom: 9 }}>
+              <div key={edu.id} className="resume-entry" style={{ marginBottom: 9, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                   <span style={{ fontSize: 11, fontWeight: 700, color: dark }}>{edu.school}</span>
                   <span style={{ fontSize: 9, color: '#9ca3af', flexShrink: 0, marginLeft: 8 }}>
@@ -141,7 +141,7 @@ export default function ExecutiveTemplate() {
         {projects.length > 0 && (
           <Section title="Key Projects" accent={accent}>
             {projects.map(proj => (
-              <div key={proj.id} style={{ marginBottom: 9 }}>
+              <div key={proj.id} className="resume-entry" style={{ marginBottom: 9, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                   <span style={{ fontSize: 11, fontWeight: 700, color: dark }}>{proj.name}</span>
                   {proj.liveLink && <span style={{ fontSize: 8.5, color: accent }}>{proj.liveLink}</span>}
@@ -157,7 +157,7 @@ export default function ExecutiveTemplate() {
         {certifications.length > 0 && (
           <Section title="Certifications" accent={accent}>
             {certifications.map(cert => (
-              <div key={cert.id} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+              <div key={cert.id} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
                 <div>
                   <span style={{ fontSize: 10.5, fontWeight: 700, color: dark }}>{cert.name}</span>
                   {cert.issuer && <span style={{ fontSize: 10, color: '#64748b' }}> · {cert.issuer}</span>}

@@ -22,7 +22,28 @@ export const PRINT_PAGE_STYLE = `
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
     color-adjust: exact !important;
+    box-sizing: border-box;
   }
+  /* Neutralise browser UA defaults not reset by Tailwind inside the
+     react-to-print iframe (which receives no stylesheet from the app). */
+  p, h1, h2, h3, h4, h5, h6, blockquote, figure, pre {
+    margin: 0;
+    padding: 0;
+  }
+  ul, ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  li {
+    margin: 0;
+    padding: 0;
+  }
+  /* Page-break helpers */
+  .no-print { display: none !important; }
+  .resume-entry { break-inside: avoid; page-break-inside: avoid; }
+  .resume-section-header { break-after: avoid; page-break-after: avoid; }
+  .resume-section { break-inside: avoid; page-break-inside: avoid; }
 `;
 
 // ── html2canvas + jsPDF fallback ──────────────────────────────────────────────
@@ -80,9 +101,14 @@ export async function downloadResumePDF(elementId, fileName) {
   const html2canvas = (await import('html2canvas')).default;
   const { jsPDF } = await import('jspdf');
 
+  // 0. Hide any screen-only overlays (page-break separators etc.)
+  const noPrintEls = element.querySelectorAll('.no-print');
+  noPrintEls.forEach(el => { el.style.display = 'none'; });
+
   // 1. Lift container-level height / overflow constraints.
   const originalStyle = element.style.cssText;
   element.style.maxHeight = 'none';
+  element.style.minHeight = '0';
   element.style.overflow  = 'visible';
   element.style.height    = 'auto';
 
@@ -116,6 +142,7 @@ export async function downloadResumePDF(elementId, fileName) {
   });
 
   // 4. Restore everything.
+  noPrintEls.forEach(el => { el.style.display = ''; });
   element.style.cssText = originalStyle;
   overflowFixes.forEach(({ el, overflow, overflowX, overflowY }) => {
     el.style.overflow  = overflow;
@@ -138,8 +165,10 @@ export async function downloadResumePDF(elementId, fileName) {
   pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
   heightLeft -= pdfHeight;
 
-  // Additional pages when content overflows one A4 sheet
-  while (heightLeft > 0) {
+  // Additional pages when more than 3 mm of content remains.
+  // 3 mm is large enough to ignore floating-point rounding (~0.0x mm) that
+  // previously created a blank page 2, yet small enough not to skip real content.
+  while (heightLeft > 3) {
     position -= pdfHeight;
     pdf.addPage();
     pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);

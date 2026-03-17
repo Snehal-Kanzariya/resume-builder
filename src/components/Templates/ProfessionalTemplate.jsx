@@ -6,7 +6,7 @@ import CustomSections from './CustomSections';
 
 function SectionHeader({ title }) {
   return (
-    <div style={{ marginBottom: 6 }}>
+    <div className="resume-section-header" style={{ marginBottom: 6 }}>
       <h2 style={{
         fontSize: 11, fontWeight: 700,
         textTransform: 'uppercase', letterSpacing: 1.5,
@@ -37,7 +37,7 @@ export default function ProfessionalTemplate() {
     <div style={{
       fontFamily: "'DM Sans', sans-serif",
       fontSize: 10.5, color: '#0f172a',
-      padding: '36px 44px', lineHeight: 1.5,
+      padding: '36px 44px 0', lineHeight: 1.5,
     }}>
 
       {/* ── HEADER ─────────────────────────────────────────────────────────── */}
@@ -61,7 +61,7 @@ export default function ProfessionalTemplate() {
 
       {/* ── SUMMARY ────────────────────────────────────────────────────────── */}
       {p.summary && (
-        <div style={{ marginBottom: 14 }}>
+        <div className="resume-section" style={{ marginBottom: 14, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
           <SectionHeader title="Professional Summary" />
           <p style={{ fontSize: 10, lineHeight: 1.7, color: '#1e293b', marginTop: 6 }}>
             {p.summary}
@@ -71,10 +71,10 @@ export default function ProfessionalTemplate() {
 
       {/* ── EXPERIENCE ─────────────────────────────────────────────────────── */}
       {experience.length > 0 && (
-        <div style={{ marginBottom: 14 }}>
+        <div className="resume-section" style={{ marginBottom: 14 }}>
           <SectionHeader title="Professional Experience" />
           {experience.map(exp => (
-            <div key={exp.id} style={{ marginTop: 10 }}>
+            <div key={exp.id} className="resume-entry" style={{ marginTop: 10, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                 <span style={{ fontSize: 11, fontWeight: 700 }}>{exp.company}</span>
                 <span style={{ fontSize: 10, color: '#374151' }}>
@@ -90,7 +90,7 @@ export default function ProfessionalTemplate() {
                 )}
               </div>
               {exp.bullets.filter(b => b.trim()).length > 0 && (
-                <ul style={{ paddingLeft: 18, margin: '4px 0 0', listStyle: 'disc' }}>
+                <ul style={{ paddingLeft: 18, marginTop: 4, marginBottom: 0, listStyle: 'disc' }}>
                   {exp.bullets.filter(b => b.trim()).map((b, i) => (
                     <li key={i} style={{ fontSize: 10, lineHeight: 1.65, color: '#1e293b', marginBottom: 2 }}>{b}</li>
                   ))}
@@ -104,10 +104,10 @@ export default function ProfessionalTemplate() {
 
       {/* ── EDUCATION ──────────────────────────────────────────────────────── */}
       {education.length > 0 && (
-        <div style={{ marginBottom: 14 }}>
+        <div className="resume-section" style={{ marginBottom: 14 }}>
           <SectionHeader title="Education" />
           {education.map(edu => (
-            <div key={edu.id} style={{ marginTop: 8 }}>
+            <div key={edu.id} className="resume-entry" style={{ marginTop: 8, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                 <span style={{ fontSize: 11, fontWeight: 700 }}>{edu.school}</span>
                 <span style={{ fontSize: 10, color: '#374151' }}>
@@ -129,7 +129,7 @@ export default function ProfessionalTemplate() {
 
       {/* ── SKILLS ─────────────────────────────────────────────────────────── */}
       {skills.length > 0 && (
-        <div style={{ marginBottom: 14 }}>
+        <div className="resume-section" style={{ marginBottom: 14, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
           <SectionHeader title="Skills" />
           <div style={{ marginTop: 6, display: 'flex', flexDirection: 'column', gap: 4 }}>
             {skills.map(cat => (
@@ -140,7 +140,7 @@ export default function ProfessionalTemplate() {
                   </span>
                 )}
                 <span style={{ fontSize: 10.5, color: '#1e293b' }}>
-                  {cat.items.join(', ')}
+                  {cat.items.join(' · ')}
                 </span>
               </div>
             ))}
@@ -151,10 +151,10 @@ export default function ProfessionalTemplate() {
 
       {/* ── PROJECTS ───────────────────────────────────────────────────────── */}
       {projects.length > 0 && (
-        <div style={{ marginBottom: 14 }}>
+        <div className="resume-section" style={{ marginBottom: 14 }}>
           <SectionHeader title="Projects" />
           {projects.map(proj => (
-            <div key={proj.id} style={{ marginTop: 8 }}>
+            <div key={proj.id} className="resume-entry" style={{ marginTop: 8, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                 <span style={{ fontSize: 11, fontWeight: 700 }}>{proj.name}</span>
                 {proj.liveLink && (
@@ -177,10 +177,10 @@ export default function ProfessionalTemplate() {
 
       {/* ── CERTIFICATIONS ─────────────────────────────────────────────────── */}
       {certifications.length > 0 && (
-        <div style={{ marginBottom: 14 }}>
+        <div className="resume-section" style={{ marginBottom: 14 }}>
           <SectionHeader title="Certifications" />
           {certifications.map(cert => (
-            <div key={cert.id} style={{ marginTop: 6, display: 'flex', justifyContent: 'space-between' }}>
+            <div key={cert.id} style={{ marginTop: 6, display: 'flex', justifyContent: 'space-between', breakInside: 'avoid', pageBreakInside: 'avoid' }}>
               <div>
                 <span style={{ fontSize: 10.5, fontWeight: 700 }}>{cert.name}</span>
                 {cert.issuer && (

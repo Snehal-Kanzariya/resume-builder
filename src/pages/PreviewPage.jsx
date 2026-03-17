@@ -8,7 +8,7 @@ import {
 import { useResume } from '../context/ResumeContext';
 import { downloadResumePDF, buildFilename, PRINT_PAGE_STYLE } from '../utils/pdfExport';
 import A4Container from '../components/Preview/A4Container';
-import { TEMPLATES, FONT_SCALES } from '../components/Preview/ResumePreview';
+import { TEMPLATES, FONT_SCALES, ORIGINAL_TEMPLATE } from '../components/Preview/ResumePreview';
 
 const PRINT_TARGET_ID = 'resume-print-area-preview';
 
@@ -18,14 +18,19 @@ const ACCENT_PRESETS = [
 ];
 
 export default function PreviewPage() {
-  const { resumeData, updateSettings } = useResume();
+  const { resumeData, updateSettings, uploadedResumeStyle } = useResume();
   const { selectedTemplate, accentColor, fontSize } = resumeData?.settings ?? {};
   const personalInfo = resumeData?.personalInfo ?? {};
 
   const [isDownloading, setDownloading] = useState(false);
+  const [pageCount,     setPageCount]   = useState(1);
   const printContentRef = useRef(null);
 
-  const { Component } = TEMPLATES.find(t => t.id === selectedTemplate) ?? TEMPLATES[0];
+  const allTemplates = uploadedResumeStyle?.isUploaded
+    ? [ORIGINAL_TEMPLATE, ...TEMPLATES]
+    : TEMPLATES;
+
+  const { Component } = allTemplates.find(t => t.id === selectedTemplate) ?? allTemplates[0];
   const contentScale  = FONT_SCALES[fontSize] ?? 1.0;
   const filename      = buildFilename(personalInfo.fullName ?? '');
 
@@ -68,6 +73,16 @@ export default function PreviewPage() {
           </span>
         </div>
 
+        <span className={`flex-shrink-0 text-[10px] font-medium px-2 py-0.5 rounded-full ${
+          pageCount >= 3
+            ? 'bg-amber-100 text-amber-700'
+            : pageCount === 2
+              ? 'bg-blue-100 text-blue-700'
+              : 'bg-slate-100 text-slate-500'
+        }`}>
+          {pageCount} {pageCount === 1 ? 'page' : 'pages'}
+        </span>
+
         <div className="flex-1" />
 
         <button
@@ -102,7 +117,7 @@ export default function PreviewPage() {
             onChange={e => updateSettings('selectedTemplate', e.target.value)}
             className="text-xs font-medium text-slate-700 dark:text-slate-200 bg-transparent border-none outline-none cursor-pointer dark:bg-slate-900"
           >
-            {TEMPLATES.map(t => <option key={t.id} value={t.id}>{t.label}</option>)}
+            {allTemplates.map(t => <option key={t.id} value={t.id}>{t.label}</option>)}
           </select>
         </div>
 
@@ -149,7 +164,7 @@ export default function PreviewPage() {
       {/* ── FULL-SCREEN A4 PREVIEW ────────────────────────────────────────────── */}
       <main className="flex-1 overflow-y-auto py-8 px-4">
         <div className="max-w-[860px] mx-auto">
-          <A4Container contentScale={contentScale}>
+          <A4Container contentScale={contentScale} onPageCountChange={setPageCount}>
             <Suspense fallback={null}>
               <Component />
             </Suspense>
@@ -165,7 +180,7 @@ export default function PreviewPage() {
         <div
           id={PRINT_TARGET_ID}
           ref={printContentRef}
-          style={{ width: '794px', minHeight: '1123px', backgroundColor: '#ffffff' }}
+          style={{ width: '794px', backgroundColor: '#ffffff' }}
         >
           <Suspense fallback={null}>
             <Component />
