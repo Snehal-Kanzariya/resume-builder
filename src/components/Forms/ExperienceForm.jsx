@@ -1,10 +1,11 @@
 import { Plus, Trash2, GripVertical, PlusCircle, X, ArrowUp, ArrowDown } from 'lucide-react';
 import { useResume } from '../../context/ResumeContext';
 import SectionAIPanel from '../AI/SectionAIPanel';
+import CondenseButton from '../AI/CondenseButton';
 import { useDragReorder } from '../../hooks/useDragReorder';
 
 function BulletList({ entry, id }) {
-  const { addExperienceBullet, updateExperienceBullet, removeExperienceBullet } = useResume();
+  const { addExperienceBullet, updateExperienceBullet, removeExperienceBullet, updateExperience } = useResume();
 
   return (
     <div className="mt-3">
@@ -32,13 +33,20 @@ function BulletList({ entry, id }) {
           </div>
         ))}
       </div>
-      <button
-        onClick={() => addExperienceBullet(id)}
-        className="mt-2 flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
-      >
-        <PlusCircle size={15} />
-        Add bullet point
-      </button>
+      <div className="flex items-center justify-between mt-2">
+        <button
+          onClick={() => addExperienceBullet(id)}
+          className="flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
+        >
+          <PlusCircle size={15} />
+          Add bullet point
+        </button>
+        <CondenseButton
+          text={entry.bullets}
+          sectionName="bullet points"
+          onCondensed={bullets => updateExperience(id, 'bullets', bullets)}
+        />
+      </div>
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { useResume } from '../../context/ResumeContext';
 import SectionAIPanel from '../AI/SectionAIPanel';
+import CondenseButton from '../AI/CondenseButton';
 
 const fields = [
   { key: 'fullName',   label: 'Full Name',           placeholder: 'Alex Johnson',              type: 'text' },
@@ -45,7 +46,14 @@ export default function PersonalInfoForm() {
           placeholder="A brief 2–3 sentence overview of your experience and key strengths..."
           className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition resize-none"
         />
-        <p className="text-xs text-slate-400 dark:text-slate-500 mt-1 text-right">{info.summary.length} / 500</p>
+        <div className="flex items-center justify-between mt-1">
+          <CondenseButton
+            text={info.summary}
+            sectionName="professional summary"
+            onCondensed={v => updatePersonalInfo('summary', v)}
+          />
+          <p className="text-xs text-slate-400 dark:text-slate-500">{info.summary.length} / 500</p>
+        </div>
       </div>
 
       <SectionAIPanel
