@@ -6,7 +6,7 @@ import CustomSections from './CustomSections';
 
 function SectionBlock({ title, accent, children }) {
   return (
-    <div style={{ marginBottom: 16 }}>
+    <div className="resume-section" style={{ marginBottom: 16 }}>
       <div className="resume-section-header" style={{
         backgroundColor: accent, color: '#fff',
         padding: '4px 14px', marginBottom: 10,

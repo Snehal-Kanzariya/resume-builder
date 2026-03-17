@@ -4,13 +4,11 @@ import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 export const A4_W = 794;
 export const A4_H = 1123;
 
-// Height of each page-break separator bar, in *screen* pixels (constant at any zoom level)
-const SEP_H = 40;
-
 /**
  * Scales an A4-sized page to fill its parent container width.
  * Supports multi-page resumes: the inner box grows past 1123px when content
- * overflows, and dark page-break separator bars are overlaid at each A4 boundary.
+ * overflows. A thin dashed line is overlaid at each A4 boundary — it is
+ * zero-height so it never covers content.
  *
  * Props:
  *   contentScale      – multiply all template content (font-size effect). Default 1.0.
@@ -68,12 +66,12 @@ const A4Container = forwardRef(function A4Container(
     return () => ro.disconnect();
   }, [onPageCountChange]);
 
-  // Outer height = visual content height + room for separator bars so they
-  // never overflow the wrapper (separators overlay the content at boundaries).
-  const outerHeight = contentHeight * scale + (pageCount - 1) * SEP_H;
+  // Outer height = visual content height only.
+  // Dashed-line indicators are zero-height and do not add space.
+  const outerHeight = contentHeight * scale;
 
   return (
-    /* Outer: reserves exactly the right vertical space for the scaled content + separators */
+    /* Outer: reserves exactly the right vertical space for the scaled content */
     <div
       ref={wrapRef}
       className={`w-full relative ${className}`}
@@ -105,9 +103,9 @@ const A4Container = forwardRef(function A4Container(
         </div>
       </div>
 
-      {/* ── Page-break separator bars ──────────────────────────────────────────
-          Screen-preview only — overlaid at each A4 boundary.
-          Hidden in PDF output via .no-print class.                          ── */}
+      {/* ── Page-break indicators ───────────────────────────────────────────────
+          Thin dashed blue line at each A4 boundary. Zero height — does NOT
+          cover or obscure any content. Hidden in PDF/print via .no-print.   ── */}
       {pageCount > 1 && Array.from({ length: pageCount - 1 }, (_, i) => (
         <div
           key={i}
@@ -116,40 +114,27 @@ const A4Container = forwardRef(function A4Container(
           style={{
             top:    `${(i + 1) * A4_H * scale}px`,
             width:  `${A4_W * scale}px`,
-            height: `${SEP_H}px`,
-            background: '#0f172a',
+            height: 0,
+            borderTop: '2px dashed #3b82f6',
             zIndex: 10,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 10,
-            padding: '0 16px',
-            boxSizing: 'border-box',
           }}
         >
-          {/* Left rule + page-end label */}
+          {/* "Page N" badge — floats above the line on the right */}
           <span style={{
-            fontSize: 9,
-            color: '#334155',
-            whiteSpace: 'nowrap',
-            fontFamily: 'system-ui, sans-serif',
-            letterSpacing: 0.5,
-          }}>
-            page {i + 1} ends
-          </span>
-          <div style={{ flex: 1, height: 1, background: 'rgba(51,65,85,0.7)' }} />
-          {/* Center divider dot */}
-          <div style={{ width: 4, height: 4, borderRadius: '50%', background: '#3b82f6', flexShrink: 0 }} />
-          <div style={{ flex: 1, height: 1, background: 'rgba(51,65,85,0.7)' }} />
-          {/* Right page-begin label */}
-          <span style={{
-            fontSize: 9,
-            color: '#3b82f6',
+            position:   'absolute',
+            right:      0,
+            top:        '-16px',
+            fontSize:   9,
             fontWeight: 600,
-            whiteSpace: 'nowrap',
+            color:      '#3b82f6',
+            background: '#1e293b',
+            padding:    '2px 10px',
+            borderRadius: 4,
             fontFamily: 'system-ui, sans-serif',
             letterSpacing: 0.5,
+            whiteSpace: 'nowrap',
           }}>
-            page {i + 2} begins
+            Page {i + 2}
           </span>
         </div>
       ))}

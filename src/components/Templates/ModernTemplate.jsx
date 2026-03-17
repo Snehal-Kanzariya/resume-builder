@@ -21,7 +21,7 @@ function SidebarSection({ title, children }) {
 
 function MainSection({ title, accent, children }) {
   return (
-    <div style={{ marginBottom: 15 }}>
+    <div className="resume-section" style={{ marginBottom: 15 }}>
       <div className="resume-section-header" style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 9 }}>
         <span style={{
           fontSize: 9, fontWeight: 800, letterSpacing: 2.2,

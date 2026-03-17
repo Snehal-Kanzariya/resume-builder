@@ -73,7 +73,7 @@ export default function CompactTemplate() {
         }}>
 
           {skills.length > 0 && (
-            <div>
+            <div className="resume-section">
               <SideLabel title="Skills" accent={accent} />
               {skills.map(cat => (
                 <div key={cat.id} style={{ marginBottom: 7 }}>
@@ -99,7 +99,7 @@ export default function CompactTemplate() {
           )}
 
           {education.length > 0 && (
-            <div>
+            <div className="resume-section">
               <SideLabel title="Education" accent={accent} />
               {education.map(edu => (
                 <div key={edu.id} style={{ marginBottom: 9 }}>
@@ -120,7 +120,7 @@ export default function CompactTemplate() {
           )}
 
           {certifications.length > 0 && (
-            <div>
+            <div className="resume-section">
               <SideLabel title="Certifications" accent={accent} />
               {certifications.map(cert => (
                 <div key={cert.id} style={{ marginBottom: 7 }}>
@@ -137,7 +137,7 @@ export default function CompactTemplate() {
         <div style={{ flex: 1, padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: 12 }}>
 
           {experience.length > 0 && (
-            <div>
+            <div className="resume-section">
               <MainLabel title="Experience" accent={accent} />
               {experience.map(exp => (
                 <div key={exp.id} className="resume-entry" style={{ marginBottom: 10, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
@@ -164,7 +164,7 @@ export default function CompactTemplate() {
           <CustomSections afterSection="experience" />
 
           {projects.length > 0 && (
-            <div>
+            <div className="resume-section">
               <MainLabel title="Projects" accent={accent} />
               {projects.map(proj => (
                 <div key={proj.id} className="resume-entry" style={{ marginBottom: 8, breakInside: 'avoid', pageBreakInside: 'avoid' }}>

@@ -72,7 +72,7 @@ export default function ClassicTemplate() {
 
       {/* ── SUMMARY ────────────────────────────────────────────────────────── */}
       {p.summary && (
-        <div style={{ marginBottom: 16, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
+        <div className="resume-section" style={{ marginBottom: 16, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
           <SectionHeader title="Professional Summary" accent={accent} />
           <p style={{ fontSize: 10, lineHeight: 1.7, color: '#374151', textAlign: 'justify' }}>
             {p.summary}
@@ -82,7 +82,7 @@ export default function ClassicTemplate() {
 
       {/* ── EXPERIENCE ─────────────────────────────────────────────────────── */}
       {experience.length > 0 && (
-        <div style={{ marginBottom: 16 }}>
+        <div className="resume-section" style={{ marginBottom: 16 }}>
           <SectionHeader title="Work Experience" accent={accent} />
           {experience.map(exp => (
             <div key={exp.id} className="resume-entry" style={{ marginBottom: 12, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
@@ -114,7 +114,7 @@ export default function ClassicTemplate() {
 
       {/* ── EDUCATION ──────────────────────────────────────────────────────── */}
       {education.length > 0 && (
-        <div style={{ marginBottom: 16 }}>
+        <div className="resume-section" style={{ marginBottom: 16 }}>
           <SectionHeader title="Education" accent={accent} />
           {education.map(edu => (
             <div key={edu.id} className="resume-entry" style={{ marginBottom: 10, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
@@ -141,7 +141,7 @@ export default function ClassicTemplate() {
 
       {/* ── SKILLS ─────────────────────────────────────────────────────────── */}
       {skills.length > 0 && (
-        <div style={{ marginBottom: 16, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
+        <div className="resume-section" style={{ marginBottom: 16, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
           <SectionHeader title="Skills" accent={accent} />
           {skills.map(cat => (
             <div key={cat.id} style={{ display: 'flex', gap: 8, marginBottom: 4 }}>
@@ -161,7 +161,7 @@ export default function ClassicTemplate() {
 
       {/* ── PROJECTS ───────────────────────────────────────────────────────── */}
       {projects.length > 0 && (
-        <div style={{ marginBottom: 16 }}>
+        <div className="resume-section" style={{ marginBottom: 16 }}>
           <SectionHeader title="Projects" accent={accent} />
           {projects.map(proj => (
             <div key={proj.id} className="resume-entry" style={{ marginBottom: 10, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
@@ -189,7 +189,7 @@ export default function ClassicTemplate() {
 
       {/* ── CERTIFICATIONS ─────────────────────────────────────────────────── */}
       {certifications.length > 0 && (
-        <div style={{ marginBottom: 16 }}>
+        <div className="resume-section" style={{ marginBottom: 16 }}>
           <SectionHeader title="Certifications" accent={accent} />
           {certifications.map(cert => (
             <div key={cert.id} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, breakInside: 'avoid', pageBreakInside: 'avoid' }}>

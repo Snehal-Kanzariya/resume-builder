@@ -6,7 +6,7 @@ import CustomSections from './CustomSections';
 
 function Section({ title, accent, children }) {
   return (
-    <div style={{ marginBottom: 14 }}>
+    <div className="resume-section" style={{ marginBottom: 14 }}>
       <div className="resume-section-header" style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 9 }}>
         <div style={{ width: 24, height: 1, backgroundColor: accent, opacity: 0.5 }} />
         <p style={{
