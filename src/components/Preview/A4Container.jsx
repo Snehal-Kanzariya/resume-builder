@@ -5,7 +5,7 @@ export const A4_W = 794;
 export const A4_H = 1123;
 
 // Height of each page-break separator bar, in *screen* pixels (constant at any zoom level)
-const SEP_H = 16;
+const SEP_H = 40;
 
 /**
  * Scales an A4-sized page to fill its parent container width.
@@ -117,27 +117,40 @@ const A4Container = forwardRef(function A4Container(
             top:    `${(i + 1) * A4_H * scale}px`,
             width:  `${A4_W * scale}px`,
             height: `${SEP_H}px`,
-            background: '#1e293b',
+            background: '#0f172a',
             zIndex: 10,
             display: 'flex',
             alignItems: 'center',
-            gap: 6,
-            padding: '0 14px',
+            gap: 10,
+            padding: '0 16px',
             boxSizing: 'border-box',
           }}
         >
-          <div style={{ flex: 1, height: 0.5, background: 'rgba(100,116,139,0.35)' }} />
+          {/* Left rule + page-end label */}
           <span style={{
-            fontSize: 8,
-            color: '#475569',
-            letterSpacing: 1.5,
-            textTransform: 'uppercase',
+            fontSize: 9,
+            color: '#334155',
             whiteSpace: 'nowrap',
             fontFamily: 'system-ui, sans-serif',
+            letterSpacing: 0.5,
           }}>
-            page {i + 2}
+            page {i + 1} ends
           </span>
-          <div style={{ flex: 1, height: 0.5, background: 'rgba(100,116,139,0.35)' }} />
+          <div style={{ flex: 1, height: 1, background: 'rgba(51,65,85,0.7)' }} />
+          {/* Center divider dot */}
+          <div style={{ width: 4, height: 4, borderRadius: '50%', background: '#3b82f6', flexShrink: 0 }} />
+          <div style={{ flex: 1, height: 1, background: 'rgba(51,65,85,0.7)' }} />
+          {/* Right page-begin label */}
+          <span style={{
+            fontSize: 9,
+            color: '#3b82f6',
+            fontWeight: 600,
+            whiteSpace: 'nowrap',
+            fontFamily: 'system-ui, sans-serif',
+            letterSpacing: 0.5,
+          }}>
+            page {i + 2} begins
+          </span>
         </div>
       ))}
     </div>
