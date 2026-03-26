@@ -2,6 +2,7 @@ import { Mail, Phone, MapPin, Linkedin, Globe, Github } from 'lucide-react';
 import { useResume } from '../../context/ResumeContext';
 import { fmtDate, dateRange } from '../../utils/dateFormat';
 import CustomSections from './CustomSections';
+import LanguagesSection from './LanguagesSection';
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
@@ -114,6 +115,14 @@ export default function ModernTemplate() {
             ))}
           </SidebarSection>
         )}
+
+        {/* Languages */}
+        <LanguagesSection
+          accentColor="#ffffff"
+          darkMode={true}
+          titleStyle={{ opacity: 0.6 }}
+          textStyle={{ opacity: 0.9 }}
+        />
 
         {/* Certifications */}
         {certifications.length > 0 && (

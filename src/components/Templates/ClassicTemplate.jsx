@@ -1,6 +1,7 @@
 import { useResume } from '../../context/ResumeContext';
 import { fmtDate, dateRange } from '../../utils/dateFormat';
 import CustomSections from './CustomSections';
+import LanguagesSection from './LanguagesSection';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -10,13 +11,13 @@ function HR({ accent }) {
 
 function SectionHeader({ title, accent }) {
   return (
-    <div className="resume-section-header" style={{ marginBottom: 7 }}>
+    <div className="resume-section-header" style={{ marginBottom: 5 }}>
       <h2 style={{
         fontSize: 11.5, fontWeight: 700,
         fontFamily: "'Merriweather', serif",
         textTransform: 'uppercase', letterSpacing: 2,
         color: accent || '#1e293b',
-        marginBottom: 4,
+        marginBottom: 3,
       }}>
         {title}
       </h2>
@@ -44,11 +45,11 @@ export default function ClassicTemplate() {
     <div style={{
       fontFamily: "'DM Sans', sans-serif",
       fontSize: 10.5, color: '#1e293b',
-      padding: '40px 44px 0', lineHeight: 1.5,
+      padding: '36px 40px 0', lineHeight: 1.5,
     }}>
 
       {/* ── HEADER ─────────────────────────────────────────────────────────── */}
-      <div style={{ textAlign: 'center', marginBottom: 18 }}>
+      <div style={{ textAlign: 'center', marginBottom: 14 }}>
         <h1 style={{
           fontFamily: "'Merriweather', serif",
           fontSize: 26, fontWeight: 700,
@@ -72,9 +73,9 @@ export default function ClassicTemplate() {
 
       {/* ── SUMMARY ────────────────────────────────────────────────────────── */}
       {p.summary && (
-        <div className="resume-section" style={{ marginBottom: 16, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
+        <div className="resume-section" style={{ marginBottom: 12, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
           <SectionHeader title="Professional Summary" accent={accent} />
-          <p style={{ fontSize: 10, lineHeight: 1.7, color: '#374151', textAlign: 'justify' }}>
+          <p style={{ fontSize: 10, lineHeight: 1.5, color: '#374151', textAlign: 'justify' }}>
             {p.summary}
           </p>
         </div>
@@ -82,10 +83,10 @@ export default function ClassicTemplate() {
 
       {/* ── EXPERIENCE ─────────────────────────────────────────────────────── */}
       {experience.length > 0 && (
-        <div className="resume-section" style={{ marginBottom: 16 }}>
+        <div className="resume-section" style={{ marginBottom: 12 }}>
           <SectionHeader title="Work Experience" accent={accent} />
           {experience.map(exp => (
-            <div key={exp.id} className="resume-entry" style={{ marginBottom: 12, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
+            <div key={exp.id} className="resume-entry" style={{ marginBottom: 10, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                 <span style={{ fontSize: 11.5, fontWeight: 700, fontFamily: "'Merriweather', serif" }}>
                   {exp.position}
@@ -102,7 +103,7 @@ export default function ClassicTemplate() {
               {exp.bullets.filter(b => b.trim()).length > 0 && (
                 <ul style={{ paddingLeft: 16, marginTop: 3, marginBottom: 0, listStyle: 'disc' }}>
                   {exp.bullets.filter(b => b.trim()).map((b, i) => (
-                    <li key={i} style={{ fontSize: 10, lineHeight: 1.65, color: '#374151', marginBottom: 2 }}>{b}</li>
+                    <li key={i} style={{ fontSize: 10, lineHeight: 1.4, color: '#374151', marginBottom: 1 }}>{b}</li>
                   ))}
                 </ul>
               )}
@@ -114,10 +115,10 @@ export default function ClassicTemplate() {
 
       {/* ── EDUCATION ──────────────────────────────────────────────────────── */}
       {education.length > 0 && (
-        <div className="resume-section" style={{ marginBottom: 16 }}>
+        <div className="resume-section" style={{ marginBottom: 12 }}>
           <SectionHeader title="Education" accent={accent} />
           {education.map(edu => (
-            <div key={edu.id} className="resume-entry" style={{ marginBottom: 10, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
+            <div key={edu.id} className="resume-entry" style={{ marginBottom: 7, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                 <span style={{ fontSize: 11.5, fontWeight: 700, fontFamily: "'Merriweather', serif" }}>
                   {edu.school}
@@ -141,10 +142,10 @@ export default function ClassicTemplate() {
 
       {/* ── SKILLS ─────────────────────────────────────────────────────────── */}
       {skills.length > 0 && (
-        <div className="resume-section" style={{ marginBottom: 16, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
+        <div className="resume-section" style={{ marginBottom: 12, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
           <SectionHeader title="Skills" accent={accent} />
           {skills.map(cat => (
-            <div key={cat.id} style={{ display: 'flex', gap: 8, marginBottom: 4 }}>
+            <div key={cat.id} style={{ display: 'flex', gap: 8, marginBottom: 3 }}>
               {cat.category && (
                 <span style={{ fontSize: 10, fontWeight: 700, minWidth: 130, color: '#374151' }}>
                   {cat.category}:
@@ -157,14 +158,15 @@ export default function ClassicTemplate() {
           ))}
         </div>
       )}
+      <LanguagesSection accentColor={accent} fontFamily="'DM Sans', sans-serif" />
       <CustomSections afterSection="skills" />
 
       {/* ── PROJECTS ───────────────────────────────────────────────────────── */}
       {projects.length > 0 && (
-        <div className="resume-section" style={{ marginBottom: 16 }}>
+        <div className="resume-section" style={{ marginBottom: 12 }}>
           <SectionHeader title="Projects" accent={accent} />
           {projects.map(proj => (
-            <div key={proj.id} className="resume-entry" style={{ marginBottom: 10, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
+            <div key={proj.id} className="resume-entry" style={{ marginBottom: 7, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                 <span style={{ fontSize: 11, fontWeight: 700, fontFamily: "'Merriweather', serif" }}>
                   {proj.name}
@@ -189,10 +191,10 @@ export default function ClassicTemplate() {
 
       {/* ── CERTIFICATIONS ─────────────────────────────────────────────────── */}
       {certifications.length > 0 && (
-        <div className="resume-section" style={{ marginBottom: 16 }}>
+        <div className="resume-section" style={{ marginBottom: 12 }}>
           <SectionHeader title="Certifications" accent={accent} />
           {certifications.map(cert => (
-            <div key={cert.id} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
+            <div key={cert.id} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
               <div>
                 <span style={{ fontSize: 10.5, fontWeight: 700 }}>{cert.name}</span>
                 {cert.issuer && (

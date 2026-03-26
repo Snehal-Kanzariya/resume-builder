@@ -37,7 +37,7 @@ function TemplateFallback() {
 
 // Base templates (always available)
 export const TEMPLATES = [
-  { id: 'modern',       label: 'Modern',       Component: ModernTemplate },
+  // { id: 'modern',       label: 'Modern',       Component: ModernTemplate },
   { id: 'classic',      label: 'Classic',      Component: ClassicTemplate },
   { id: 'minimal',      label: 'Minimal',      Component: MinimalTemplate },
   { id: 'creative',     label: 'Creative',     Component: CreativeTemplate },

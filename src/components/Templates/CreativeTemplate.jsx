@@ -2,13 +2,14 @@ import { Briefcase, GraduationCap, FolderOpen, Award, Zap, User } from 'lucide-r
 import { useResume } from '../../context/ResumeContext';
 import { fmtDate, dateRange } from '../../utils/dateFormat';
 import CustomSections from './CustomSections';
+import LanguagesSection from './LanguagesSection';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function RightSection({ title, icon: Icon, accent, children }) {
   return (
-    <div className="resume-section" style={{ marginBottom: 16 }}>
-      <div className="resume-section-header" style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 9 }}>
+    <div className="resume-section" style={{ marginBottom: 12 }}>
+      <div className="resume-section-header" style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 7 }}>
         <span style={{
           width: 20, height: 20, borderRadius: '50%',
           backgroundColor: accent, display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -64,7 +65,7 @@ export default function CreativeTemplate() {
     <div style={{ fontFamily: "'DM Sans', sans-serif", display: 'flex', flexDirection: 'column', lineHeight: 1.45 }}>
 
       {/* ── HEADER BANNER ──────────────────────────────────────────────────── */}
-      <div style={{ background: headerBg, padding: '24px 30px', color: '#fff', flexShrink: 0 }}>
+      <div style={{ background: headerBg, padding: '20px 26px', color: '#fff', flexShrink: 0 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
           <div>
             <h1 style={{ fontSize: 26, fontWeight: 800, letterSpacing: -0.5, lineHeight: 1.1, marginBottom: 4 }}>
@@ -98,8 +99,8 @@ export default function CreativeTemplate() {
         {/* LEFT: skills + certifications */}
         <div style={{
           width: '33%', backgroundColor: '#0f172a', color: '#fff',
-          padding: '20px 16px', display: 'flex', flexDirection: 'column',
-          gap: 16, flexShrink: 0,
+          padding: '16px 14px', display: 'flex', flexDirection: 'column',
+          gap: 12, flexShrink: 0,
         }}>
 
           {/* Skills */}
@@ -112,7 +113,7 @@ export default function CreativeTemplate() {
                 </p>
               </div>
               {skills.map(cat => (
-                <div key={cat.id} style={{ marginBottom: 12 }}>
+                <div key={cat.id} style={{ marginBottom: 9 }}>
                   {cat.category && (
                     <p style={{ fontSize: 8, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 6 }}>
                       {cat.category}
@@ -126,6 +127,9 @@ export default function CreativeTemplate() {
             </div>
           )}
 
+          {/* Languages */}
+          <LanguagesSection darkMode={true} accentColor={accent} />
+
           {/* Certifications */}
           {certifications.length > 0 && (
             <div>
@@ -136,7 +140,7 @@ export default function CreativeTemplate() {
                 </p>
               </div>
               {certifications.map(cert => (
-                <div key={cert.id} style={{ marginBottom: 9, borderLeft: `2px solid ${accent}40`, paddingLeft: 8 }}>
+                <div key={cert.id} style={{ marginBottom: 7, borderLeft: `2px solid ${accent}40`, paddingLeft: 8 }}>
                   <p style={{ fontSize: 9.5, fontWeight: 600, color: '#fff', marginBottom: 2 }}>{cert.name}</p>
                   {cert.issuer && <p style={{ fontSize: 8.5, color: 'rgba(255,255,255,0.55)' }}>{cert.issuer}</p>}
                   {cert.date  && <p style={{ fontSize: 8, color: 'rgba(255,255,255,0.4)'  }}>{fmtDate(cert.date)}</p>}
@@ -148,7 +152,7 @@ export default function CreativeTemplate() {
 
         {/* RIGHT: experience + education + projects */}
         <div style={{
-          flex: 1, padding: '20px 22px',
+          flex: 1, padding: '16px 20px',
           display: 'flex', flexDirection: 'column',
         }}>
 
@@ -156,7 +160,7 @@ export default function CreativeTemplate() {
           {experience.length > 0 && (
             <RightSection title="Experience" icon={Briefcase} accent={accent}>
               {experience.map(exp => (
-                <div key={exp.id} className="resume-entry" style={{ marginBottom: 11 }}>
+                <div key={exp.id} className="resume-entry" style={{ marginBottom: 9 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                     <span style={{ fontSize: 11, fontWeight: 700, color: '#0f172a' }}>{exp.position}</span>
                     <span style={{ fontSize: 8.5, color: '#94a3b8', flexShrink: 0, marginLeft: 8 }}>
@@ -169,7 +173,7 @@ export default function CreativeTemplate() {
                   {exp.bullets.filter(b => b.trim()).length > 0 && (
                     <ul style={{ paddingLeft: 13, margin: 0, listStyle: 'disc' }}>
                       {exp.bullets.filter(b => b.trim()).map((b, i) => (
-                        <li key={i} style={{ fontSize: 9.5, lineHeight: 1.6, color: '#374151', marginBottom: 1.5 }}>{b}</li>
+                        <li key={i} style={{ fontSize: 9.5, lineHeight: 1.4, color: '#374151', marginBottom: 1 }}>{b}</li>
                       ))}
                     </ul>
                   )}
@@ -183,7 +187,7 @@ export default function CreativeTemplate() {
           {education.length > 0 && (
             <RightSection title="Education" icon={GraduationCap} accent={accent}>
               {education.map(edu => (
-                <div key={edu.id} className="resume-entry" style={{ marginBottom: 9 }}>
+                <div key={edu.id} className="resume-entry" style={{ marginBottom: 7 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                     <span style={{ fontSize: 11, fontWeight: 700, color: '#0f172a' }}>{edu.school}</span>
                     <span style={{ fontSize: 8.5, color: '#94a3b8' }}>
@@ -207,7 +211,7 @@ export default function CreativeTemplate() {
           {projects.length > 0 && (
             <RightSection title="Projects" icon={FolderOpen} accent={accent}>
               {projects.map(proj => (
-                <div key={proj.id} className="resume-entry" style={{ marginBottom: 9 }}>
+                <div key={proj.id} className="resume-entry" style={{ marginBottom: 7 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                     <span style={{ fontSize: 10.5, fontWeight: 700, color: '#0f172a' }}>{proj.name}</span>
                     {proj.liveLink && (

@@ -16,6 +16,7 @@ import EducationForm       from '../components/Forms/EducationForm';
 import SkillsForm          from '../components/Forms/SkillsForm';
 import ProjectsForm        from '../components/Forms/ProjectsForm';
 import CertificationsForm  from '../components/Forms/CertificationsForm';
+import LanguagesForm       from '../components/Forms/LanguagesForm';
 import CustomSectionForm   from '../components/Forms/CustomSectionForm';
 import AISuggestions       from '../components/AI/AISuggestions';
 
@@ -26,6 +27,7 @@ const FORM_MAP = {
   skills:         <SkillsForm />,
   projects:       <ProjectsForm />,
   certifications: <CertificationsForm />,
+  languages:      <LanguagesForm />,
 };
 
 // ── Mobile section tab bar ───────────────────────────────────────────────────

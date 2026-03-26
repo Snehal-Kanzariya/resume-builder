@@ -4,11 +4,18 @@ import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 export const A4_W = 794;
 export const A4_H = 1123;
 
+// If content overflows page 1 by less than this fraction, try compact mode
+const COMPACT_THRESHOLD = A4_H * 1.11; // ~1247px
+
 /**
  * Scales an A4-sized page to fill its parent container width.
  * Supports multi-page resumes: the inner box grows past 1123px when content
  * overflows. A thin dashed line is overlaid at each A4 boundary — it is
  * zero-height so it never covers content.
+ *
+ * Smart auto-compress: when content barely overflows 1 page (< ~11%), a
+ * "compact-mode" CSS class is added that subtly shrinks fonts, line-heights,
+ * and margins to push the content back onto 1 page.
  *
  * Props:
  *   contentScale      – multiply all template content (font-size effect). Default 1.0.
@@ -26,6 +33,7 @@ const A4Container = forwardRef(function A4Container(
   const [scale,         setScale]         = useState(1);
   const [contentHeight, setContentHeight] = useState(0);
   const [pageCount,     setPageCount]     = useState(1);
+  const [compactMode,   setCompactMode]   = useState(false);
 
   // Merge forwarded print ref with internal measurement ref.
   const setInnerRefs = useCallback((el) => {
@@ -46,13 +54,18 @@ const A4Container = forwardRef(function A4Container(
     return () => ro.disconnect();
   }, []);
 
-  // Track content height and compute page count.
+  // Track content height, detect near-overflow, compute page count.
   useEffect(() => {
     const el = innerRef.current;
     if (!el) return;
     const update = () => {
       const h = el.scrollHeight;
       setContentHeight(prev => (prev === h ? prev : h));
+
+      // Smart compact detection: content barely overflows 1 page
+      const needsCompact = h > A4_H && h <= COMPACT_THRESHOLD;
+      setCompactMode(prev => (prev === needsCompact ? prev : needsCompact));
+
       const pages = Math.max(1, Math.ceil(h / A4_H));
       setPageCount(prev => {
         if (prev === pages) return prev;
@@ -66,6 +79,24 @@ const A4Container = forwardRef(function A4Container(
     return () => ro.disconnect();
   }, [onPageCountChange]);
 
+  // Re-measure after compact mode toggles (may push content back to 1 page)
+  useEffect(() => {
+    const el = innerRef.current;
+    if (!el) return;
+    // Allow a frame for CSS to apply
+    const id = requestAnimationFrame(() => {
+      const h = el.scrollHeight;
+      setContentHeight(prev => (prev === h ? prev : h));
+      const pages = Math.max(1, Math.ceil(h / A4_H));
+      setPageCount(prev => {
+        if (prev === pages) return prev;
+        onPageCountChange?.(pages);
+        return pages;
+      });
+    });
+    return () => cancelAnimationFrame(id);
+  }, [compactMode, onPageCountChange]);
+
   // Outer height = visual content height only.
   // Dashed-line indicators are zero-height and do not add space.
   const outerHeight = contentHeight * scale;
@@ -77,10 +108,20 @@ const A4Container = forwardRef(function A4Container(
       className={`w-full relative ${className}`}
       style={{ height: `${outerHeight}px` }}
     >
+      {/* Compact-mode CSS — injected once, scoped via .compact-mode class */}
+      <style>{`
+        .compact-mode .resume-section { margin-bottom: 10px !important; }
+        .compact-mode .resume-section-header { margin-bottom: 5px !important; }
+        .compact-mode .resume-entry { margin-bottom: 8px !important; }
+        .compact-mode ul { margin-top: 1px !important; }
+        .compact-mode li { line-height: 1.35 !important; margin-bottom: 1px !important; }
+        .compact-mode p { line-height: 1.4 !important; }
+      `}</style>
+
       {/* A4 box — 794px wide, all pages as one continuous div, no transforms on height */}
       <div
         ref={setInnerRefs}
-        className="print-area absolute top-0 left-0 bg-white"
+        className={`print-area absolute top-0 left-0 bg-white ${compactMode ? 'compact-mode' : ''}`}
         style={{
           width: `${A4_W}px`,
           transform: `scale(${scale})`,

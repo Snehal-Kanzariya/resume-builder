@@ -1,6 +1,7 @@
 import { useResume } from '../../context/ResumeContext';
 import { dateRange } from '../../utils/dateFormat';
 import CustomSections from './CustomSections';
+import LanguagesSection from './LanguagesSection';
 
 // ── Tech: terminal-dark header, monospace section labels, code-badge skills ───
 
@@ -8,7 +9,7 @@ const MONO = "'Courier New', 'Lucida Console', monospace";
 
 function TermHeader({ title, accent }) {
   return (
-    <div className="resume-section-header" style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+    <div className="resume-section-header" style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 7 }}>
       <span style={{ fontFamily: MONO, fontSize: 10, color: accent, fontWeight: 700 }}>{'>'}</span>
       <span style={{ fontFamily: MONO, fontSize: 8.5, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', color: accent }}>
         {title}
@@ -44,9 +45,9 @@ export default function TechTemplate() {
     <div style={{ fontFamily: "'DM Sans', sans-serif", display: 'flex', flexDirection: 'column', lineHeight: 1.5 }}>
 
       {/* ── TERMINAL HEADER ──────────────────────────────────────────────────── */}
-      <div style={{ backgroundColor: termBg, color: '#c9d1d9', padding: '24px 28px 20px' }}>
+      <div style={{ backgroundColor: termBg, color: '#c9d1d9', padding: '20px 24px 16px' }}>
         {/* Fake window chrome */}
-        <div style={{ display: 'flex', gap: 6, marginBottom: 16 }}>
+        <div style={{ display: 'flex', gap: 6, marginBottom: 12 }}>
           {['#ff5f57','#ffbd2e','#28c840'].map(c => (
             <div key={c} style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: c }} />
           ))}
@@ -79,19 +80,19 @@ export default function TechTemplate() {
       </div>
 
       {/* ── BODY ────────────────────────────────────────────────────────────── */}
-      <div style={{ padding: '20px 28px 0', backgroundColor: '#fff' }}>
+      <div style={{ padding: '16px 24px 0', backgroundColor: '#fff' }}>
 
         {p.summary && (
-          <div className="resume-section" style={{ marginBottom: 16 }}>
+          <div className="resume-section" style={{ marginBottom: 12 }}>
             <TermHeader title="// about" accent={accent} />
-            <p style={{ fontSize: 10, lineHeight: 1.75, color: '#374151', paddingLeft: 16 }}>{p.summary}</p>
+            <p style={{ fontSize: 10, lineHeight: 1.5, color: '#374151', paddingLeft: 14 }}>{p.summary}</p>
           </div>
         )}
 
         {skills.length > 0 && (
-          <div className="resume-section" style={{ marginBottom: 16, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
+          <div className="resume-section" style={{ marginBottom: 12, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
             <TermHeader title="// tech_stack" accent={accent} />
-            <div style={{ paddingLeft: 16, display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <div style={{ paddingLeft: 14, display: 'flex', flexDirection: 'column', gap: 4 }}>
               {skills.map(cat => (
                 <div key={cat.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
                   {cat.category && (
@@ -107,24 +108,25 @@ export default function TechTemplate() {
             </div>
           </div>
         )}
+        <LanguagesSection />
         <CustomSections afterSection="skills" />
 
         {experience.length > 0 && (
-          <div className="resume-section" style={{ marginBottom: 16 }}>
+          <div className="resume-section" style={{ marginBottom: 12 }}>
             <TermHeader title="// experience" accent={accent} />
             {experience.map(exp => (
-              <div key={exp.id} className="resume-entry" style={{ marginBottom: 12, paddingLeft: 16, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
+              <div key={exp.id} className="resume-entry" style={{ marginBottom: 10, paddingLeft: 14, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                   <span style={{ fontSize: 11, fontWeight: 700, color: '#0f172a' }}>{exp.position}</span>
                   <span style={{ fontFamily: MONO, fontSize: 8.5, color: '#94a3b8', flexShrink: 0, marginLeft: 8 }}>
                     {dateRange(exp.startDate, exp.endDate, exp.current)}
                   </span>
                 </div>
-                <p style={{ fontFamily: MONO, fontSize: 9, color: accent, marginTop: 0, marginBottom: 5 }}>
+                <p style={{ fontFamily: MONO, fontSize: 9, color: accent, marginTop: 0, marginBottom: 4 }}>
                   @ {exp.company}{exp.location ? ` // ${exp.location}` : ''}
                 </p>
                 {exp.bullets.filter(b => b.trim()).map((b, i) => (
-                  <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 2 }}>
+                  <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 1 }}>
                     <span style={{ fontFamily: MONO, color: accent, fontSize: 10, flexShrink: 0 }}>-</span>
                     <span style={{ fontSize: 9.5, lineHeight: 1.6, color: '#374151' }}>{b}</span>
                   </div>
@@ -136,10 +138,10 @@ export default function TechTemplate() {
         <CustomSections afterSection="experience" />
 
         {projects.length > 0 && (
-          <div className="resume-section" style={{ marginBottom: 16 }}>
+          <div className="resume-section" style={{ marginBottom: 12 }}>
             <TermHeader title="// projects" accent={accent} />
             {projects.map(proj => (
-              <div key={proj.id} className="resume-entry" style={{ marginBottom: 9, paddingLeft: 16, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
+              <div key={proj.id} className="resume-entry" style={{ marginBottom: 7, paddingLeft: 14, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                   <span style={{ fontFamily: MONO, fontSize: 10.5, fontWeight: 700, color: '#0f172a' }}>{proj.name}</span>
                   {proj.liveLink && <span style={{ fontFamily: MONO, fontSize: 8.5, color: accent }}>{proj.liveLink}</span>}
@@ -157,10 +159,10 @@ export default function TechTemplate() {
         <CustomSections afterSection="projects" />
 
         {education.length > 0 && (
-          <div className="resume-section" style={{ marginBottom: 16 }}>
+          <div className="resume-section" style={{ marginBottom: 12 }}>
             <TermHeader title="// education" accent={accent} />
             {education.map(edu => (
-              <div key={edu.id} className="resume-entry" style={{ marginBottom: 8, paddingLeft: 16, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
+              <div key={edu.id} className="resume-entry" style={{ marginBottom: 6, paddingLeft: 14, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                   <span style={{ fontSize: 11, fontWeight: 700, color: '#0f172a' }}>{edu.school}</span>
                   <span style={{ fontFamily: MONO, fontSize: 8.5, color: '#94a3b8' }}>
@@ -181,7 +183,7 @@ export default function TechTemplate() {
           <div className="resume-section">
             <TermHeader title="// certifications" accent={accent} />
             {certifications.map(cert => (
-              <div key={cert.id} style={{ paddingLeft: 16, marginBottom: 5, display: 'flex', justifyContent: 'space-between', breakInside: 'avoid', pageBreakInside: 'avoid' }}>
+              <div key={cert.id} style={{ paddingLeft: 14, marginBottom: 4, display: 'flex', justifyContent: 'space-between', breakInside: 'avoid', pageBreakInside: 'avoid' }}>
                 <span style={{ fontSize: 10, fontWeight: 600, color: '#0f172a' }}>{cert.name}
                   {cert.issuer && <span style={{ fontWeight: 400, color: '#64748b' }}> · {cert.issuer}</span>}
                 </span>

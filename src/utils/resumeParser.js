@@ -15,6 +15,7 @@ export function validateParsedData(data) {
       location:  data?.personalInfo?.location  || '',
       linkedin:  data?.personalInfo?.linkedin  || '',
       portfolio: data?.personalInfo?.portfolio || '',
+      github:    data?.personalInfo?.github    || '',
       summary:   data?.personalInfo?.summary   || '',
     },
     experience: (Array.isArray(data?.experience) ? data.experience : []).map(e => ({
@@ -57,6 +58,23 @@ export function validateParsedData(data) {
       date:   c.date   || '',
       link:   c.link   || '',
     })),
+    languages: (Array.isArray(data?.languages) ? data.languages : []).map(l => ({
+      id:          l.id || crypto.randomUUID(),
+      name:        l.name        || '',
+      proficiency: ['Native', 'Fluent', 'Advanced', 'Intermediate', 'Basic'].includes(l.proficiency)
+        ? l.proficiency : 'Intermediate',
+    })),
+    // customSections from parser: [{title, entries: [{heading, subheading, description, bullets}]}]
+    // Kept in parser format here; importResumeData converts to context format.
+    customSections: (Array.isArray(data?.customSections) ? data.customSections : []).map(s => ({
+      title:   s.title || '',
+      entries: (Array.isArray(s.entries) ? s.entries : []).map(e => ({
+        heading:     e.heading     || '',
+        subheading:  e.subheading  || '',
+        description: e.description || '',
+        bullets:     Array.isArray(e.bullets) ? e.bullets.map(String).filter(Boolean) : [],
+      })),
+    })).filter(s => s.title && s.entries.length > 0),
   };
 }
 
@@ -108,14 +126,49 @@ async function callGroq(messages, maxTokens = 2048) {
 }
 
 const SCHEMA = `{
-  "personalInfo": {"fullName":"","jobTitle":"","email":"","phone":"","location":"","linkedin":"","portfolio":"","summary":""},
+  "personalInfo": {"fullName":"","jobTitle":"","email":"","phone":"","location":"","linkedin":"","portfolio":"","github":"","summary":""},
   "experience": [{"company":"","position":"","startDate":"","endDate":"","current":false,"location":"","bullets":[""]}],
-  "education": [{"school":"","degree":"","field":"","startDate":"","endDate":"","gpa":""}],
+  "education": [{"school":"","degree":"","field":"","startDate":"","endDate":"","gpa":"","achievements":""}],
   "skills": [{"category":"","items":[""]}],
   "projects": [{"name":"","description":"","technologies":"","liveLink":"","githubLink":""}],
-  "certifications": [{"name":"","issuer":"","date":""}],
-  "styleMetadata": {"fontFamily":"sans-serif","layout":"single-column","headerStyle":"simple","colorScheme":"minimal"}
+  "certifications": [{"name":"","issuer":"","date":"","description":""}],
+  "languages": [{"name":"","proficiency":"Native|Fluent|Advanced|Intermediate|Basic"}],
+  "customSections": [{"title":"","entries":[{"heading":"","subheading":"","description":"","bullets":[""]}]}],
+  "styleMetadata": {
+    "fontFamily":"sans-serif",
+    "layout":"single-column",
+    "headerStyle":"simple",
+    "colorScheme":"minimal",
+    "accentColor":"",
+    "hasSidebar":false,
+    "sidebarPosition":"left",
+    "sidebarContent":[]
+  }
 }`;
+
+const SYSTEM_PROMPT =
+  `You are a resume parser. Extract ALL text EXACTLY as written. Do NOT summarize or shorten anything.\n\n` +
+  `CRITICAL RULES:\n` +
+  `- Extract EVERY section that exists in the resume including non-standard sections\n` +
+  `- Common sections: Summary, Experience, Education, Skills, Projects, Certifications\n` +
+  `- Also extract if present: Languages, Training, Courses, Hobbies, Volunteer Work, Awards, Publications, Interests\n` +
+  `- For standard sections (experience, education, skills, projects, certifications), use the provided schema fields\n` +
+  `- For Languages section: extract to the "languages" array with name and proficiency (Native/Fluent/Advanced/Intermediate/Basic)\n` +
+  `- For any section not in the standard schema (Training, Awards, Hobbies, Volunteer Work, etc.), put it in customSections array with title and entries\n` +
+  `- Copy ALL text word for word — do NOT omit, paraphrase, or summarize any bullet, description, or metric\n` +
+  `- Preserve exact dates, numbers, percentages, company names, technologies\n` +
+  `- If a job has a tech stack line, include it as the first bullet under that job\n` +
+  `- Extract ALL skills with the same category groupings as in the resume\n\n` +
+  `STYLE ANALYSIS — also analyze the visual style and return styleMetadata:\n` +
+  `- fontFamily: If the resume looks formal/traditional with serif fonts → "serif". If modern/clean → "sans-serif". If code-like → "monospace"\n` +
+  `- layout: If there is a distinct sidebar column (skills/education/contact in a separate column) → "two-column". If everything flows top to bottom in one column → "single-column"\n` +
+  `- headerStyle: If name has a very large bold style → "bold-header". If there is a dark/colored background bar behind the name → "dark-header". If name is centered → "centered". Otherwise → "simple"\n` +
+  `- colorScheme: If blue headings or accents are visible → "blue-accent". If mostly black/gray → "minimal". If dark sidebar or dark header → "dark". If multiple bright colors → "colorful"\n` +
+  `- accentColor: The primary non-black color used. Provide as hex code if possible (e.g. "#2196F3"), otherwise describe as "blue", "green", "red", etc.\n` +
+  `- hasSidebar: true if the resume has a visually distinct sidebar column, false otherwise\n` +
+  `- sidebarPosition: "left" or "right" (which side the sidebar is on). Default "left"\n` +
+  `- sidebarContent: array of section names that appear in the sidebar (e.g. ["Skills", "Education", "Languages"])\n\n` +
+  `Return ONLY valid JSON matching this exact schema: ${SCHEMA}. No markdown, no explanation.`;
 
 /**
  * Parse raw resume text into structured JSON using Groq AI.
@@ -124,32 +177,8 @@ const SCHEMA = `{
  */
 export async function parseResumeText(text) {
   const messages = [
-    {
-      role: 'system',
-      content:
-        `You are a resume parser. Extract ALL text EXACTLY as written — do NOT summarize, shorten, paraphrase, or omit ANY content. Every word, number, metric must be preserved verbatim.\n\n` +
-        `Rules:\n` +
-        `- Copy professional summary EXACTLY word for word\n` +
-        `- Copy EVERY bullet point EXACTLY as written under each job\n` +
-        `- If a job has a tech stack line, include it as the first bullet\n` +
-        `- Extract ALL skills with the same category groupings as in the resume\n` +
-        `- Extract ALL education entries with GPA, achievements, and any notes\n` +
-        `- Extract ALL projects with their full descriptions\n` +
-        `- Extract ALL certifications\n` +
-        `- Do NOT combine, merge, or summarize anything\n` +
-        `- Preserve exact dates, numbers, percentages, company names\n` +
-        `- CRITICAL: Do not leave anything out\n\n` +
-        `Also analyze the apparent visual style and populate styleMetadata: ` +
-        `fontFamily must be one of: serif, sans-serif, monospace. ` +
-        `layout must be one of: single-column, two-column. ` +
-        `headerStyle must be one of: simple, centered, bold-header, dark-header. ` +
-        `colorScheme must be one of: minimal, blue-accent, dark, colorful. ` +
-        `Return ONLY valid JSON matching this exact schema: ${SCHEMA}. No markdown, no explanation.`,
-    },
-    {
-      role: 'user',
-      content: `Parse this resume:\n\n${text}`,
-    },
+    { role: 'system', content: SYSTEM_PROMPT },
+    { role: 'user',   content: `Parse this resume:\n\n${text}` },
   ];
 
   let raw = stripFences(await callGroq(messages, 4096));
@@ -258,5 +287,6 @@ export async function applyInterviewAnswers(resumeData, answers) {
     skills:         validated.skills.length         > 0 ? validated.skills         : (resumeData.skills         || []),
     projects:       validated.projects.length       > 0 ? validated.projects       : (resumeData.projects       || []),
     certifications: validated.certifications.length > 0 ? validated.certifications : (resumeData.certifications || []),
+    languages:      validated.languages.length      > 0 ? validated.languages      : (resumeData.languages      || []),
   };
 }

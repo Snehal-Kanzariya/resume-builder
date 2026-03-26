@@ -1,6 +1,7 @@
 import { useResume } from '../../context/ResumeContext';
 import { fmtDate, dateRange } from '../../utils/dateFormat';
 import CustomSections from './CustomSections';
+import LanguagesSection from './LanguagesSection';
 
 // ── Compact: 2-col sidebar for skills+edu+certs, main col for exp+projects ────
 
@@ -10,7 +11,7 @@ function SideLabel({ title, accent }) {
       fontSize: 7.5, fontWeight: 800, letterSpacing: 2.5,
       textTransform: 'uppercase', color: accent,
       borderBottom: `1.5px solid ${accent}`,
-      paddingBottom: 3, marginBottom: 8,
+      paddingBottom: 3, marginBottom: 6,
     }}>
       {title}
     </p>
@@ -19,7 +20,7 @@ function SideLabel({ title, accent }) {
 
 function MainLabel({ title, accent }) {
   return (
-    <div className="resume-section-header" style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 8 }}>
+    <div className="resume-section-header" style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 6 }}>
       <span style={{ fontSize: 7.5, fontWeight: 800, letterSpacing: 2.5, textTransform: 'uppercase', color: accent, whiteSpace: 'nowrap' }}>
         {title}
       </span>
@@ -41,7 +42,7 @@ export default function CompactTemplate() {
     <div style={{ fontFamily: "'DM Sans', sans-serif", display: 'flex', flexDirection: 'column', lineHeight: 1.4 }}>
 
       {/* ── HEADER (full width, compact) ─────────────────────────────────────── */}
-      <div style={{ padding: '18px 20px 12px', borderBottom: `2.5px solid ${accent}`, backgroundColor: '#fff' }}>
+      <div style={{ padding: '14px 18px 10px', borderBottom: `2.5px solid ${accent}`, backgroundColor: '#fff' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
           <div>
             <h1 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', letterSpacing: -0.5, lineHeight: 1.1, marginBottom: 2 }}>
@@ -57,7 +58,7 @@ export default function CompactTemplate() {
           </div>
         </div>
         {p.summary && (
-          <p style={{ fontSize: 9, lineHeight: 1.65, color: '#475569', marginTop: 8 }}>{p.summary}</p>
+          <p style={{ fontSize: 9, lineHeight: 1.65, color: '#475569', marginTop: 6 }}>{p.summary}</p>
         )}
       </div>
 
@@ -66,9 +67,9 @@ export default function CompactTemplate() {
 
         {/* LEFT SIDEBAR — 32% */}
         <div style={{
-          width: '32%', padding: '14px 14px', flexShrink: 0,
+          width: '32%', padding: '10px 12px', flexShrink: 0,
           borderRight: '1px solid #e2e8f0', display: 'flex',
-          flexDirection: 'column', gap: 14,
+          flexDirection: 'column', gap: 10,
           backgroundColor: '#f8fafc',
         }}>
 
@@ -76,7 +77,7 @@ export default function CompactTemplate() {
             <div className="resume-section">
               <SideLabel title="Skills" accent={accent} />
               {skills.map(cat => (
-                <div key={cat.id} style={{ marginBottom: 7 }}>
+                <div key={cat.id} style={{ marginBottom: 5 }}>
                   {cat.category && (
                     <p style={{ fontSize: 7.5, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 3 }}>
                       {cat.category}
@@ -102,7 +103,7 @@ export default function CompactTemplate() {
             <div className="resume-section">
               <SideLabel title="Education" accent={accent} />
               {education.map(edu => (
-                <div key={edu.id} style={{ marginBottom: 9 }}>
+                <div key={edu.id} style={{ marginBottom: 7 }}>
                   <p style={{ fontSize: 9.5, fontWeight: 700, color: '#0f172a', lineHeight: 1.3 }}>{edu.school}</p>
                   <p style={{ fontSize: 8.5, color: '#475569', marginTop: 1 }}>
                     {[edu.degree, edu.field].filter(Boolean).join(' in ')}
@@ -119,11 +120,13 @@ export default function CompactTemplate() {
             </div>
           )}
 
+          <LanguagesSection accentColor={accent} />
+
           {certifications.length > 0 && (
             <div className="resume-section">
               <SideLabel title="Certifications" accent={accent} />
               {certifications.map(cert => (
-                <div key={cert.id} style={{ marginBottom: 7 }}>
+                <div key={cert.id} style={{ marginBottom: 5 }}>
                   <p style={{ fontSize: 9, fontWeight: 600, color: '#0f172a' }}>{cert.name}</p>
                   {cert.issuer && <p style={{ fontSize: 8, color: '#64748b' }}>{cert.issuer}</p>}
                   {cert.date   && <p style={{ fontSize: 7.5, color: '#94a3b8' }}>{fmtDate(cert.date)}</p>}
@@ -134,13 +137,13 @@ export default function CompactTemplate() {
         </div>
 
         {/* RIGHT MAIN — 68% */}
-        <div style={{ flex: 1, padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div style={{ flex: 1, padding: '10px 16px', display: 'flex', flexDirection: 'column', gap: 9 }}>
 
           {experience.length > 0 && (
             <div className="resume-section">
               <MainLabel title="Experience" accent={accent} />
               {experience.map(exp => (
-                <div key={exp.id} className="resume-entry" style={{ marginBottom: 10, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
+                <div key={exp.id} className="resume-entry" style={{ marginBottom: 8, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                     <span style={{ fontSize: 10.5, fontWeight: 700, color: '#0f172a' }}>{exp.position}</span>
                     <span style={{ fontSize: 8, color: '#9ca3af', flexShrink: 0, marginLeft: 6 }}>
@@ -153,7 +156,7 @@ export default function CompactTemplate() {
                   {exp.bullets.filter(b => b.trim()).length > 0 && (
                     <ul style={{ paddingLeft: 12, margin: 0, listStyle: 'disc' }}>
                       {exp.bullets.filter(b => b.trim()).map((b, i) => (
-                        <li key={i} style={{ fontSize: 9, lineHeight: 1.6, color: '#374151', marginBottom: 1 }}>{b}</li>
+                        <li key={i} style={{ fontSize: 9, lineHeight: 1.4, color: '#374151', marginBottom: 0.5 }}>{b}</li>
                       ))}
                     </ul>
                   )}
@@ -167,7 +170,7 @@ export default function CompactTemplate() {
             <div className="resume-section">
               <MainLabel title="Projects" accent={accent} />
               {projects.map(proj => (
-                <div key={proj.id} className="resume-entry" style={{ marginBottom: 8, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
+                <div key={proj.id} className="resume-entry" style={{ marginBottom: 6, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                     <span style={{ fontSize: 10, fontWeight: 700, color: '#0f172a' }}>{proj.name}</span>
                     {proj.liveLink && <span style={{ fontSize: 8, color: accent }}>{proj.liveLink}</span>}

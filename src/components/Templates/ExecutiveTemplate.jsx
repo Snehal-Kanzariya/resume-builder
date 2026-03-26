@@ -1,13 +1,14 @@
 import { useResume } from '../../context/ResumeContext';
 import { fmtDate, dateRange } from '../../utils/dateFormat';
 import CustomSections from './CustomSections';
+import LanguagesSection from './LanguagesSection';
 
 // ── Executive: dark charcoal header, gold accents, single column ──────────────
 
 function Section({ title, accent, children }) {
   return (
-    <div className="resume-section" style={{ marginBottom: 16 }}>
-      <div className="resume-section-header" style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+    <div className="resume-section" style={{ marginBottom: 12 }}>
+      <div className="resume-section-header" style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 7 }}>
         <h2 style={{
           fontSize: 9, fontWeight: 700, letterSpacing: 3.5,
           textTransform: 'uppercase', color: accent,
@@ -39,7 +40,7 @@ export default function ExecutiveTemplate() {
       {/* ── HEADER ──────────────────────────────────────────────────────────── */}
       <div style={{
         backgroundColor: dark, color: '#fff',
-        padding: '32px 40px 24px',
+        padding: '28px 36px 20px',
         borderBottom: `4px solid ${accent}`,
       }}>
         <h1 style={{
@@ -62,10 +63,10 @@ export default function ExecutiveTemplate() {
       </div>
 
       {/* ── BODY ────────────────────────────────────────────────────────────── */}
-      <div style={{ padding: '24px 40px 0', backgroundColor: '#fff' }}>
+      <div style={{ padding: '20px 36px 0', backgroundColor: '#fff' }}>
 
         {p.summary && (
-          <div style={{ marginBottom: 16, borderLeft: `3px solid ${accent}`, paddingLeft: 14 }}>
+          <div style={{ marginBottom: 12, borderLeft: `3px solid ${accent}`, paddingLeft: 12 }}>
             <p style={{ fontSize: 10, lineHeight: 1.8, color: '#374151', fontStyle: 'italic' }}>{p.summary}</p>
           </div>
         )}
@@ -73,20 +74,20 @@ export default function ExecutiveTemplate() {
         {experience.length > 0 && (
           <Section title="Professional Experience" accent={accent}>
             {experience.map(exp => (
-              <div key={exp.id} className="resume-entry" style={{ marginBottom: 12, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
+              <div key={exp.id} className="resume-entry" style={{ marginBottom: 10, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                   <span style={{ fontSize: 11.5, fontWeight: 700, color: dark }}>{exp.position}</span>
                   <span style={{ fontSize: 9, color: '#9ca3af', flexShrink: 0, marginLeft: 8 }}>
                     {dateRange(exp.startDate, exp.endDate, exp.current)}
                   </span>
                 </div>
-                <p style={{ fontSize: 10, color: accent, fontWeight: 600, marginTop: 0, marginBottom: 5 }}>
+                <p style={{ fontSize: 10, color: accent, fontWeight: 600, marginTop: 0, marginBottom: 4 }}>
                   {exp.company}{exp.location ? `  ·  ${exp.location}` : ''}
                 </p>
                 {exp.bullets.filter(b => b.trim()).length > 0 && (
                   <ul style={{ paddingLeft: 16, margin: 0, listStyle: 'none' }}>
                     {exp.bullets.filter(b => b.trim()).map((b, i) => (
-                      <li key={i} style={{ fontSize: 9.5, lineHeight: 1.65, color: '#374151', marginBottom: 2, paddingLeft: 10, position: 'relative' }}>
+                      <li key={i} style={{ fontSize: 9.5, lineHeight: 1.4, color: '#374151', marginBottom: 1, paddingLeft: 10, position: 'relative' }}>
                         <span style={{ position: 'absolute', left: 0, color: accent, fontWeight: 700 }}>›</span>
                         {b}
                       </li>
@@ -102,7 +103,7 @@ export default function ExecutiveTemplate() {
         {education.length > 0 && (
           <Section title="Education" accent={accent}>
             {education.map(edu => (
-              <div key={edu.id} className="resume-entry" style={{ marginBottom: 9, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
+              <div key={edu.id} className="resume-entry" style={{ marginBottom: 7, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                   <span style={{ fontSize: 11, fontWeight: 700, color: dark }}>{edu.school}</span>
                   <span style={{ fontSize: 9, color: '#9ca3af', flexShrink: 0, marginLeft: 8 }}>
@@ -125,7 +126,7 @@ export default function ExecutiveTemplate() {
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
               {skills.flatMap(cat => cat.items).map((item, i) => (
                 <span key={i} style={{
-                  fontSize: 9.5, padding: '3px 10px',
+                  fontSize: 9.5, padding: '2px 8px',
                   border: `1px solid ${accent}40`,
                   borderRadius: 3, color: '#374151',
                   backgroundColor: `${accent}08`,
@@ -136,12 +137,13 @@ export default function ExecutiveTemplate() {
             </div>
           </Section>
         )}
+        <LanguagesSection />
         <CustomSections afterSection="skills" />
 
         {projects.length > 0 && (
           <Section title="Key Projects" accent={accent}>
             {projects.map(proj => (
-              <div key={proj.id} className="resume-entry" style={{ marginBottom: 9, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
+              <div key={proj.id} className="resume-entry" style={{ marginBottom: 7, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                   <span style={{ fontSize: 11, fontWeight: 700, color: dark }}>{proj.name}</span>
                   {proj.liveLink && <span style={{ fontSize: 8.5, color: accent }}>{proj.liveLink}</span>}
@@ -157,7 +159,7 @@ export default function ExecutiveTemplate() {
         {certifications.length > 0 && (
           <Section title="Certifications" accent={accent}>
             {certifications.map(cert => (
-              <div key={cert.id} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
+              <div key={cert.id} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
                 <div>
                   <span style={{ fontSize: 10.5, fontWeight: 700, color: dark }}>{cert.name}</span>
                   {cert.issuer && <span style={{ fontSize: 10, color: '#64748b' }}> · {cert.issuer}</span>}

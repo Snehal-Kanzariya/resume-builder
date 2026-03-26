@@ -1,11 +1,12 @@
 import { useResume } from '../../context/ResumeContext';
 import { fmtDate, dateRange } from '../../utils/dateFormat';
 import CustomSections from './CustomSections';
+import LanguagesSection from './LanguagesSection';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function Divider() {
-  return <div style={{ borderBottom: '0.75px solid #e2e8f0', margin: '13px 0' }} />;
+  return <div style={{ borderBottom: '0.75px solid #e2e8f0', margin: '10px 0' }} />;
 }
 
 function SectionHeader({ title, accent }) {
@@ -13,7 +14,7 @@ function SectionHeader({ title, accent }) {
     <p className="resume-section-header" style={{
       fontSize: 9, fontWeight: 700, letterSpacing: 3,
       textTransform: 'uppercase', color: accent || '#94a3b8',
-      marginBottom: 11,
+      marginBottom: 8,
     }}>
       {title}
     </p>
@@ -35,7 +36,7 @@ export default function MinimalTemplate() {
     <div style={{
       fontFamily: "'DM Sans', sans-serif",
       fontSize: 10.5, color: '#1e293b',
-      padding: '44px 48px 0', lineHeight: 1.5,
+      padding: '38px 42px 0', lineHeight: 1.5,
     }}>
 
       {/* ── HEADER ─────────────────────────────────────────────────────────── */}
@@ -80,7 +81,7 @@ export default function MinimalTemplate() {
         <div className="resume-section">
           <SectionHeader title="Experience" accent={accent} />
           {experience.map((exp, idx) => (
-            <div key={exp.id} className="resume-entry" style={{ marginBottom: idx < experience.length - 1 ? 13 : 0, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
+            <div key={exp.id} className="resume-entry" style={{ marginBottom: idx < experience.length - 1 ? 10 : 0, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                 <span style={{ fontSize: 11, fontWeight: 600, color: '#0f172a' }}>{exp.position}</span>
                 <span style={{ fontSize: 9, color: '#94a3b8' }}>
@@ -93,7 +94,7 @@ export default function MinimalTemplate() {
               {exp.bullets.filter(b => b.trim()).length > 0 && (
                 <ul style={{ paddingLeft: 14, margin: 0, listStyle: 'none' }}>
                   {exp.bullets.filter(b => b.trim()).map((b, i) => (
-                    <li key={i} style={{ fontSize: 9.5, lineHeight: 1.65, color: '#475569', marginBottom: 2, paddingLeft: 10, position: 'relative' }}>
+                    <li key={i} style={{ fontSize: 9.5, lineHeight: 1.4, color: '#475569', marginBottom: 1, paddingLeft: 10, position: 'relative' }}>
                       <span style={{ position: 'absolute', left: 0, color: accent }}>–</span>
                       {b}
                     </li>
@@ -112,7 +113,7 @@ export default function MinimalTemplate() {
         <div className="resume-section">
           <SectionHeader title="Education" accent={accent} />
           {education.map((edu, idx) => (
-            <div key={edu.id} className="resume-entry" style={{ marginBottom: idx < education.length - 1 ? 10 : 0, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
+            <div key={edu.id} className="resume-entry" style={{ marginBottom: idx < education.length - 1 ? 7 : 0, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                 <span style={{ fontSize: 11, fontWeight: 600, color: '#0f172a' }}>{edu.school}</span>
                 <span style={{ fontSize: 9, color: '#94a3b8' }}>
@@ -137,7 +138,7 @@ export default function MinimalTemplate() {
       {skills.length > 0 && (
         <div className="resume-section">
           <SectionHeader title="Skills" accent={accent} />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 3, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
             {skills.map(cat => (
               <div key={cat.id} style={{ display: 'flex', gap: 10 }}>
                 {cat.category && (
@@ -154,6 +155,7 @@ export default function MinimalTemplate() {
           <Divider />
         </div>
       )}
+      <LanguagesSection />
       <CustomSections afterSection="skills" />
 
       {/* ── PROJECTS ───────────────────────────────────────────────────────── */}
@@ -161,7 +163,7 @@ export default function MinimalTemplate() {
         <div className="resume-section">
           <SectionHeader title="Projects" accent={accent} />
           {projects.map((proj, idx) => (
-            <div key={proj.id} className="resume-entry" style={{ marginBottom: idx < projects.length - 1 ? 11 : 0, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
+            <div key={proj.id} className="resume-entry" style={{ marginBottom: idx < projects.length - 1 ? 8 : 0, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                 <span style={{ fontSize: 10.5, fontWeight: 600, color: '#0f172a' }}>{proj.name}</span>
                 {proj.liveLink && (
@@ -186,7 +188,7 @@ export default function MinimalTemplate() {
         <div className="resume-section">
           <SectionHeader title="Certifications" accent={accent} />
           {certifications.map(cert => (
-            <div key={cert.id} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
+            <div key={cert.id} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
               <div>
                 <span style={{ fontSize: 10, fontWeight: 500 }}>{cert.name}</span>
                 {cert.issuer && (

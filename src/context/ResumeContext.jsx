@@ -21,6 +21,7 @@ const initialResumeData = {
   skills: [],
   projects: [],
   certifications: [],
+  languages: [],
   customSections: [],
 
   settings: {
@@ -44,6 +45,7 @@ export function ResumeProvider({ children }) {
         ...parsed,
         personalInfo: { ...initialResumeData.personalInfo, ...(parsed.personalInfo || {}) },
         settings: { ...initialResumeData.settings, ...(parsed.settings || {}) },
+        languages: parsed.languages || [],
         customSections: parsed.customSections || [],
       };
     } catch {
@@ -58,6 +60,10 @@ export function ResumeProvider({ children }) {
     layout: 'single-column',
     headerStyle: 'simple',
     colorScheme: 'minimal',
+    accentColor: '',
+    hasSidebar: false,
+    sidebarPosition: 'left',
+    sidebarContent: [],
     sectionOrder: ['summary', 'experience', 'education', 'skills', 'projects', 'certifications'],
   });
 
@@ -297,6 +303,37 @@ export function ResumeProvider({ children }) {
     }));
   }, []);
 
+  // ── Languages ────────────────────────────────────────────────────────────────
+  const addLanguage = useCallback(() => {
+    setResumeData(prev => ({
+      ...prev,
+      languages: [
+        ...(prev.languages || []),
+        { id: generateId(), name: '', proficiency: 'Intermediate' },
+      ],
+    }));
+  }, []);
+
+  const removeLanguage = useCallback((id) => {
+    setResumeData(prev => ({
+      ...prev,
+      languages: (prev.languages || []).filter(l => l.id !== id),
+    }));
+  }, []);
+
+  const updateLanguage = useCallback((id, field, value) => {
+    setResumeData(prev => ({
+      ...prev,
+      languages: (prev.languages || []).map(l =>
+        l.id === id ? { ...l, [field]: value } : l
+      ),
+    }));
+  }, []);
+
+  const reorderLanguages = useCallback((from, to) => {
+    setResumeData(prev => ({ ...prev, languages: reorderArray(prev.languages || [], from, to) }));
+  }, []);
+
   // ── Reorder helpers ──────────────────────────────────────────────────────────
   function reorderArray(arr, from, to) {
     const next = [...arr];
@@ -359,6 +396,10 @@ export function ResumeProvider({ children }) {
       layout: 'single-column',
       headerStyle: 'simple',
       colorScheme: 'minimal',
+      accentColor: '',
+      hasSidebar: false,
+      sidebarPosition: 'left',
+      sidebarContent: [],
       sectionOrder: ['summary', 'experience', 'education', 'skills', 'projects', 'certifications'],
     });
     localStorage.removeItem('resumeData');
@@ -464,11 +505,15 @@ export function ResumeProvider({ children }) {
       const meta = parsedData.styleMetadata;
       setUploadedResumeStyle({
         isUploaded: true,
-        fontFamily:  ['serif', 'sans-serif', 'monospace'].includes(meta.fontFamily)  ? meta.fontFamily  : 'sans-serif',
-        layout:      ['single-column', 'two-column'].includes(meta.layout)           ? meta.layout      : 'single-column',
-        headerStyle: ['simple', 'bold-header', 'dark-header', 'centered'].includes(meta.headerStyle) ? meta.headerStyle : 'simple',
-        colorScheme: ['minimal', 'blue-accent', 'dark', 'colorful'].includes(meta.colorScheme)       ? meta.colorScheme : 'minimal',
-        sectionOrder: Array.isArray(meta.sectionOrder) ? meta.sectionOrder
+        fontFamily:      ['serif', 'sans-serif', 'monospace'].includes(meta.fontFamily) ? meta.fontFamily : 'sans-serif',
+        layout:          ['single-column', 'two-column'].includes(meta.layout) ? meta.layout : 'single-column',
+        headerStyle:     ['simple', 'bold-header', 'dark-header', 'centered'].includes(meta.headerStyle) ? meta.headerStyle : 'simple',
+        colorScheme:     ['minimal', 'blue-accent', 'dark', 'colorful'].includes(meta.colorScheme) ? meta.colorScheme : 'minimal',
+        accentColor:     typeof meta.accentColor === 'string' ? meta.accentColor : '',
+        hasSidebar:      Boolean(meta.hasSidebar),
+        sidebarPosition: meta.sidebarPosition === 'right' ? 'right' : 'left',
+        sidebarContent:  Array.isArray(meta.sidebarContent) ? meta.sidebarContent : [],
+        sectionOrder:    Array.isArray(meta.sectionOrder) ? meta.sectionOrder
           : ['summary', 'experience', 'education', 'skills', 'projects', 'certifications'],
       });
     }
@@ -532,7 +577,45 @@ export function ResumeProvider({ children }) {
           date:   c.date   || '',
           link:   c.link   || '',
         })),
-        customSections: prev?.customSections || [],
+        languages: (() => {
+          const existing = prev?.languages || [];
+          const parsed   = parsedData?.languages || [];
+          if (existing.length > 0) return existing;
+          return parsed.map(l => ({
+            id:          l.id          || generateId(),
+            name:        l.name        || '',
+            proficiency: ['Native', 'Fluent', 'Advanced', 'Intermediate', 'Basic'].includes(l.proficiency)
+              ? l.proficiency : 'Intermediate',
+          }));
+        })(),
+        customSections: (() => {
+          // Keep existing custom sections; convert parser customSections only when builder has none
+          const existing = prev?.customSections || [];
+          if (existing.length > 0) return existing;
+          const parserSections = parsedData?.customSections || [];
+          return parserSections
+            .filter(s => s.title && Array.isArray(s.entries) && s.entries.length > 0)
+            .map(s => {
+              // Flatten entries into bullet strings: "heading (subheading): description"
+              const items = s.entries.flatMap(e => {
+                const parts = [];
+                if (e.heading) {
+                  parts.push(e.subheading ? `${e.heading} (${e.subheading})` : e.heading);
+                }
+                if (e.description) parts.push(e.description);
+                if (Array.isArray(e.bullets)) parts.push(...e.bullets.filter(Boolean));
+                return parts.filter(Boolean);
+              });
+              return {
+                id:           generateId(),
+                title:        s.title,
+                type:         'bullets',
+                content:      '',
+                items:        items.length ? items : [''],
+                afterSection: 'certifications',
+              };
+            });
+        })(),
         settings: {
           ...(prev?.settings || initialResumeData.settings),
           // Auto-switch to Original template when upload includes style metadata
@@ -555,6 +638,7 @@ export function ResumeProvider({ children }) {
       skills:         (data.skills         || []).map(s => ({ ...s, id: s.id || generateId() })),
       projects:       (data.projects       || []).map(p => ({ ...p, id: p.id || generateId() })),
       certifications: (data.certifications || []).map(c => ({ ...c, id: c.id || generateId() })),
+      languages:      (data.languages      || []).map(l => ({ ...l, id: l.id || generateId() })),
     }));
   }, []);
 
@@ -592,6 +676,12 @@ export function ResumeProvider({ children }) {
     addCertification,
     removeCertification,
     updateCertification,
+
+    // Languages
+    addLanguage,
+    removeLanguage,
+    updateLanguage,
+    reorderLanguages,
 
     // Settings
     updateSettings,

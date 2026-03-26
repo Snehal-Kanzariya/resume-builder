@@ -31,7 +31,7 @@ export default function CustomSections({
   if (!visible.length) return null;
 
   return visible.map(section => (
-    <div key={section.id} style={{ marginBottom: 15, ...wrapperStyle }}>
+    <div key={section.id} className="resume-section" style={{ marginBottom: 15, ...wrapperStyle }}>
 
       {/* Section title */}
       <div style={{
